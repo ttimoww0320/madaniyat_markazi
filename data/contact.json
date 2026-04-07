@@ -1,0 +1,19 @@
+{
+  "address": "г. Ташкент, ул. Навои, 25",
+  "landmark": "Ориентир: станция метро Навои",
+  "phones": [
+    { "label": "Приёмная", "number": "+998711234567" },
+    { "label": "Касса",    "number": "+998711234568" }
+  ],
+  "email": "info@domkultura.uz",
+  "hours": {
+    "weekdays": "Пн–Пт: 09:00 – 20:00",
+    "weekends": "Сб–Вс: 10:00 – 18:00"
+  },
+  "socials": [
+    { "name": "Telegram",  "url": "#" },
+    { "name": "Instagram", "url": "#" },
+    { "name": "Facebook",  "url": "#" },
+    { "name": "YouTube",   "url": "#" }
+  ]
+}

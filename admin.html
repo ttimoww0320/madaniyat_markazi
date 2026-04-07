@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка — Дом культуры</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f4f4f8;
+            color: #1a1a1a;
+        }
+
+        /* ===== LOGIN ===== */
+        #login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 48px 40px;
+            width: 360px;
+            box-shadow: 0 8px 32px rgba(0,0,0,.1);
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, #534AB7, #7F77DD);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .login-box h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+        .login-box p  { color: #666; font-size: 14px; margin-bottom: 28px; }
+
+        .login-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            font-size: 15px;
+            margin-bottom: 12px;
+            transition: border-color .2s;
+        }
+        .login-input:focus { outline: none; border-color: #534AB7; }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #534AB7;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background .2s;
+        }
+        .login-btn:hover { background: #4339a0; }
+
+        .login-error {
+            color: #e53e3e;
+            font-size: 13px;
+            margin-top: 10px;
+            min-height: 18px;
+        }
+
+        /* ===== ADMIN PANEL ===== */
+        #admin-panel { display: none; min-height: 100vh; }
+
+        .admin-header {
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            position: sticky; top: 0; z-index: 100;
+        }
+
+        .admin-logo { display: flex; align-items: center; gap: 12px; }
+        .admin-logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #534AB7, #7F77DD);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .admin-logo-text { font-weight: 600; font-size: 18px; }
+        .admin-logo-sub  { font-size: 12px; color: #888; margin-left: 4px; }
+
+        .logout-btn {
+            padding: 8px 18px;
+            background: #f4f4f8;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: border-color .2s;
+        }
+        .logout-btn:hover { border-color: #534AB7; color: #534AB7; }
+
+        /* ===== TABS ===== */
+        .admin-tabs {
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 0 32px;
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 16px 20px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: color .2s, border-color .2s;
+        }
+        .tab-btn:hover  { color: #534AB7; }
+        .tab-btn.active { color: #534AB7; border-bottom-color: #534AB7; }
+
+        /* ===== CONTENT ===== */
+        .admin-content { padding: 32px; max-width: 900px; margin: 0 auto; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ===== CARDS / ITEMS ===== */
+        .section-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .section-card h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-row {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .item-row.cols-2 { grid-template-columns: 1fr 1fr; }
+        .item-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .item-row.cols-4 { grid-template-columns: 1fr 1fr 1fr auto; }
+
+        .field-group { display: flex; flex-direction: column; gap: 5px; }
+
+        .field-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        .field-input, .field-select, .field-textarea {
+            padding: 10px 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #fff;
+            transition: border-color .2s;
+        }
+        .field-input:focus, .field-select:focus, .field-textarea:focus {
+            outline: none;
+            border-color: #534AB7;
+        }
+        .field-textarea { resize: vertical; min-height: 80px; }
+
+        .delete-btn {
+            align-self: center;
+            width: 36px; height: 36px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: #888;
+            font-size: 18px;
+            transition: border-color .2s, color .2s;
+            flex-shrink: 0;
+        }
+        .delete-btn:hover { border-color: #e53e3e; color: #e53e3e; }
+
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            background: #f4f4f8;
+            border: 1.5px dashed #ccc;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: border-color .2s, color .2s;
+        }
+        .add-btn:hover { border-color: #534AB7; color: #534AB7; }
+
+        /* ===== SAVE BUTTON ===== */
+        .save-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .save-btn {
+            padding: 12px 32px;
+            background: #534AB7;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background .2s;
+        }
+        .save-btn:hover    { background: #4339a0; }
+        .save-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+        .save-status { font-size: 14px; min-height: 20px; }
+        .save-status.ok  { color: #1D9E75; }
+        .save-status.err { color: #e53e3e; }
+
+        /* ===== DIVIDER ===== */
+        .subsection-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #534AB7;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin: 20px 0 12px;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #e5e5e5;
+            margin: 20px 0;
+        }
+
+        /* ===== CROP MODAL ===== */
+        #crop-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.75);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .crop-box {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 780px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .crop-box h3 { color: #fff; font-size: 18px; font-weight: 600; }
+        .crop-box p  { color: #aaa; font-size: 13px; margin-top: 4px; }
+
+        .crop-canvas-wrap {
+            position: relative;
+            line-height: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            max-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        #crop-canvas {
+            max-width: 100%;
+            max-height: 60vh;
+            display: block;
+            touch-action: none;
+        }
+
+        .crop-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .crop-cancel {
+            padding: 12px 24px;
+            background: transparent;
+            border: 1px solid #555;
+            border-radius: 10px;
+            color: #ccc;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .crop-cancel:hover { border-color: #aaa; }
+
+        .crop-confirm {
+            padding: 12px 28px;
+            background: #534AB7;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .crop-confirm:hover { background: #4339a0; }
+
+        @media (max-width: 600px) {
+            .admin-content { padding: 16px; }
+            .item-row.cols-2,
+            .item-row.cols-3,
+            .item-row.cols-4 { grid-template-columns: 1fr; }
+            .admin-header { padding: 0 16px; }
+            .admin-tabs   { padding: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== ЭКРАН ВХОДА ===== -->
+<div id="login-screen">
+    <div class="login-box">
+        <div class="login-logo">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="#fff" stroke-width="1.5"/>
+                <path d="M12 22V12M2 7l10 5 10-5" stroke="#fff" stroke-width="1.5"/>
+            </svg>
+        </div>
+        <h1>Админка</h1>
+        <p>Введите пароль для входа</p>
+        <input type="password" id="pwd-input" class="login-input"
+               placeholder="Пароль" onkeydown="if(event.key==='Enter') doLogin()">
+        <button class="login-btn" onclick="doLogin()">Войти</button>
+        <p class="login-error" id="login-error"></p>
+    </div>
+</div>
+
+<!-- ===== ПАНЕЛЬ АДМИНИСТРАТОРА ===== -->
+<div id="admin-panel">
+
+    <header class="admin-header">
+        <div class="admin-logo">
+            <div class="admin-logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="#fff" stroke-width="1.5"/>
+                </svg>
+            </div>
+            <span class="admin-logo-text">Дом культуры</span>
+            <span class="admin-logo-sub">— админка</span>
+        </div>
+        <button class="logout-btn" onclick="doLogout()">Выйти</button>
+    </header>
+
+    <nav class="admin-tabs">
+        <button class="tab-btn active" onclick="showTab('events',this)">📅 Афиша</button>
+        <button class="tab-btn"        onclick="showTab('circles',this)">🎨 Кружки</button>
+        <button class="tab-btn"        onclick="showTab('team',this)">👥 Команда</button>
+        <button class="tab-btn"        onclick="showTab('documents',this)">📄 Документы</button>
+        <button class="tab-btn"        onclick="showTab('site',this)">🏠 Сайт</button>
+        <button class="tab-btn"        onclick="showTab('gallery',this)">🖼 Галерея</button>
+        <button class="tab-btn"        onclick="showTab('contact',this)">📞 Контакты</button>
+    </nav>
+
+    <div class="admin-content">
+
+        <!-- ===== АФИША ===== -->
+        <div id="tab-events" class="tab-panel active">
+            <div class="section-card">
+                <h2>📅 Ближайшие события</h2>
+                <div id="events-list"></div>
+                <button class="add-btn" onclick="addEvent()">+ Добавить событие</button>
+                <hr class="divider">
+                <div class="save-bar">
+                    <button class="save-btn" onclick="saveSection('events', collectEvents)">Сохранить</button>
+                    <span class="save-status" id="events-status"></span>
+                </div>
+            </div>
+            <div class="section-card">
+                <h2>🖼 Фон секции «Афиша»</h2>
+                <div id="bg-field-events"></div>
+                <div class="save-bar" style="margin-top:12px">
+                    <button class="save-btn" id="bg-save-btn-events" onclick="saveSectionBg('events')">Сохранить фон</button>
+                    <span class="save-status" id="bg-status-events"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== КРУЖКИ ===== -->
+        <div id="tab-circles" class="tab-panel">
+            <div class="section-card">
+                <h2>🎨 Кружки и секции</h2>
+                <div id="circles-list"></div>
+                <button class="add-btn" onclick="addCircle()">+ Добавить кружок</button>
+                <hr class="divider">
+                <div class="save-bar">
+                    <button class="save-btn" onclick="saveSection('circles', collectCircles)">Сохранить</button>
+                    <span class="save-status" id="circles-status"></span>
+                </div>
+            </div>
+            <div class="section-card">
+                <h2>🖼 Фон секции «Кружки»</h2>
+                <div id="bg-field-circles"></div>
+                <div class="save-bar" style="margin-top:12px">
+                    <button class="save-btn" id="bg-save-btn-circles" onclick="saveSectionBg('circles')">Сохранить фон</button>
+                    <span class="save-status" id="bg-status-circles"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== КОМАНДА ===== -->
+        <div id="tab-team" class="tab-panel">
+            <!-- Директор -->
+            <div class="section-card">
+                <h2>🏛 Директор</h2>
+                <div class="item-row cols-2">
+                    <div class="field-group">
+                        <label class="field-label">ФИО</label>
+                        <input class="field-input" id="dir-name">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Должность / звание</label>
+                        <input class="field-input" id="dir-title">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Телефон</label>
+                        <input class="field-input" id="dir-phone">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Email</label>
+                        <input class="field-input" id="dir-email">
+                    </div>
+                    <div class="field-group" style="grid-column:1/-1">
+                        <label class="field-label">Приёмные часы (каждая строка — отдельное время)</label>
+                        <textarea class="field-textarea" id="dir-hours"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Заместители -->
+            <div class="section-card">
+                <h2>👔 Заместители</h2>
+                <div id="deputies-list"></div>
+                <button class="add-btn" onclick="addDeputy()">+ Добавить заместителя</button>
+            </div>
+
+            <!-- Сотрудники -->
+            <div class="section-card">
+                <h2>👤 Сотрудники</h2>
+                <div id="staff-list"></div>
+                <button class="add-btn" onclick="addStaff()">+ Добавить сотрудника</button>
+                <hr class="divider">
+                <div class="save-bar">
+                    <button class="save-btn" onclick="saveSection('team', collectTeam)">Сохранить всё</button>
+                    <span class="save-status" id="team-status"></span>
+                </div>
+            </div>
+            <div class="section-card">
+                <h2>🖼 Фон секции «Команда»</h2>
+                <div id="bg-field-team"></div>
+                <div class="save-bar" style="margin-top:12px">
+                    <button class="save-btn" id="bg-save-btn-team" onclick="saveSectionBg('team')">Сохранить фон</button>
+                    <span class="save-status" id="bg-status-team"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ДОКУМЕНТЫ ===== -->
+        <div id="tab-documents" class="tab-panel">
+            <div class="section-card">
+                <h2>📄 Основные документы</h2>
+                <div id="docs-main-list"></div>
+                <button class="add-btn" onclick="addDocMain()">+ Добавить документ</button>
+            </div>
+            <div class="section-card">
+                <h2>📎 Дополнительные документы</h2>
+                <div id="docs-small-list"></div>
+                <button class="add-btn" onclick="addDocSmall()">+ Добавить документ</button>
+                <hr class="divider">
+                <div class="save-bar">
+                    <button class="save-btn" onclick="saveSection('documents', collectDocuments)">Сохранить</button>
+                    <span class="save-status" id="documents-status"></span>
+                </div>
+            </div>
+            <div class="section-card">
+                <h2>🖼 Фон секции «Документы»</h2>
+                <div id="bg-field-documents"></div>
+                <div class="save-bar" style="margin-top:12px">
+                    <button class="save-btn" id="bg-save-btn-documents" onclick="saveSectionBg('documents')">Сохранить фон</button>
+                    <span class="save-status" id="bg-status-documents"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ГАЛЕРЕЯ ===== -->
+        <div id="tab-gallery" class="tab-panel">
+            <div class="section-card">
+                <h2>🖼 Элементы галереи</h2>
+                <div id="gallery-list"></div>
+                <button class="add-btn" onclick="addGalleryItem()">+ Добавить элемент</button>
+                <hr class="divider">
+                <div class="save-bar">
+                    <button class="save-btn" onclick="saveSection('gallery', collectGallery)">Сохранить</button>
+                    <span class="save-status" id="gallery-status"></span>
+                </div>
+            </div>
+            <div class="section-card">
+                <h2>🖼 Фон секции «Галерея»</h2>
+                <div id="bg-field-gallery"></div>
+                <div class="save-bar" style="margin-top:12px">
+                    <button class="save-btn" id="bg-save-btn-gallery" onclick="saveSectionBg('gallery')">Сохранить фон</button>
+                    <span class="save-status" id="bg-status-gallery"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== КОНТАКТЫ ===== -->
+        <div id="tab-contact" class="tab-panel">
+            <div class="section-card">
+                <h2>📍 Адрес</h2>
+                <div class="item-row cols-2">
+                    <div class="field-group">
+                        <label class="field-label">Адрес</label>
+                        <input class="field-input" id="con-address">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Ориентир</label>
+                        <input class="field-input" id="con-landmark">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h2>📞 Телефоны</h2>
+                <div id="phones-list"></div>
+                <button class="add-btn" onclick="addPhone()">+ Добавить телефон</button>
+            </div>
+
+            <div class="section-card">
+                <h2>✉️ Email и режим работы</h2>
+                <div class="item-row cols-2">
+                    <div class="field-group">
+                        <label class="field-label">Email</label>
+                        <input class="field-input" id="con-email">
+                    </div>
+                </div>
+                <div class="item-row cols-2" style="margin-top:8px">
+                    <div class="field-group">
+                        <label class="field-label">Пн–Пт</label>
+                        <input class="field-input" id="con-weekdays">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Сб–Вс</label>
+                        <input class="field-input" id="con-weekends">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h2>🌐 Социальные сети</h2>
+                <div id="socials-list"></div>
+                <button class="add-btn" onclick="addSocial()">+ Добавить соцсеть</button>
+                <hr class="divider">
+                <div class="save-bar">
+                    <button class="save-btn" onclick="saveSection('contact', collectContact)">Сохранить</button>
+                    <span class="save-status" id="contact-status"></span>
+                </div>
+            </div>
+            <div class="section-card">
+                <h2>🖼 Фон секции «Контакты»</h2>
+                <div id="bg-field-contact"></div>
+                <div class="save-bar" style="margin-top:12px">
+                    <button class="save-btn" id="bg-save-btn-contact" onclick="saveSectionBg('contact')">Сохранить фон</button>
+                    <span class="save-status" id="bg-status-contact"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== САЙТ ===== -->
+        <div id="tab-site" class="tab-panel">
+            <div class="section-card">
+                <h2>🖼 Общий фон сайта</h2>
+                <p style="font-size:13px;color:#666;margin-bottom:12px;">Применяется ко всем секциям. Если у секции есть свой фон — он имеет приоритет.</p>
+                <div id="site-global-bg-field"></div>
+            </div>
+            <div class="section-card">
+                <h2>🏠 Шапка сайта</h2>
+                <div class="item-row cols-2">
+                    <div class="field-group">
+                        <label class="field-label">Название (логотип)</label>
+                        <input class="field-input" id="site-logo-text">
+                    </div>
+                </div>
+            </div>
+            <div class="section-card">
+                <h2>🎯 Главный баннер</h2>
+                <div class="item-row cols-2">
+                    <div class="field-group">
+                        <label class="field-label">Заголовок</label>
+                        <input class="field-input" id="site-hero-title">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Подзаголовок</label>
+                        <input class="field-input" id="site-hero-subtitle">
+                    </div>
+                </div>
+                <div class="item-row cols-2" style="margin-top:8px">
+                    <div class="field-group">
+                        <label class="field-label">Кнопка 1 — текст</label>
+                        <input class="field-input" id="site-btn1-text">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Кнопка 1 — ссылка</label>
+                        <input class="field-input" id="site-btn1-href">
+                    </div>
+                </div>
+                <div class="item-row cols-2" style="margin-top:8px">
+                    <div class="field-group">
+                        <label class="field-label">Кнопка 2 — текст</label>
+                        <input class="field-input" id="site-btn2-text">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Кнопка 2 — ссылка</label>
+                        <input class="field-input" id="site-btn2-href">
+                    </div>
+                </div>
+            </div>
+            <div class="section-card">
+                <h2>📋 Подвал сайта</h2>
+                <div class="item-row cols-2">
+                    <div class="field-group">
+                        <label class="field-label">Название (логотип)</label>
+                        <input class="field-input" id="site-footer-logo">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Копирайт</label>
+                        <input class="field-input" id="site-footer-copy">
+                    </div>
+                </div>
+                <hr class="divider">
+                <div class="save-bar">
+                    <button class="save-btn" id="site-save-btn" onclick="saveSite()">Сохранить</button>
+                    <span class="save-status" id="site-status"></span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== КРОП МОДАЛКА ===== -->
+<div id="crop-modal">
+    <div class="crop-box">
+        <div>
+            <h3>✂️ Выберите область фото</h3>
+            <p>Перетащите рамку чтобы переместить · Потяните за угол чтобы изменить размер</p>
+        </div>
+        <div class="crop-canvas-wrap">
+            <canvas id="crop-canvas"></canvas>
+        </div>
+        <div class="crop-footer">
+            <button class="crop-cancel" onclick="cancelCrop()">Отмена</button>
+            <button class="crop-confirm" onclick="confirmCrop()">✓ Вырезать и загрузить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// =====================================================
+// CROP TOOL
+// =====================================================
+let _cropCallback = null;
+let _cropImg      = null;
+let _cropCanvas   = null;
+let _cropCtx      = null;
+let _cropSel      = { x: 0, y: 0, w: 0, h: 0 };
+let _cropDrag     = null; // { type, startX, startY, startSel }
+
+function showCropModal(file, callback) {
+    _cropCallback = callback;
+    const reader = new FileReader();
+    reader.onload = e => {
+        _cropImg = new Image();
+        _cropImg.onload = () => {
+            document.getElementById('crop-modal').style.display = 'flex';
+            _initCrop();
+        };
+        _cropImg.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function _initCrop() {
+    _cropCanvas = document.getElementById('crop-canvas');
+    _cropCtx    = _cropCanvas.getContext('2d');
+
+    // Масштабируем под экран
+    const maxW = 720, maxH = window.innerHeight * 0.55;
+    const scale = Math.min(maxW / _cropImg.width, maxH / _cropImg.height, 1);
+    _cropCanvas.width  = Math.round(_cropImg.width  * scale);
+    _cropCanvas.height = Math.round(_cropImg.height * scale);
+
+    // Начальное выделение — центральные 80%
+    const m = 0.1;
+    _cropSel = {
+        x: _cropCanvas.width  * m,
+        y: _cropCanvas.height * m,
+        w: _cropCanvas.width  * (1 - 2 * m),
+        h: _cropCanvas.height * (1 - 2 * m),
+    };
+
+    _cropDrag = null;
+    _drawCrop();
+
+    // Events — мышь
+    _cropCanvas.onmousedown  = _cropDown;
+    _cropCanvas.onmousemove  = _cropMove;
+    _cropCanvas.onmouseup    = _cropUp;
+    _cropCanvas.onmouseleave = _cropUp;
+
+    // Events — касание (телефон/планшет)
+    _cropCanvas.ontouchstart  = e => { e.preventDefault(); _cropDown(_touch2mouse(e)); };
+    _cropCanvas.ontouchmove   = e => { e.preventDefault(); _cropMove(_touch2mouse(e)); };
+    _cropCanvas.ontouchend    = _cropUp;
+}
+
+function _touch2mouse(e) {
+    const t = e.touches[0];
+    return { clientX: t.clientX, clientY: t.clientY, preventDefault: () => {} };
+}
+
+function _drawCrop() {
+    const c = _cropCanvas, ctx = _cropCtx, s = _cropSel;
+    ctx.clearRect(0, 0, c.width, c.height);
+
+    // Оригинальное фото
+    ctx.drawImage(_cropImg, 0, 0, c.width, c.height);
+
+    // Тёмная маска вокруг выделения
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.fillRect(0,       0,       c.width, s.y);               // top
+    ctx.fillRect(0,       s.y+s.h, c.width, c.height-s.y-s.h); // bottom
+    ctx.fillRect(0,       s.y,     s.x,     s.h);               // left
+    ctx.fillRect(s.x+s.w, s.y,     c.width-s.x-s.w, s.h);      // right
+
+    // Сетка правила третей
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.lineWidth = 1;
+    for (let i = 1; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(s.x + s.w*i/3, s.y);           ctx.lineTo(s.x + s.w*i/3, s.y+s.h);
+        ctx.moveTo(s.x,            s.y + s.h*i/3); ctx.lineTo(s.x+s.w,       s.y + s.h*i/3);
+        ctx.stroke();
+    }
+
+    // Рамка выделения
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(s.x, s.y, s.w, s.h);
+
+    // Угловые ручки
+    _cropHandles().forEach(h => {
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(h.x, h.y, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#534AB7';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+}
+
+function _cropHandles() {
+    const { x, y, w, h } = _cropSel;
+    return [
+        { x, y,     t: 'nw' }, { x: x+w, y,     t: 'ne' },
+        { x, y: y+h, t: 'sw' }, { x: x+w, y: y+h, t: 'se' },
+    ];
+}
+
+function _getHit(mx, my) {
+    for (const h of _cropHandles()) {
+        if (Math.hypot(mx - h.x, my - h.y) <= 10) return h.t;
+    }
+    const { x, y, w, h } = _cropSel;
+    if (mx >= x && mx <= x+w && my >= y && my <= y+h) return 'move';
+    return null;
+}
+
+function _pos(e) {
+    const r = _cropCanvas.getBoundingClientRect();
+    return {
+        x: (e.clientX - r.left) * (_cropCanvas.width  / r.width),
+        y: (e.clientY - r.top)  * (_cropCanvas.height / r.height),
+    };
+}
+
+function _cropDown(e) {
+    const { x, y } = _pos(e);
+    const hit = _getHit(x, y);
+    if (hit) {
+        _cropDrag = { type: hit, sx: x, sy: y, sel: { ..._cropSel } };
+        e.preventDefault && e.preventDefault();
+    }
+}
+
+function _cropMove(e) {
+    const { x, y } = _pos(e);
+    if (!_cropDrag) {
+        const hit = _getHit(x, y);
+        _cropCanvas.style.cursor = hit === 'move' ? 'move'
+            : (hit ? 'nwse-resize' : 'default');
+        return;
+    }
+    const dx = x - _cropDrag.sx, dy = y - _cropDrag.sy;
+    const s = _cropDrag.sel, C = _cropCanvas, MIN = 40;
+
+    if (_cropDrag.type === 'move') {
+        _cropSel.x = Math.max(0, Math.min(C.width  - s.w, s.x + dx));
+        _cropSel.y = Math.max(0, Math.min(C.height - s.h, s.y + dy));
+    } else {
+        let { x: nx, y: ny, w: nw, h: nh } = s;
+        if (_cropDrag.type.includes('e')) nw = Math.max(MIN, Math.min(C.width  - nx, s.w + dx));
+        if (_cropDrag.type.includes('s')) nh = Math.max(MIN, Math.min(C.height - ny, s.h + dy));
+        if (_cropDrag.type.includes('w')) {
+            const newX = Math.max(0, Math.min(s.x + s.w - MIN, s.x + dx));
+            nw = s.x + s.w - newX; nx = newX;
+        }
+        if (_cropDrag.type.includes('n')) {
+            const newY = Math.max(0, Math.min(s.y + s.h - MIN, s.y + dy));
+            nh = s.y + s.h - newY; ny = newY;
+        }
+        _cropSel = { x: nx, y: ny, w: nw, h: nh };
+    }
+    _drawCrop();
+}
+
+function _cropUp() { _cropDrag = null; }
+
+function confirmCrop() {
+    const s = _cropSel;
+    const scaleX = _cropImg.width  / _cropCanvas.width;
+    const scaleY = _cropImg.height / _cropCanvas.height;
+
+    const out = document.createElement('canvas');
+    out.width  = Math.round(s.w * scaleX);
+    out.height = Math.round(s.h * scaleY);
+    out.getContext('2d').drawImage(
+        _cropImg,
+        s.x * scaleX, s.y * scaleY, s.w * scaleX, s.h * scaleY,
+        0, 0, out.width, out.height
+    );
+
+    out.toBlob(blob => {
+        document.getElementById('crop-modal').style.display = 'none';
+        if (_cropCallback) _cropCallback(blob);
+        _cropCallback = null;
+    }, 'image/jpeg', 0.93);
+}
+
+function cancelCrop() {
+    document.getElementById('crop-modal').style.display = 'none';
+    _cropCallback = null;
+}
+
+// =====================================================
+// AUTH
+// =====================================================
+let PASSWORD = '';
+
+function doLogin() {
+    const val = document.getElementById('pwd-input').value.trim();
+    if (!val) return;
+
+    const errEl = document.getElementById('login-error');
+    errEl.textContent = 'Проверка...';
+
+    fetch('/api/auth', {
+        headers: { 'Authorization': `Bearer ${val}` }
+    })
+        .then(r => {
+            if (r.ok) {
+                PASSWORD = val;
+                sessionStorage.setItem('admin_pwd', val);
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                loadAllSections();
+            } else if (r.status === 401) {
+                errEl.textContent = 'Неверный пароль';
+            } else {
+                errEl.textContent = 'Ошибка сервера: ' + r.status;
+            }
+        })
+        .catch(() => {
+            errEl.textContent = 'Сервер недоступен. Запущен ли npm start?';
+        });
+}
+
+function doLogout() {
+    sessionStorage.removeItem('admin_pwd');
+    PASSWORD = '';
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('login-error').textContent = '';
+}
+
+// Автовход если пароль сохранён в сессии
+window.addEventListener('DOMContentLoaded', () => {
+    const saved = sessionStorage.getItem('admin_pwd');
+    if (saved) { document.getElementById('pwd-input').value = saved; doLogin(); }
+});
+
+// =====================================================
+// TABS
+// =====================================================
+function showTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${name}`).classList.add('active');
+    btn.classList.add('active');
+}
+
+// =====================================================
+// API
+// =====================================================
+async function apiGet(section) {
+    const r = await fetch(`/api/${section}`);
+    if (!r.ok) throw new Error(`GET /api/${section} → ${r.status}`);
+    return r.json();
+}
+
+async function apiPost(section, data) {
+    const r = await fetch(`/api/${section}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${PASSWORD}` },
+        body: JSON.stringify(data)
+    });
+    if (!r.ok) throw new Error(`Ошибка сохранения: ${r.status}`);
+    return r.json();
+}
+
+async function saveSection(section, collector) {
+    const btn    = document.getElementById(`${section}-save-btn`) || document.querySelector(`#tab-${section} .save-btn`);
+    const status = document.getElementById(`${section}-status`);
+    btn.disabled = true;
+    status.textContent = 'Сохранение...';
+    status.className = 'save-status';
+    try {
+        const data = collector();
+        await apiPost(section, data);
+        status.textContent = '✓ Сохранено';
+        status.className = 'save-status ok';
+    } catch(e) {
+        status.textContent = '✗ ' + e.message;
+        status.className = 'save-status err';
+    } finally {
+        btn.disabled = false;
+        setTimeout(() => { status.textContent = ''; status.className = 'save-status'; }, 3000);
+    }
+}
+
+async function saveWithStatus(btnId, statusId, fn) {
+    const btn    = document.getElementById(btnId);
+    const status = document.getElementById(statusId);
+    if (btn) btn.disabled = true;
+    if (status) { status.textContent = 'Сохранение...'; status.className = 'save-status'; }
+    try {
+        await fn();
+        if (status) { status.textContent = '✓ Сохранено'; status.className = 'save-status ok'; }
+    } catch(e) {
+        if (status) { status.textContent = '✗ Ошибка'; status.className = 'save-status err'; }
+    } finally {
+        if (btn) btn.disabled = false;
+        setTimeout(() => { if (status) { status.textContent = ''; status.className = 'save-status'; } }, 3000);
+    }
+}
+
+// =====================================================
+// HELPERS
+// =====================================================
+function el(tag, attrs = {}, ...children) {
+    const e = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => {
+        if (k === 'class') e.className = v;
+        else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+        else e.setAttribute(k, v);
+    });
+    children.forEach(c => e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c));
+    return e;
+}
+
+function fieldGroup(label, input) {
+    const g = document.createElement('div');
+    g.className = 'field-group';
+    const l = document.createElement('label');
+    l.className = 'field-label';
+    l.textContent = label;
+    g.appendChild(l);
+    g.appendChild(input);
+    return g;
+}
+
+function input(value = '', placeholder = '') {
+    const i = document.createElement('input');
+    i.className = 'field-input';
+    i.value = value;
+    i.placeholder = placeholder;
+    return i;
+}
+
+function select(options, value) {
+    const s = document.createElement('select');
+    s.className = 'field-select';
+    options.forEach(([val, label]) => {
+        const o = document.createElement('option');
+        o.value = val; o.textContent = label;
+        if (val === value) o.selected = true;
+        s.appendChild(o);
+    });
+    return s;
+}
+
+function deleteBtn(onClick) {
+    const b = document.createElement('button');
+    b.className = 'delete-btn';
+    b.type = 'button';
+    b.textContent = '×';
+    b.onclick = onClick;
+    return b;
+}
+
+// =====================================================
+// EVENTS
+// =====================================================
+function renderEventItem(ev) {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.style.gridTemplateColumns = '1fr';
+
+    // Верхняя строка: поля
+    const fields = document.createElement('div');
+    fields.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;';
+
+    const dateIn   = input(ev.date, '12 апреля');
+    const titleIn  = input(ev.title, 'Название события');
+    const placeIn  = input(ev.place, 'Зал');
+    const timeIn   = input(ev.time, '18:00');
+    const colorSel = select([['blue','🔵 Синий'],['yellow','🟡 Жёлтый'],['green','🟢 Зелёный']], ev.color);
+
+    fields.appendChild(fieldGroup('Дата', dateIn));
+    fields.appendChild(fieldGroup('Название', titleIn));
+    fields.appendChild(fieldGroup('Место', placeIn));
+    fields.appendChild(fieldGroup('Время', timeIn));
+
+    // Нижняя строка: цвет + загрузка фото + удалить
+    const bottom = document.createElement('div');
+    bottom.style.cssText = 'display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;';
+
+    // Цвет
+    const colorGroup = fieldGroup('Цвет', colorSel);
+    colorGroup.style.minWidth = '140px';
+
+    // Загрузка фото
+    let imageUrl = ev.image || '';
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+
+    const preview = document.createElement('img');
+    preview.style.cssText = 'width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #e5e5e5;display:' + (imageUrl ? 'block' : 'none');
+    if (imageUrl) preview.src = imageUrl;
+
+    const uploadBtn = document.createElement('button');
+    uploadBtn.type = 'button';
+    uploadBtn.textContent = imageUrl ? '🖼 Заменить фото' : '📷 Загрузить фото';
+    uploadBtn.style.cssText = 'padding:10px 16px;background:#f4f4f8;border:1px solid #e5e5e5;border-radius:8px;font-size:13px;cursor:pointer;white-space:nowrap;';
+    uploadBtn.onmouseenter = () => uploadBtn.style.borderColor = '#534AB7';
+    uploadBtn.onmouseleave = () => uploadBtn.style.borderColor = '#e5e5e5';
+
+    const removeImgBtn = document.createElement('button');
+    removeImgBtn.type = 'button';
+    removeImgBtn.textContent = '✕ Убрать фото';
+    removeImgBtn.style.cssText = 'padding:10px 12px;background:#fff;border:1px solid #e5e5e5;border-radius:8px;font-size:13px;cursor:pointer;color:#e53e3e;display:' + (imageUrl ? 'block' : 'none');
+
+    uploadBtn.onclick = () => fileInput.click();
+    removeImgBtn.onclick = () => {
+        imageUrl = '';
+        preview.style.display = 'none';
+        preview.src = '';
+        removeImgBtn.style.display = 'none';
+        uploadBtn.textContent = '📷 Загрузить фото';
+    };
+
+    fileInput.onchange = () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        // Сначала показываем кроп, потом загружаем обрезанное фото
+        showCropModal(file, async (croppedBlob) => {
+            uploadBtn.textContent = 'Загрузка...';
+            uploadBtn.disabled = true;
+            try {
+                const fname = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+                const r = await fetch(`/api/upload?name=${fname}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${PASSWORD}` },
+                    body: croppedBlob
+                });
+                const json = await r.json();
+                if (json.url) {
+                    imageUrl = json.url;
+                    preview.src = imageUrl;
+                    preview.style.display = 'block';
+                    removeImgBtn.style.display = 'block';
+                    uploadBtn.textContent = '🖼 Заменить фото';
+                }
+            } catch(e) {
+                alert('Ошибка загрузки: ' + e.message);
+                uploadBtn.textContent = '📷 Загрузить фото';
+            }
+            uploadBtn.disabled = false;
+            fileInput.value = '';
+        });
+    };
+
+    const uploadGroup = document.createElement('div');
+    uploadGroup.className = 'field-group';
+    const uploadLabel = document.createElement('label');
+    uploadLabel.className = 'field-label';
+    uploadLabel.textContent = 'Фото';
+    const uploadControls = document.createElement('div');
+    uploadControls.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
+    uploadControls.appendChild(fileInput);
+    uploadControls.appendChild(uploadBtn);
+    uploadControls.appendChild(removeImgBtn);
+    uploadControls.appendChild(preview);
+    uploadGroup.appendChild(uploadLabel);
+    uploadGroup.appendChild(uploadControls);
+
+    // Кнопка удалить
+    const delGroup = document.createElement('div');
+    delGroup.className = 'field-group';
+    const delLabel = document.createElement('label');
+    delLabel.className = 'field-label';
+    delLabel.textContent = '\u00a0';
+    delGroup.appendChild(delLabel);
+    delGroup.appendChild(deleteBtn(() => row.remove()));
+
+    bottom.appendChild(colorGroup);
+    bottom.appendChild(uploadGroup);
+    bottom.appendChild(delGroup);
+
+    row.appendChild(fields);
+    row.appendChild(bottom);
+
+    row._getData = () => ({
+        id: ev.id || Date.now(),
+        date: dateIn.value, color: colorSel.value,
+        title: titleIn.value, place: placeIn.value,
+        time: timeIn.value, image: imageUrl
+    });
+
+    return row;
+}
+
+function addEvent() {
+    document.getElementById('events-list').appendChild(
+        renderEventItem({ id: Date.now(), date: '', color: 'blue', title: '', place: '', time: '' })
+    );
+}
+
+function collectEvents() {
+    return [...document.getElementById('events-list').children].map(r => r._getData());
+}
+
+// =====================================================
+// CIRCLES
+// =====================================================
+function renderCircleItem(c) {
+    const row = document.createElement('div');
+    row.className = 'item-row cols-4';
+
+    const titleIn = input(c.title, 'Название кружка');
+    const ageIn   = input(c.age, '6–14 лет');
+    const colorSel = select([
+        ['purple','🟣 Фиолетовый'],['green','🟢 Зелёный'],
+        ['yellow','🟡 Жёлтый'],['pink','🩷 Розовый']
+    ], c.color);
+
+    const delWrapper = document.createElement('div');
+    delWrapper.className = 'field-group';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label'; lbl.textContent = '\u00a0';
+    delWrapper.appendChild(lbl);
+    delWrapper.appendChild(deleteBtn(() => row.remove()));
+
+    row.appendChild(fieldGroup('Название', titleIn));
+    row.appendChild(fieldGroup('Возраст', ageIn));
+    row.appendChild(fieldGroup('Цвет', colorSel));
+    row.appendChild(delWrapper);
+
+    row._getData = () => ({ id: c.id || Date.now(), title: titleIn.value, age: ageIn.value, color: colorSel.value });
+    return row;
+}
+
+function addCircle() {
+    document.getElementById('circles-list').appendChild(
+        renderCircleItem({ id: Date.now(), title: '', age: '', color: 'purple' })
+    );
+}
+
+function collectCircles() {
+    return [...document.getElementById('circles-list').children].map(r => r._getData());
+}
+
+// =====================================================
+// TEAM
+// =====================================================
+function renderDeputyItem(d) {
+    const row = document.createElement('div');
+    row.className = 'item-row cols-3';
+
+    const nameIn  = input(d.name, 'ФИО');
+    const roleIn  = input(d.role, 'Должность');
+    const deptIn  = input(d.department, 'Отдел');
+    const phoneIn = input(d.phone, '+998...');
+    const emailIn = input(d.email, 'email@...');
+    const colorSel = select([['green','🟢 Зелёный'],['blue','🔵 Синий'],['yellow','🟡 Жёлтый']], d.color);
+
+    const delWrapper = document.createElement('div');
+    delWrapper.className = 'field-group';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label'; lbl.textContent = '\u00a0';
+    delWrapper.appendChild(lbl);
+    delWrapper.appendChild(deleteBtn(() => row.remove()));
+
+    row.appendChild(fieldGroup('ФИО', nameIn));
+    row.appendChild(fieldGroup('Должность', roleIn));
+    row.appendChild(fieldGroup('Отдел', deptIn));
+    row.appendChild(fieldGroup('Телефон', phoneIn));
+    row.appendChild(fieldGroup('Email', emailIn));
+    row.appendChild(fieldGroup('Цвет', colorSel));
+    row.appendChild(delWrapper);
+
+    row._getData = () => ({ id: d.id || Date.now(), name: nameIn.value, role: roleIn.value, department: deptIn.value, color: colorSel.value, phone: phoneIn.value, email: emailIn.value });
+    return row;
+}
+
+function addDeputy() {
+    document.getElementById('deputies-list').appendChild(
+        renderDeputyItem({ id: Date.now(), name: '', role: 'Заместитель директора', department: '', color: 'green', phone: '', email: '' })
+    );
+}
+
+function renderStaffItem(s) {
+    const row = document.createElement('div');
+    row.className = 'item-row cols-4';
+
+    const nameIn  = input(s.name, 'Фамилия И.О.');
+    const roleIn  = input(s.role, 'Должность');
+    const phoneIn = input(s.phone, '+998...');
+
+    const delWrapper = document.createElement('div');
+    delWrapper.className = 'field-group';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label'; lbl.textContent = '\u00a0';
+    delWrapper.appendChild(lbl);
+    delWrapper.appendChild(deleteBtn(() => row.remove()));
+
+    row.appendChild(fieldGroup('ФИО', nameIn));
+    row.appendChild(fieldGroup('Должность', roleIn));
+    row.appendChild(fieldGroup('Телефон', phoneIn));
+    row.appendChild(delWrapper);
+
+    row._getData = () => ({ id: s.id || Date.now(), name: nameIn.value, role: roleIn.value, phone: phoneIn.value });
+    return row;
+}
+
+function addStaff() {
+    document.getElementById('staff-list').appendChild(
+        renderStaffItem({ id: Date.now(), name: '', role: '', phone: '' })
+    );
+}
+
+function collectTeam() {
+    return {
+        director: {
+            name:  document.getElementById('dir-name').value,
+            title: document.getElementById('dir-title').value,
+            phone: document.getElementById('dir-phone').value,
+            email: document.getElementById('dir-email').value,
+            hours: document.getElementById('dir-hours').value.split('\n').map(s => s.trim()).filter(Boolean)
+        },
+        deputies: [...document.getElementById('deputies-list').children].map(r => r._getData()),
+        staff:    [...document.getElementById('staff-list').children].map(r => r._getData())
+    };
+}
+
+// =====================================================
+// SITE
+// =====================================================
+let _siteData = {};
+
+function bgUploadField(labelText, currentUrl, onUploaded) {
+    let url = currentUrl || '';
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+
+    const preview = document.createElement('div');
+    preview.style.cssText = 'width:100%;height:80px;border-radius:8px;background:#f0f0f0;margin-top:6px;overflow:hidden;position:relative;';
+    if (url) {
+        preview.style.backgroundImage = `url('${url}')`;
+        preview.style.backgroundSize  = 'cover';
+        preview.style.backgroundPosition = 'center';
+    }
+
+    const status = document.createElement('span');
+    status.style.cssText = 'font-size:12px;color:#555;margin-left:8px;';
+    status.textContent = url ? '✓ Фото загружено' : 'Фото не выбрано';
+
+    const uploadBtn = document.createElement('button');
+    uploadBtn.type = 'button';
+    uploadBtn.className = 'add-btn';
+    uploadBtn.style.marginTop = '0';
+    uploadBtn.textContent = url ? '↻ Заменить' : '↑ Загрузить фото';
+    uploadBtn.onclick = () => fileInput.click();
+
+    const clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.className = 'delete-btn';
+    clearBtn.style.cssText = 'margin-left:6px;margin-top:0;';
+    clearBtn.textContent = '✕ Убрать';
+    clearBtn.onclick = () => {
+        url = '';
+        preview.style.backgroundImage = '';
+        preview.style.background = '#f0f0f0';
+        status.textContent = 'Фото не выбрано';
+        uploadBtn.textContent = '↑ Загрузить фото';
+        onUploaded('');
+    };
+
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        showCropModal(file, async (croppedBlob) => {
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '...';
+            try {
+                const fname = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+                const res = await fetch(`/api/upload?name=${fname}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${PASSWORD}` },
+                    body: croppedBlob
+                });
+                const json = await res.json();
+                url = json.url;
+                preview.style.backgroundImage    = `url('${url}')`;
+                preview.style.backgroundSize     = 'cover';
+                preview.style.backgroundPosition = 'center';
+                status.textContent = `✓ ${file.name}`;
+                uploadBtn.textContent = '↻ Заменить';
+                onUploaded(url);
+            } catch(e) {
+                status.textContent = '✗ Ошибка загрузки';
+            }
+            uploadBtn.disabled = false;
+        });
+    });
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'field-group';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label'; lbl.textContent = labelText;
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;align-items:center;gap:4px;flex-wrap:wrap;';
+    btnRow.appendChild(uploadBtn);
+    btnRow.appendChild(clearBtn);
+    btnRow.appendChild(status);
+    btnRow.appendChild(fileInput);
+    wrapper.appendChild(lbl);
+    wrapper.appendChild(btnRow);
+    wrapper.appendChild(preview);
+    wrapper._getUrl = () => url;
+    return wrapper;
+}
+
+function saveSite() {
+    saveWithStatus('site-save-btn', 'site-status', () => {
+        const data = {
+            header:  { logoText: document.getElementById('site-logo-text').value },
+            hero: {
+                title:    document.getElementById('site-hero-title').value,
+                subtitle: document.getElementById('site-hero-subtitle').value,
+                btn1Text: document.getElementById('site-btn1-text').value,
+                btn1Href: document.getElementById('site-btn1-href').value,
+                btn2Text: document.getElementById('site-btn2-text').value,
+                btn2Href: document.getElementById('site-btn2-href').value,
+            },
+            footer: {
+                logoText:  document.getElementById('site-footer-logo').value,
+                copyright: document.getElementById('site-footer-copy').value,
+            },
+            globalBg:    _siteData.globalBg    || '',
+            backgrounds: _siteData.backgrounds || {}
+        };
+        return apiPost('site', data);
+    });
+}
+
+function saveSectionBg(key) {
+    saveWithStatus(`bg-save-btn-${key}`, `bg-status-${key}`, () => {
+        _siteData.backgrounds = _siteData.backgrounds || {};
+        return apiPost('site', _siteData);
+    });
+}
+
+// =====================================================
+// DOCUMENTS
+// =====================================================
+function docUploadField(initialFile, initialSize, onUploaded) {
+    let fileUrl  = initialFile || '';
+    let fileSize = initialSize || '';
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf,.doc,.docx,.xls,.xlsx,.png,.jpg';
+    fileInput.style.display = 'none';
+
+    const fileStatus = document.createElement('span');
+    fileStatus.style.cssText = 'font-size:12px;color:#555;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    fileStatus.textContent = fileUrl ? '✓ Файл загружен' : 'Файл не выбран';
+
+    const uploadBtn = document.createElement('button');
+    uploadBtn.type = 'button';
+    uploadBtn.className = 'add-btn';
+    uploadBtn.style.marginTop = '0';
+    uploadBtn.textContent = fileUrl ? '↻ Заменить' : '↑ Загрузить';
+
+    uploadBtn.onclick = () => fileInput.click();
+
+    fileInput.addEventListener('change', async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        const bytes = file.size;
+        const ext   = file.name.split('.').pop().toUpperCase();
+        if (bytes < 1024 * 1024) {
+            fileSize = `${ext} • ${Math.round(bytes / 1024)} KB`;
+        } else {
+            fileSize = `${ext} • ${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        }
+        fileStatus.textContent = 'Загрузка...';
+        uploadBtn.disabled = true;
+        try {
+            const safeName = Date.now() + '_' + file.name;
+            const res  = await fetch(`/api/upload?name=${encodeURIComponent(safeName)}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${PASSWORD}` },
+                body: file
+            });
+            const json = await res.json();
+            fileUrl = json.url;
+            fileStatus.textContent = `✓ ${file.name}`;
+            uploadBtn.textContent = '↻ Заменить';
+            onUploaded(fileUrl, fileSize);
+        } catch(e) {
+            fileStatus.textContent = '✗ Ошибка загрузки';
+        }
+        uploadBtn.disabled = false;
+    });
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'field-group';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label';
+    lbl.textContent = 'Файл';
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;';
+    row.appendChild(uploadBtn);
+    row.appendChild(fileStatus);
+    row.appendChild(fileInput);
+    wrapper.appendChild(lbl);
+    wrapper.appendChild(row);
+
+    wrapper._getFile = () => fileUrl;
+    wrapper._getSize = () => fileSize;
+    return wrapper;
+}
+
+function renderDocMainItem(doc) {
+    const row = document.createElement('div');
+    row.className = 'item-row cols-3';
+
+    const titleIn  = input(doc.title, 'Название документа');
+    const descIn   = input(doc.description || '', 'Описание');
+    const colorSel = select([['red','🔴 Красный'],['green','🟢 Зелёный'],['blue','🔵 Синий'],['yellow','🟡 Жёлтый']], doc.color);
+
+    const fileField = docUploadField(doc.file, doc.size, () => {});
+
+    const delWrapper = document.createElement('div');
+    delWrapper.className = 'field-group';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label'; lbl.textContent = '\u00a0';
+    delWrapper.appendChild(lbl);
+    delWrapper.appendChild(deleteBtn(() => row.remove()));
+
+    row.appendChild(fieldGroup('Название', titleIn));
+    row.appendChild(fieldGroup('Описание', descIn));
+    row.appendChild(fieldGroup('Цвет', colorSel));
+    row.appendChild(fileField);
+    row.appendChild(delWrapper);
+
+    row._getData = () => ({
+        id: doc.id || Date.now(),
+        title: titleIn.value,
+        description: descIn.value,
+        size: fileField._getSize() || doc.size,
+        color: colorSel.value,
+        file: fileField._getFile()
+    });
+    return row;
+}
+
+function addDocMain() {
+    document.getElementById('docs-main-list').appendChild(
+        renderDocMainItem({ id: Date.now(), title: '', description: '', size: '', color: 'blue', file: '' })
+    );
+}
+
+function renderDocSmallItem(doc) {
+    const row = document.createElement('div');
+    row.className = 'item-row cols-4';
+
+    const titleIn  = input(doc.title, 'Название документа');
+    const fileField = docUploadField(doc.file, doc.size, () => {});
+
+    const delWrapper = document.createElement('div');
+    delWrapper.className = 'field-group';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label'; lbl.textContent = '\u00a0';
+    delWrapper.appendChild(lbl);
+    delWrapper.appendChild(deleteBtn(() => row.remove()));
+
+    row.appendChild(fieldGroup('Название', titleIn));
+    row.appendChild(fileField);
+    row.appendChild(delWrapper);
+
+    row._getData = () => ({
+        id: doc.id || Date.now(),
+        title: titleIn.value,
+        size: fileField._getSize() || doc.size,
+        file: fileField._getFile()
+    });
+    return row;
+}
+
+function addDocSmall() {
+    document.getElementById('docs-small-list').appendChild(
+        renderDocSmallItem({ id: Date.now(), title: '', size: '', file: '' })
+    );
+}
+
+function collectDocuments() {
+    return {
+        main:  [...document.getElementById('docs-main-list').children].map(r => r._getData()),
+        small: [...document.getElementById('docs-small-list').children].map(r => r._getData())
+    };
+}
+
+// =====================================================
+// GALLERY
+// =====================================================
+function renderGalleryItem(item) {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.style.flexWrap = 'wrap';
+
+    const altIn = input(item.alt || '', 'Название альбома / описание');
+
+    const largeLabel = document.createElement('label');
+    largeLabel.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;';
+    const largeCheck = document.createElement('input');
+    largeCheck.type = 'checkbox';
+    largeCheck.checked = !!item.large;
+    largeCheck.style.accentColor = '#534AB7';
+    largeLabel.appendChild(largeCheck);
+    largeLabel.appendChild(document.createTextNode('Большая карточка'));
+    const largeWrapper = document.createElement('div');
+    largeWrapper.className = 'field-group';
+    const lbl2 = document.createElement('label');
+    lbl2.className = 'field-label'; lbl2.textContent = 'Размер';
+    largeWrapper.appendChild(lbl2);
+    largeWrapper.appendChild(largeLabel);
+
+    const delWrapper = document.createElement('div');
+    delWrapper.className = 'field-group';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label'; lbl.textContent = '\u00a0';
+    delWrapper.appendChild(lbl);
+    delWrapper.appendChild(deleteBtn(() => row.remove()));
+
+    // Photos
+    let photos = [...(item.photos || [])];
+    const photosWrap = document.createElement('div');
+    photosWrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px;';
+
+    function renderThumbs() {
+        photosWrap.innerHTML = '';
+        photos.forEach((url, i) => {
+            const thumb = document.createElement('div');
+            thumb.style.cssText = 'position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;flex-shrink:0;';
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+            const rm = document.createElement('button');
+            rm.type = 'button'; rm.textContent = '✕';
+            rm.style.cssText = 'position:absolute;top:3px;right:3px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:4px;width:20px;height:20px;font-size:11px;cursor:pointer;padding:0;line-height:1;';
+            rm.onclick = () => { photos.splice(i, 1); renderThumbs(); };
+            thumb.appendChild(img);
+            thumb.appendChild(rm);
+            photosWrap.appendChild(thumb);
+        });
+
+        const fileIn = document.createElement('input');
+        fileIn.type = 'file'; fileIn.accept = 'image/*'; fileIn.style.display = 'none';
+
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button'; addBtn.className = 'add-btn';
+        addBtn.style.marginTop = '0'; addBtn.textContent = '+ Фото';
+        addBtn.onclick = () => fileIn.click();
+
+        fileIn.addEventListener('change', async () => {
+            const file = fileIn.files[0];
+            if (!file) return;
+            addBtn.disabled = true; addBtn.textContent = '...';
+            try {
+                const fname = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+                const res = await fetch(`/api/upload?name=${fname}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${PASSWORD}` },
+                    body: file
+                });
+                const json = await res.json();
+                photos.push(json.url);
+                renderThumbs();
+            } catch(e) {
+                alert('Ошибка загрузки фото');
+            }
+            addBtn.disabled = false; addBtn.textContent = '+ Фото';
+        });
+
+        photosWrap.appendChild(addBtn);
+        photosWrap.appendChild(fileIn);
+    }
+
+    renderThumbs();
+
+    const photosField = document.createElement('div');
+    photosField.className = 'field-group';
+    photosField.style.cssText = 'flex-basis:100%;margin-top:4px;';
+    const photosLbl = document.createElement('label');
+    photosLbl.className = 'field-label'; photosLbl.textContent = 'Фотографии';
+    photosField.appendChild(photosLbl);
+    photosField.appendChild(photosWrap);
+
+    row.appendChild(fieldGroup('Название', altIn));
+    row.appendChild(largeWrapper);
+    row.appendChild(delWrapper);
+    row.appendChild(photosField);
+
+    row._getData = () => ({ id: item.id || Date.now(), alt: altIn.value, large: largeCheck.checked, photos });
+    return row;
+}
+
+function addGalleryItem() {
+    document.getElementById('gallery-list').appendChild(
+        renderGalleryItem({ id: Date.now(), alt: '', large: false, photos: [] })
+    );
+}
+
+function collectGallery() {
+    return [...document.getElementById('gallery-list').children].map(r => r._getData());
+}
+
+// =====================================================
+// CONTACT
+// =====================================================
+function renderPhoneItem(p) {
+    const row = document.createElement('div');
+    row.className = 'item-row cols-4';
+
+    const numIn   = input(p.number, '+998 71 123-45-67');
+    const labelIn = input(p.label, 'Приёмная');
+
+    const delWrapper = document.createElement('div');
+    delWrapper.className = 'field-group';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label'; lbl.textContent = '\u00a0';
+    delWrapper.appendChild(lbl);
+    delWrapper.appendChild(deleteBtn(() => row.remove()));
+
+    row.appendChild(fieldGroup('Номер', numIn));
+    row.appendChild(fieldGroup('Подпись', labelIn));
+    row.appendChild(delWrapper);
+
+    row._getData = () => ({ number: numIn.value, label: labelIn.value });
+    return row;
+}
+
+function addPhone() {
+    document.getElementById('phones-list').appendChild(renderPhoneItem({ number: '', label: '' }));
+}
+
+function renderSocialItem(s) {
+    const row = document.createElement('div');
+    row.className = 'item-row cols-4';
+
+    const nameIn = input(s.name, 'Telegram');
+    const urlIn  = input(s.url, 'https://...');
+
+    const delWrapper = document.createElement('div');
+    delWrapper.className = 'field-group';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label'; lbl.textContent = '\u00a0';
+    delWrapper.appendChild(lbl);
+    delWrapper.appendChild(deleteBtn(() => row.remove()));
+
+    row.appendChild(fieldGroup('Название', nameIn));
+    row.appendChild(fieldGroup('Ссылка', urlIn));
+    row.appendChild(delWrapper);
+
+    row._getData = () => ({ name: nameIn.value, url: urlIn.value });
+    return row;
+}
+
+function addSocial() {
+    document.getElementById('socials-list').appendChild(renderSocialItem({ name: '', url: '#' }));
+}
+
+function collectContact() {
+    return {
+        address:  document.getElementById('con-address').value,
+        landmark: document.getElementById('con-landmark').value,
+        phones:   [...document.getElementById('phones-list').children].map(r => r._getData()),
+        email:    document.getElementById('con-email').value,
+        hours: {
+            weekdays: document.getElementById('con-weekdays').value,
+            weekends: document.getElementById('con-weekends').value,
+        },
+        socials: [...document.getElementById('socials-list').children].map(r => r._getData()),
+    };
+}
+
+// =====================================================
+// LOAD ALL
+// =====================================================
+async function loadAllSections() {
+    // Events
+    apiGet('events').then(data => {
+        const list = document.getElementById('events-list');
+        list.innerHTML = '';
+        data.forEach(ev => list.appendChild(renderEventItem(ev)));
+    });
+
+    // Circles
+    apiGet('circles').then(data => {
+        const list = document.getElementById('circles-list');
+        list.innerHTML = '';
+        data.forEach(c => list.appendChild(renderCircleItem(c)));
+    });
+
+    // Team
+    apiGet('team').then(data => {
+        document.getElementById('dir-name').value  = data.director.name;
+        document.getElementById('dir-title').value = data.director.title;
+        document.getElementById('dir-phone').value = data.director.phone;
+        document.getElementById('dir-email').value = data.director.email;
+        document.getElementById('dir-hours').value = data.director.hours.join('\n');
+
+        const depList = document.getElementById('deputies-list');
+        depList.innerHTML = '';
+        data.deputies.forEach(d => depList.appendChild(renderDeputyItem(d)));
+
+        const staffList = document.getElementById('staff-list');
+        staffList.innerHTML = '';
+        data.staff.forEach(s => staffList.appendChild(renderStaffItem(s)));
+    });
+
+    // Site
+    apiGet('site').then(data => {
+        _siteData = data;
+        document.getElementById('site-logo-text').value     = data.header?.logoText  || '';
+        document.getElementById('site-hero-title').value    = data.hero?.title       || '';
+        document.getElementById('site-hero-subtitle').value = data.hero?.subtitle    || '';
+        document.getElementById('site-btn1-text').value     = data.hero?.btn1Text    || '';
+        document.getElementById('site-btn1-href').value     = data.hero?.btn1Href    || '';
+        document.getElementById('site-btn2-text').value     = data.hero?.btn2Text    || '';
+        document.getElementById('site-btn2-href').value     = data.hero?.btn2Href    || '';
+        document.getElementById('site-footer-logo').value   = data.footer?.logoText  || '';
+        document.getElementById('site-footer-copy').value     = data.footer?.copyright  || '';
+        // Глобальный фон
+        const globalField = bgUploadField('Фото фона', data.globalBg || '', url => { _siteData.globalBg = url; });
+        document.getElementById('site-global-bg-field').appendChild(globalField);
+
+        // Фоны секций
+        const bgs = data.backgrounds || {};
+        const sectionBgMap = {
+            events: 'Афиша', circles: 'Кружки', team: 'Команда',
+            documents: 'Документы', gallery: 'Галерея', contact: 'Контакты'
+        };
+        Object.entries(sectionBgMap).forEach(([key, label]) => {
+            const field = bgUploadField(`Фото фона (${label})`, bgs[key] || '', url => {
+                _siteData.backgrounds = _siteData.backgrounds || {};
+                _siteData.backgrounds[key] = url;
+            });
+            const container = document.getElementById(`bg-field-${key}`);
+            if (container) container.appendChild(field);
+        });
+    });
+
+    // Documents
+    apiGet('documents').then(data => {
+        const mainList = document.getElementById('docs-main-list');
+        mainList.innerHTML = '';
+        data.main.forEach(d => mainList.appendChild(renderDocMainItem(d)));
+
+        const smallList = document.getElementById('docs-small-list');
+        smallList.innerHTML = '';
+        data.small.forEach(d => smallList.appendChild(renderDocSmallItem(d)));
+    });
+
+    // Gallery
+    apiGet('gallery').then(data => {
+        const list = document.getElementById('gallery-list');
+        list.innerHTML = '';
+        data.forEach(item => list.appendChild(renderGalleryItem(item)));
+    });
+
+    // Contact
+    apiGet('contact').then(data => {
+        document.getElementById('con-address').value  = data.address;
+        document.getElementById('con-landmark').value = data.landmark;
+        document.getElementById('con-email').value    = data.email;
+        document.getElementById('con-weekdays').value = data.hours.weekdays;
+        document.getElementById('con-weekends').value = data.hours.weekends;
+
+        const phoneList = document.getElementById('phones-list');
+        phoneList.innerHTML = '';
+        data.phones.forEach(p => phoneList.appendChild(renderPhoneItem(p)));
+
+        const socialList = document.getElementById('socials-list');
+        socialList.innerHTML = '';
+        data.socials.forEach(s => socialList.appendChild(renderSocialItem(s)));
+    });
+}
+</script>
+</body>
+</html>

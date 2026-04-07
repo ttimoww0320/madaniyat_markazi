@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дом культуры</title>
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Секции: каждый файл записывает свой HTML в window.sectionXxx -->
+    <script src="sections/events.js" defer></script>
+    <script src="sections/circles.js" defer></script>
+    <script src="sections/team.js" defer></script>
+    <script src="sections/documents.js" defer></script>
+    <script src="sections/contact.js" defer></script>
+    <script src="sections/gallery.js" defer></script>
+</head>
+<body>
+
+    <!-- ===== ШАПКА ===== -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="#fff" stroke-width="1.5"/>
+                    <path d="M12 22V12M2 7l10 5 10-5" stroke="#fff" stroke-width="1.5"/>
+                </svg>
+            </div>
+            <span class="logo-text" id="logo-text">Дом культуры</span>
+        </div>
+        <nav class="nav" aria-label="Основная навигация">
+            <a href="#events">Афиша</a>
+            <a href="#circles">Кружки</a>
+            <a href="#team">Команда</a>
+            <a href="#documents">Документы</a>
+            <a href="#gallery">Галерея</a>
+            <a href="#contact">Контакты</a>
+        </nav>
+    </header>
+
+    <main>
+
+    <!-- ===== ГЛАВНЫЙ БАННЕР ===== -->
+    <section class="hero">
+        <h1 id="hero-title">Культура начинается здесь</h1>
+        <p id="hero-subtitle">Мероприятия, кружки и творческие мастерские для всей семьи</p>
+        <div class="hero-buttons">
+            <a id="hero-btn1" href="#events" class="btn-primary">Смотреть афишу</a>
+            <a id="hero-btn2" href="#contact" class="btn-secondary">Записаться</a>
+        </div>
+    </section>
+
+    <!-- ===== КОНТЕЙНЕРЫ ДЛЯ СЕКЦИЙ ===== -->
+    <div id="section-events"></div>
+    <div id="section-circles"></div>
+    <div id="section-team"></div>
+    <div id="section-documents"></div>
+    <div id="section-gallery"></div>
+    <div id="section-contact"></div>
+
+    </main>
+
+    <!-- ===== ПОДВАЛ ===== -->
+    <footer class="footer">
+        <div class="footer-logo">
+            <div class="footer-logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="#fff" stroke-width="1.5"/>
+                </svg>
+            </div>
+            <span class="footer-text" id="footer-logo-text">Дом культуры</span>
+        </div>
+        <p class="footer-copy" id="footer-copyright">© 2026 Все права защищены</p>
+    </footer>
+
+    <script src="js/main.js"></script>
+
+    <!-- ===== ЛАЙТБОКС ===== -->
+    <div id="lightbox" onclick="if(event.target===this)window.closeLightbox()">
+        <button class="lb-close" onclick="window.closeLightbox()" aria-label="Закрыть">✕</button>
+        <button class="lb-arrow lb-prev" id="lb-prev" onclick="window.lbPrev()" aria-label="Назад">&#8592;</button>
+        <div class="lb-img-wrap">
+            <img id="lb-img" src="" alt="">
+        </div>
+        <button class="lb-arrow lb-next" id="lb-next" onclick="window.lbNext()" aria-label="Вперёд">&#8594;</button>
+        <span class="lb-counter" id="lb-counter"></span>
+    </div>
+</body>
+</html>
