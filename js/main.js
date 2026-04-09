@@ -111,7 +111,7 @@ async function loadSite() {
         if (bar) {
             bar.innerHTML = data.stats.map(s =>
                 `<div class="stat-item">
-                    <span class="stat-num" data-target="${s.value}">0</span>
+                    <span class="stat-num" data-target="${s.value}" data-suffix="${s.suffix || ''}">0</span>
                     <span class="stat-label">${s.label}</span>
                 </div>`
             ).join('');

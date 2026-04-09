@@ -772,15 +772,17 @@
 // =====================================================
 // CROP TOOL
 // =====================================================
-let _cropCallback = null;
-let _cropImg      = null;
-let _cropCanvas   = null;
-let _cropCtx      = null;
-let _cropSel      = { x: 0, y: 0, w: 0, h: 0 };
-let _cropDrag     = null; // { type, startX, startY, startSel }
+let _cropCallback    = null;
+let _cropImg         = null;
+let _cropCanvas      = null;
+let _cropCtx         = null;
+let _cropSel         = { x: 0, y: 0, w: 0, h: 0 };
+let _cropDrag        = null;
+let _cropAspectRatio = null; // null = свободно, 1 = квадрат
 
-function showCropModal(file, callback) {
-    _cropCallback = callback;
+function showCropModal(file, callback, aspectRatio = null) {
+    _cropCallback    = callback;
+    _cropAspectRatio = aspectRatio;
     const reader = new FileReader();
     reader.onload = e => {
         _cropImg = new Image();
@@ -803,14 +805,25 @@ function _initCrop() {
     _cropCanvas.width  = Math.round(_cropImg.width  * scale);
     _cropCanvas.height = Math.round(_cropImg.height * scale);
 
-    // Начальное выделение — центральные 80%
-    const m = 0.1;
-    _cropSel = {
-        x: _cropCanvas.width  * m,
-        y: _cropCanvas.height * m,
-        w: _cropCanvas.width  * (1 - 2 * m),
-        h: _cropCanvas.height * (1 - 2 * m),
-    };
+    // Начальное выделение
+    if (_cropAspectRatio === 1) {
+        // Квадрат по центру
+        const side = Math.min(_cropCanvas.width, _cropCanvas.height) * 0.8;
+        _cropSel = {
+            x: (_cropCanvas.width  - side) / 2,
+            y: (_cropCanvas.height - side) / 2,
+            w: side,
+            h: side,
+        };
+    } else {
+        const m = 0.1;
+        _cropSel = {
+            x: _cropCanvas.width  * m,
+            y: _cropCanvas.height * m,
+            w: _cropCanvas.width  * (1 - 2 * m),
+            h: _cropCanvas.height * (1 - 2 * m),
+        };
+    }
 
     _cropDrag = null;
     _drawCrop();
@@ -932,6 +945,11 @@ function _cropMove(e) {
         if (_cropDrag.type.includes('n')) {
             const newY = Math.max(0, Math.min(s.y + s.h - MIN, s.y + dy));
             nh = s.y + s.h - newY; ny = newY;
+        }
+        // Фиксируем квадрат если нужно
+        if (_cropAspectRatio === 1) {
+            const side = Math.min(nw, nh);
+            nw = side; nh = side;
         }
         _cropSel = { x: nx, y: ny, w: nw, h: nh };
     }
@@ -1322,7 +1340,7 @@ function collectCircles() {
 // =====================================================
 let _dirPhoto = null; // makePhotoField instance for the director
 
-function makePhotoField(existingUrl) {
+function makePhotoField(existingUrl, aspectRatio = 1) {
     let imageUrl = existingUrl || '';
 
     const fileInput = document.createElement('input');
@@ -1383,7 +1401,7 @@ function makePhotoField(existingUrl) {
             }
             uploadBtn.disabled = false;
             fileInput.value = '';
-        });
+        }, aspectRatio);
     };
 
     const wrap = document.createElement('div');
@@ -2100,7 +2118,7 @@ function renderNewsItem(n) {
     textIn.value = n.text || '';
     textIn.rows = 3;
     textIn.style.cssText = 'resize:vertical;font-family:inherit;font-size:14px;';
-    const photoField = makePhotoField(n.image || '');
+    const photoField = makePhotoField(n.image || '', null);
 
     const delWrapper = document.createElement('div');
     delWrapper.className = 'field-group';
@@ -2144,7 +2162,7 @@ function renderAchievementItem(a) {
     descIn.value = a.description || '';
     descIn.rows = 2;
     descIn.style.cssText = 'resize:vertical;font-family:inherit;font-size:14px;';
-    const photoField = makePhotoField(a.image || '');
+    const photoField = makePhotoField(a.image || '', null);
 
     const delWrapper = document.createElement('div');
     delWrapper.className = 'field-group';

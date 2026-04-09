@@ -8,7 +8,7 @@ const ROOT           = __dirname;
 const ADMIN_PASSWORD = 'madaniyat_yunusobod';
 
 const TG_TOKEN   = '8214512522:AAH1HzTLfI3WAYrkXRo41BgBAi1SOAxlPEo';
-const TG_CHAT_ID = '617371098';
+const TG_CHAT_ID = '-5259348022';
 
 function sendTelegram(text) {
     return new Promise((resolve, reject) => {

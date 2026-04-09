@@ -274,12 +274,13 @@
             animated = true;
             bar.querySelectorAll('.stat-num').forEach(el => {
                 const target = +el.dataset.target;
+                const suffix = el.dataset.suffix || '';
                 const steps = 1800 / 16;
                 let current = 0;
                 const inc = target / steps;
                 const timer = setInterval(() => {
                     current = Math.min(current + inc, target);
-                    el.textContent = Math.floor(current).toLocaleString('ru');
+                    el.textContent = Math.floor(current).toLocaleString('ru') + (current >= target ? suffix : '');
                     if (current >= target) clearInterval(timer);
                 }, 16);
             });
