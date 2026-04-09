@@ -22,6 +22,7 @@ window.renderCircles = function(data) {
             </div>
             <h3 class="circle-title">${c.title}</h3>
             <p class="circle-age">${c.age}</p>
+            <button class="circle-enroll-btn" onclick="window.openEnroll('${c.title.replace(/'/g,"\\'")}')">Записаться</button>
         </div>`;
         if (i >= 5) {
             return `<div class="circle-extra-item" style="display:none">${card}</div>`;

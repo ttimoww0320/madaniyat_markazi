@@ -132,12 +132,15 @@ window.renderContact = function(data) {
                 <div class="social-links">${socialLinks}</div>
             </div>
 
-            <div class="map-placeholder" role="img" aria-label="Карта местоположения">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="#fff" stroke-width="1.5"/>
-                    <circle cx="12" cy="10" r="3" stroke="#fff" stroke-width="1.5"/>
-                </svg>
-                <p>${data.address}</p>
+            <div class="map-wrap">
+                <iframe
+                    class="map-iframe"
+                    src="https://maps.google.com/maps?q=${encodeURIComponent(data.address)}&output=embed&hl=ru&z=16"
+                    allowfullscreen
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Карта местоположения"
+                ></iframe>
             </div>
         </div>
     </div>

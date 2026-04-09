@@ -16,6 +16,11 @@
 </head>
 <body>
 
+    <!-- ===== БАННЕР ОБЪЯВЛЕНИЙ ===== -->
+    <div class="announce-bar" id="announce-bar">
+        <div class="announce-track" id="announce-track"></div>
+    </div>
+
     <!-- ===== ШАПКА ===== -->
     <header class="header">
         <div class="logo">
@@ -49,6 +54,26 @@
         </div>
     </section>
 
+    <!-- ===== СЧЁТЧИКИ ===== -->
+    <section class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-num" data-target="5000">0</span>
+            <span class="stat-label">посетителей в год</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num" data-target="20">0</span>
+            <span class="stat-label">кружков и секций</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num" data-target="15">0</span>
+            <span class="stat-label">лет работы</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num" data-target="50">0</span>
+            <span class="stat-label">мероприятий в год</span>
+        </div>
+    </section>
+
     <!-- ===== КОНТЕЙНЕРЫ ДЛЯ СЕКЦИЙ ===== -->
     <div id="section-events"></div>
     <div id="section-circles"></div>
@@ -73,6 +98,150 @@
     </footer>
 
     <script src="js/main.js"></script>
+    <script>
+    // ===== ЗАПИСЬ НА КРУЖОК =====
+    let _enrollCircle = '';
+
+    window.openEnroll = function(circleName) {
+        _enrollCircle = circleName;
+        document.getElementById('enroll-circle-label').textContent = '📌 ' + circleName;
+        document.getElementById('enroll-name').value = '';
+        document.getElementById('enroll-phone').value = '';
+        document.getElementById('enroll-child').value = '';
+        document.getElementById('enroll-error').style.display = 'none';
+        document.getElementById('enroll-form-body').style.display = '';
+        document.getElementById('enroll-success').style.display = 'none';
+        document.getElementById('enroll-submit-btn').disabled = false;
+        document.getElementById('enroll-modal').classList.add('open');
+    };
+
+    window.closeEnroll = function() {
+        document.getElementById('enroll-modal').classList.remove('open');
+    };
+
+    window.submitEnroll = async function() {
+        const name  = document.getElementById('enroll-name').value.trim();
+        const phone = document.getElementById('enroll-phone').value.trim();
+        const child = document.getElementById('enroll-child').value.trim();
+        const err   = document.getElementById('enroll-error');
+
+        if (!name || !phone) {
+            err.textContent = 'Пожалуйста, заполните имя и телефон.';
+            err.style.display = 'block';
+            return;
+        }
+        err.style.display = 'none';
+
+        const btn = document.getElementById('enroll-submit-btn');
+        btn.disabled = true;
+        btn.textContent = 'Отправка...';
+
+        const message = `Кружок: ${_enrollCircle}` + (child ? `\nРебёнок: ${child}` : '');
+        try {
+            const r = await fetch('/api/send-message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phone, message, topic: 'circle' })
+            });
+            if (r.ok) {
+                document.getElementById('enroll-form-body').style.display = 'none';
+                document.getElementById('enroll-success').style.display = 'block';
+                setTimeout(window.closeEnroll, 3000);
+            } else {
+                err.textContent = 'Ошибка отправки. Попробуйте ещё раз.';
+                err.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Отправить заявку';
+            }
+        } catch {
+            err.textContent = 'Нет соединения. Проверьте интернет.';
+            err.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Отправить заявку';
+        }
+    };
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') window.closeEnroll();
+    });
+
+    // ===== БАННЕР ОБЪЯВЛЕНИЙ =====
+    (function() {
+        fetch('/api/events').then(r => r.json()).then(events => {
+            const bar = document.getElementById('announce-bar');
+            const track = document.getElementById('announce-track');
+            if (!events || !events.length) { bar.dataset.empty = 'true'; return; }
+
+            const items = events.map(e =>
+                `<span class="announce-item"><span class="announce-dot"></span>${e.date ? e.date + ' — ' : ''}${e.title}</span>`
+            ).join('');
+            // Дублируем для бесшовной анимации
+            track.innerHTML = items + items;
+        }).catch(() => {
+            document.getElementById('announce-bar').dataset.empty = 'true';
+        });
+    })();
+
+    // ===== АНИМАЦИЯ СЧЁТЧИКОВ =====
+    (function() {
+        const nums = document.querySelectorAll('.stat-num');
+        let animated = false;
+
+        function animateCounters() {
+            if (animated) return;
+            animated = true;
+            nums.forEach(el => {
+                const target = +el.dataset.target;
+                const duration = 1800;
+                const step = 16;
+                const steps = duration / step;
+                let current = 0;
+                const inc = target / steps;
+                const timer = setInterval(() => {
+                    current = Math.min(current + inc, target);
+                    el.textContent = Math.floor(current).toLocaleString('ru');
+                    if (current >= target) clearInterval(timer);
+                }, step);
+            });
+        }
+
+        const observer = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) animateCounters();
+        }, { threshold: 0.3 });
+        const bar = document.querySelector('.stats-bar');
+        if (bar) observer.observe(bar);
+    })();
+    </script>
+
+    <!-- ===== МОДАЛ: ЗАПИСЬ НА КРУЖОК ===== -->
+    <div id="enroll-modal" onclick="if(event.target===this)window.closeEnroll()">
+        <div class="enroll-box">
+            <button class="enroll-close" onclick="window.closeEnroll()" aria-label="Закрыть">✕</button>
+            <h3>Записаться на кружок</h3>
+            <p class="enroll-circle-name" id="enroll-circle-label"></p>
+            <div id="enroll-form-body">
+                <div class="enroll-field">
+                    <label>Ваше имя *</label>
+                    <input id="enroll-name" type="text" placeholder="Иванова Мария">
+                </div>
+                <div class="enroll-field">
+                    <label>Телефон *</label>
+                    <input id="enroll-phone" type="tel" placeholder="+998 90 123 45 67">
+                </div>
+                <div class="enroll-field">
+                    <label>Имя ребёнка и возраст</label>
+                    <input id="enroll-child" type="text" placeholder="Алёша, 10 лет">
+                </div>
+                <p id="enroll-error" style="color:#e53e3e;font-size:13px;margin-bottom:10px;display:none"></p>
+                <button class="enroll-submit" id="enroll-submit-btn" onclick="window.submitEnroll()">Отправить заявку</button>
+            </div>
+            <div class="enroll-success" id="enroll-success" style="display:none">
+                <div class="enroll-check">✅</div>
+                <h4>Заявка принята!</h4>
+                <p>Мы свяжемся с вами в ближайшее время.</p>
+            </div>
+        </div>
+    </div>
 
     <!-- ===== ЛАЙТБОКС ===== -->
     <div id="lightbox" onclick="if(event.target===this)window.closeLightbox()">
