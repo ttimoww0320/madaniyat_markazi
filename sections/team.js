@@ -6,6 +6,13 @@ function personSVG(size, stroke) {
     </svg>`;
 }
 
+function photoAvatar(photo, cssClass, fallbackSvg) {
+    if (photo) {
+        return `<div class="avatar ${cssClass}" style="padding:0;overflow:hidden;"><img src="${photo}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"></div>`;
+    }
+    return `<div class="avatar ${cssClass}">${fallbackSvg}</div>`;
+}
+
 const DEPUTY_COLORS = { green: '#0F6E56', blue: '#185FA5', yellow: '#854F0B' };
 
 window.renderTeam = function(data) {
@@ -13,7 +20,7 @@ window.renderTeam = function(data) {
 
     const deputyCards = deputies.map(d => `
         <div class="deputy-card">
-            <div class="avatar md ${d.color}">${personSVG(36, DEPUTY_COLORS[d.color] || '#888')}</div>
+            ${photoAvatar(d.photo, `md ${d.color}`, personSVG(36, DEPUTY_COLORS[d.color] || '#888'))}
             <span class="badge sm ${d.color}">${d.role}</span>
             <h3 class="name-md">${d.name}</h3>
             <p class="title-sm">${d.department}</p>
@@ -24,7 +31,7 @@ window.renderTeam = function(data) {
 
     const staffCards = staff.map(s => `
         <div class="staff-card">
-            <div class="avatar sm">${personSVG(28, '#888')}</div>
+            ${photoAvatar(s.photo, 'sm', personSVG(28, '#888'))}
             <h4 class="name-sm">${s.name}</h4>
             <p class="title-xs">${s.role}</p>
             <a href="tel:${s.phone}" class="phone-sm">${s.phone}</a>
@@ -41,7 +48,7 @@ window.renderTeam = function(data) {
     </div>
 
     <div class="director-card">
-        <div class="avatar lg">${personSVG(56, '#534AB7')}</div>
+        ${photoAvatar(director.photo, 'lg', personSVG(56, '#534AB7'))}
         <span class="badge purple">Директор</span>
         <h3 class="name-lg">${director.name}</h3>
         <p class="title-text">${director.title}</p>
