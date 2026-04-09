@@ -63,7 +63,7 @@ body.has-global-bg .hero {
 }
 
 .section-link {
-    color: #534AB7;
+    color: #1A3C6E;
     font-size: 15px;
 }
 
@@ -76,7 +76,7 @@ span.section-link {
 .section-link-btn {
     background: none;
     border: none;
-    color: #534AB7;
+    color: #1A3C6E;
     font-size: 15px;
     cursor: pointer;
     padding: 0;
@@ -118,16 +118,26 @@ span.section-link {
 /* =============================================
    HEADER
    ============================================= */
+/* Флаг Узбекистана — тонкая полоса сверху */
+.flag-stripe {
+    display: flex;
+    height: 5px;
+    width: 100%;
+}
+.flag-stripe .fs-blue  { flex: 1; background: #1DAEEF; }
+.flag-stripe .fs-white { flex: 1; background: #fff; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+.flag-stripe .fs-green { flex: 1; background: #1EB57E; }
+
 .header {
-    padding: 1rem 2rem;
+    padding: 0.8rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #e5e5e5;
     position: sticky;
     top: 0;
-    background: #fff;
+    background: #1A3C6E;
     z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,.2);
 }
 
 .logo {
@@ -136,34 +146,42 @@ span.section-link {
     gap: 12px;
 }
 
-.logo-icon {
+/* Герб — круглый значок с официальным стилем */
+.logo-emblem {
     width: 44px;
     height: 44px;
-    background: linear-gradient(135deg, #534AB7, #7F77DD);
-    border-radius: 10px;
+    background: #fff;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px #C8A84B;
 }
 
 .logo-text {
-    font-weight: 600;
-    font-size: 20px;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    line-height: 1.3;
+    max-width: 280px;
 }
 
 .nav {
     display: flex;
-    gap: 32px;
+    gap: 24px;
+    flex-wrap: wrap;
 }
 
 .nav a {
-    font-size: 15px;
-    color: #666;
+    font-size: 14px;
+    color: rgba(255,255,255,.8);
     transition: color .2s;
+    white-space: nowrap;
 }
 
 .nav a:hover {
-    color: #534AB7;
+    color: #fff;
 }
 
 /* =============================================
@@ -201,7 +219,7 @@ span.section-link {
 /* Shared base for primary button and form submit */
 .btn-primary,
 .form-submit {
-    background: #534AB7;
+    background: #1A3C6E;
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -213,7 +231,7 @@ span.section-link {
 
 .btn-primary:hover,
 .form-submit:not(:disabled):hover {
-    background: #4339a0;
+    background: #14305A;
 }
 
 .btn-primary {
@@ -235,8 +253,8 @@ span.section-link {
 }
 
 .btn-secondary:hover {
-    border-color: #534AB7;
-    color: #534AB7;
+    border-color: #1A3C6E;
+    color: #1A3C6E;
 }
 
 /* =============================================
@@ -273,7 +291,7 @@ span.section-link {
 .event-date {
     font-size: 13px;
     font-weight: 600;
-    color: #534AB7;
+    color: #1A3C6E;
 }
 
 .event-date.yellow { color: #BA7517; }
@@ -316,7 +334,7 @@ span.section-link {
     justify-content: center;
 }
 
-.circle-icon.purple { background: #EEEDFE; }
+.circle-icon.purple { background: #E8EFF8; }
 .circle-icon.green  { background: #E1F5EE; }
 .circle-icon.yellow { background: #FAEEDA; }
 .circle-icon.pink   { background: #FBEAF0; }
@@ -357,7 +375,7 @@ span.section-link {
     background-position: center;
 }
 .news-img-placeholder {
-    background: linear-gradient(135deg, #EEEDFE, #D3D1F7);
+    background: linear-gradient(135deg, #E8EFF8, #D3D1F7);
 }
 .news-body {
     padding: 20px;
@@ -449,7 +467,7 @@ span.section-link {
     max-width: 380px;
     margin: 0 auto 40px;
     background: #fff;
-    border: 2px solid #534AB7;
+    border: 2px solid #1A3C6E;
     border-radius: 20px;
     padding: 32px;
     text-align: center;
@@ -466,7 +484,7 @@ span.section-link {
 .avatar.lg {
     width: 120px;
     height: 120px;
-    background: linear-gradient(135deg, #EEEDFE, #CECBF6);
+    background: linear-gradient(135deg, #E8EFF8, #CECBF6);
     margin-bottom: 20px;
 }
 
@@ -497,7 +515,7 @@ span.section-link {
     margin-bottom: 12px;
 }
 
-.badge.purple { background: #EEEDFE; color: #534AB7; }
+.badge.purple { background: #E8EFF8; color: #1A3C6E; }
 .badge.green  { background: #E1F5EE; color: #0F6E56; }
 .badge.blue   { background: #E6F1FB; color: #185FA5; }
 .badge.yellow { background: #FAEEDA; color: #854F0B; }
@@ -539,15 +557,15 @@ span.section-link {
     justify-content: center;
     gap: 8px;
     padding: 12px;
-    background: #EEEDFE;
+    background: #E8EFF8;
     border-radius: 10px;
-    color: #534AB7;
+    color: #1A3C6E;
     font-size: 14px;
     margin-bottom: 10px;
 }
 
 .contact-text { font-size: 13px; color: #666; margin-bottom: 6px; }
-.contact-email { color: #534AB7; }
+.contact-email { color: #1A3C6E; }
 
 .deputies-grid {
     display: grid;
@@ -578,7 +596,7 @@ span.section-link {
 }
 
 .phone-sm { font-size: 12px; color: #888; }
-a.phone-sm { color: #534AB7; }
+a.phone-sm { color: #1A3C6E; }
 
 /* =============================================
    DOCUMENTS
@@ -646,7 +664,7 @@ a.phone-sm { color: #534AB7; }
 
 .doc-download {
     font-size: 13px;
-    color: #534AB7;
+    color: #1A3C6E;
     font-weight: 500;
     text-decoration: none;
 }
@@ -739,7 +757,7 @@ a.doc-small:hover {
 .form-select:focus,
 .form-textarea:focus {
     outline: none;
-    border-color: #534AB7;
+    border-color: #1A3C6E;
 }
 
 .form-textarea {
@@ -757,7 +775,7 @@ a.doc-small:hover {
 .form-checkbox input {
     width: 20px;
     height: 20px;
-    accent-color: #534AB7;
+    accent-color: #1A3C6E;
     margin-top: 2px;
     flex-shrink: 0;
     cursor: pointer;
@@ -770,7 +788,7 @@ a.doc-small:hover {
     cursor: pointer;
 }
 
-.form-checkbox a { color: #534AB7; }
+.form-checkbox a { color: #1A3C6E; }
 
 .form-submit {
     width: 100%;
@@ -821,7 +839,7 @@ a.doc-small:hover {
     flex-shrink: 0;
 }
 
-.contact-item-icon.purple { background: #EEEDFE; }
+.contact-item-icon.purple { background: #E8EFF8; }
 .contact-item-icon.green  { background: #E1F5EE; }
 .contact-item-icon.blue   { background: #E6F1FB; }
 .contact-item-icon.yellow { background: #FAEEDA; }
@@ -838,7 +856,7 @@ a.doc-small:hover {
     line-height: 1.6;
 }
 
-.contact-link { color: #534AB7; }
+.contact-link { color: #1A3C6E; }
 
 .social-links { display: flex; gap: 14px; }
 
@@ -855,7 +873,7 @@ a.doc-small:hover {
 }
 
 .social-link:hover {
-    border-color: #534AB7;
+    border-color: #1A3C6E;
     transform: translateY(-2px);
 }
 
@@ -1025,17 +1043,52 @@ a.doc-small:hover {
 .gallery-item.clickable { cursor: pointer; }
 
 /* =============================================
+   КНОПКИ ДОСТУПНОСТИ
+   ============================================= */
+.access-btns {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.access-btn {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    color: #fff;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s;
+    font-family: inherit;
+}
+.access-btn:hover,
+.access-btn.active { background: rgba(255,255,255,.3); }
+
+/* =============================================
    FOOTER
    ============================================= */
 .footer {
-    padding: 24px 2rem;
-    border-top: 1px solid #e5e5e5;
-    background: #fff;
+    background: #1A3C6E;
+    color: rgba(255,255,255,.85);
+    padding: 0;
+}
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 32px 2rem;
+}
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,.15);
+    padding: 14px 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 8px;
 }
 
 .footer-logo {
@@ -1045,24 +1098,83 @@ a.doc-small:hover {
 }
 
 .footer-logo-icon {
-    width: 36px;
-    height: 36px;
-    background: linear-gradient(135deg, #534AB7, #7F77DD);
-    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px #C8A84B;
 }
 
 .footer-text {
-    font-weight: 600;
-    font-size: 16px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
 }
 
-.footer-copy {
+.footer-requisites {
     font-size: 13px;
-    color: #888;
+    line-height: 1.8;
+    color: rgba(255,255,255,.7);
 }
+
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.footer-links a {
+    font-size: 13px;
+    color: rgba(255,255,255,.7);
+    transition: color .2s;
+}
+.footer-links a:hover { color: #fff; }
+
+.footer-copy {
+    font-size: 12px;
+    color: rgba(255,255,255,.5);
+}
+.footer-official {
+    font-size: 12px;
+    color: rgba(255,255,255,.4);
+}
+
+/* =============================================
+   РЕЖИМ ДЛЯ СЛАБОВИДЯЩИХ
+   ============================================= */
+body.high-contrast {
+    background: #000 !important;
+    color: #fff !important;
+}
+body.high-contrast .header { background: #000; border-bottom: 2px solid #fff; }
+body.high-contrast .nav a  { color: #fff; }
+body.high-contrast .section,
+body.high-contrast .card,
+body.high-contrast .news-card,
+body.high-contrast .ach-card,
+body.high-contrast .circle-card,
+body.high-contrast .deputy-card,
+body.high-contrast .staff-card,
+body.high-contrast .info-card,
+body.high-contrast .director-card {
+    background: #111 !important;
+    border-color: #fff !important;
+    color: #fff !important;
+}
+body.high-contrast .section-gray,
+body.high-contrast .section-gray .section { background: #111 !important; }
+body.high-contrast a { color: #FFD700 !important; }
+body.high-contrast .btn-primary,
+body.high-contrast .circle-enroll-btn,
+body.high-contrast .enroll-submit { background: #fff !important; color: #000 !important; }
+body.high-contrast .btn-secondary { border-color: #fff !important; color: #fff !important; }
+body.high-contrast p, body.high-contrast h1, body.high-contrast h2,
+body.high-contrast h3, body.high-contrast h4 { color: #fff !important; }
+body.high-contrast .stats-bar { background: #111; border: 1px solid #fff; }
+body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
 
 /* =============================================
    RESPONSIVE
@@ -1143,7 +1255,7 @@ a.doc-small:hover {
     display: flex;
     justify-content: center;
     gap: 0;
-    background: #534AB7;
+    background: #1A3C6E;
     flex-wrap: wrap;
 }
 .stat-item {
@@ -1175,7 +1287,7 @@ a.doc-small:hover {
     display: inline-block;
     margin-top: 14px;
     padding: 8px 20px;
-    background: #534AB7;
+    background: #1A3C6E;
     color: #fff;
     border: none;
     border-radius: 20px;
@@ -1184,7 +1296,7 @@ a.doc-small:hover {
     cursor: pointer;
     transition: background .2s;
 }
-.circle-enroll-btn:hover { background: #4339a0; }
+.circle-enroll-btn:hover { background: #14305A; }
 
 /* =============================================
    МОДАЛЬНОЕ ОКНО ЗАПИСИ
@@ -1217,7 +1329,7 @@ a.doc-small:hover {
 }
 .enroll-circle-name {
     font-size: 14px;
-    color: #534AB7;
+    color: #1A3C6E;
     font-weight: 600;
     margin-bottom: 20px;
 }
@@ -1257,11 +1369,11 @@ a.doc-small:hover {
     outline: none;
     transition: border-color .2s;
 }
-.enroll-field input:focus { border-color: #534AB7; }
+.enroll-field input:focus { border-color: #1A3C6E; }
 .enroll-submit {
     width: 100%;
     padding: 13px;
-    background: #534AB7;
+    background: #1A3C6E;
     color: #fff;
     border: none;
     border-radius: 12px;
@@ -1271,7 +1383,7 @@ a.doc-small:hover {
     margin-top: 4px;
     transition: background .2s;
 }
-.enroll-submit:hover { background: #4339a0; }
+.enroll-submit:hover { background: #14305A; }
 .enroll-submit:disabled { background: #aaa; cursor: not-allowed; }
 .enroll-success {
     text-align: center;
