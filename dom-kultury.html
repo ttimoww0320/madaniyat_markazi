@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Дом культуры</title>
+    <title>Yunusobod tuman Madaniyat bo'limi — Rasmiy sayt</title>
+    <meta name="description" content="Yunusobod tuman Madaniyat bo'limining rasmiy sayti. To'garaklar, tadbirlar, jamoalar va madaniy hayot haqida ma'lumot.">
+    <meta name="keywords" content="Yunusobod, madaniyat, to'garak, tadbir, dom kultury, Toshkent">
+    <meta name="author" content="Yunusobod tuman Madaniyat bo'limi">
+    <meta property="og:title" content="Yunusobod tuman Madaniyat bo'limi">
+    <meta property="og:description" content="Rasmiy sayt — tadbirlar, to'garaklar va madaniy hayot">
+    <meta property="og:type" content="website">
+    <!-- Favicon — герб в SVG -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%231A3C6E'/><path d='M16 4a10.5 10.5 0 100 22 8 8 0 110-16 10.5 10.5 0 010-6z' fill='%23C8A84B'/><polygon points='20,6 21.5,10.5 26,10.5 22.5,13.5 24,18 20,15.5 16,18 17.5,13.5 14,10.5 18.5,10.5' fill='%23C8A84B'/></svg>">
     <link rel="stylesheet" href="css/styles.css">
 
     <!-- Секции: каждый файл записывает свой HTML в window.sectionXxx -->
@@ -44,21 +52,26 @@
             </div>
             <span class="logo-text" id="logo-text">Дом культуры</span>
         </div>
-        <nav class="nav" aria-label="Основная навигация">
-            <a href="#news">Новости</a>
-            <a href="#events">Афиша</a>
-            <a href="#circles">Кружки</a>
-            <a href="#achievements">Достижения</a>
-            <a href="#team">Команда</a>
-            <a href="#documents">Документы</a>
-            <a href="#gallery">Галерея</a>
-            <a href="#contact">Контакты</a>
+        <nav class="nav" id="main-nav" aria-label="Основная навигация">
+            <a href="#news"         onclick="closeMenu()">Новости</a>
+            <a href="#events"       onclick="closeMenu()">Афиша</a>
+            <a href="#circles"      onclick="closeMenu()">Кружки</a>
+            <a href="#achievements" onclick="closeMenu()">Достижения</a>
+            <a href="#team"         onclick="closeMenu()">Команда</a>
+            <a href="#documents"    onclick="closeMenu()">Документы</a>
+            <a href="#gallery"      onclick="closeMenu()">Галерея</a>
+            <a href="#contact"      onclick="closeMenu()">Контакты</a>
         </nav>
-        <!-- Кнопки доступности -->
+        <!-- Кнопки доступности + бургер -->
+        <div class="header-right">
         <div class="access-btns" aria-label="Доступность">
             <button class="access-btn" onclick="changeFontSize(1)" title="Увеличить шрифт" aria-label="Увеличить шрифт">A+</button>
             <button class="access-btn" onclick="changeFontSize(-1)" title="Уменьшить шрифт" aria-label="Уменьшить шрифт">A-</button>
             <button class="access-btn" id="contrast-btn" onclick="toggleContrast()" title="Режим для слабовидящих" aria-label="Высокий контраст">👁</button>
+        </div>
+        <button class="burger-btn" id="burger-btn" onclick="toggleMenu()" aria-label="Меню" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
         </div>
     </header>
 
@@ -185,6 +198,25 @@
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') window.closeEnroll();
     });
+
+    // ===== БУРГЕР-МЕНЮ =====
+    window.toggleMenu = function() {
+        const nav = document.getElementById('main-nav');
+        const btn = document.getElementById('burger-btn');
+        const open = nav.classList.toggle('open');
+        btn.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', open);
+        document.body.style.overflow = open ? 'hidden' : '';
+    };
+    window.closeMenu = function() {
+        const nav = document.getElementById('main-nav');
+        const btn = document.getElementById('burger-btn');
+        nav.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+    };
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') window.closeMenu(); });
 
     // ===== ДОСТУПНОСТЬ =====
     let _fontSize = parseInt(localStorage.getItem('fontSize') || '0');

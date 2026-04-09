@@ -1043,6 +1043,39 @@ a.doc-small:hover {
 .gallery-item.clickable { cursor: pointer; }
 
 /* =============================================
+   БУРГЕР-МЕНЮ
+   ============================================= */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.burger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 8px;
+}
+.burger-btn span {
+    display: block;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+    transition: transform .25s, opacity .25s;
+}
+.burger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.burger-btn.open span:nth-child(2) { opacity: 0; }
+.burger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* =============================================
    КНОПКИ ДОСТУПНОСТИ
    ============================================= */
 .access-btns {
@@ -1180,30 +1213,49 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
    RESPONSIVE
    ============================================= */
 @media (max-width: 768px) {
-    .header {
-        flex-direction: column;
-        gap: 16px;
-    }
+    .burger-btn { display: flex; }
 
     .nav {
-        flex-wrap: wrap;
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #1A3C6E;
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
-        gap: 16px;
+        gap: 28px;
+        z-index: 99;
+    }
+    .nav.open { display: flex; }
+    .nav a {
+        font-size: 20px;
+        color: #fff;
+        font-weight: 600;
     }
 
-    .hero h1 { font-size: 32px; }
+    .access-btns { display: none; }
+
+    .hero h1 { font-size: 28px; }
+    .hero p   { font-size: 15px; }
+
+    .stats-bar { flex-direction: column; }
+    .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,.15); }
+    .stat-item:last-child { border-bottom: none; }
 
     .gallery-grid {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
     }
-
-    .gallery-item.large {
-        grid-row: auto;
-        height: 200px;
-    }
-
+    .gallery-item.large { grid-row: auto; height: 200px; }
     .gallery-item { height: 140px; }
+
+    .footer-top { flex-direction: column; gap: 16px; }
+    .footer-bottom { flex-direction: column; text-align: center; }
+
+    .enroll-box { padding: 24px 16px; }
 }
 
 /* =============================================
