@@ -93,6 +93,30 @@ async function loadSite() {
     if (data.footer) {
         set('footer-logo-text', data.footer.logoText);
         set('footer-copyright', data.footer.copyright);
+
+        const req = document.getElementById('footer-requisites');
+        if (req) {
+            req.innerHTML = [
+                data.footer.logoText   ? `<p><strong>${data.footer.logoText}</strong></p>` : '',
+                data.footer.address    ? `<p>${data.footer.address}</p>` : '',
+                data.footer.inn        ? `<p>ИНН: ${data.footer.inn}</p>` : '',
+                data.footer.workHours  ? `<p>${data.footer.workHours}</p>` : '',
+            ].join('');
+        }
+    }
+
+    // Счётчики из site.json
+    if (data.stats && data.stats.length) {
+        const bar = document.getElementById('stats-bar');
+        if (bar) {
+            bar.innerHTML = data.stats.map(s =>
+                `<div class="stat-item">
+                    <span class="stat-num" data-target="${s.value}">0</span>
+                    <span class="stat-label">${s.label}</span>
+                </div>`
+            ).join('');
+            if (window.initStatsAnimation) window.initStatsAnimation();
+        }
     }
 
     return data;

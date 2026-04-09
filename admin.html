@@ -702,10 +702,28 @@
                         <label class="field-label">Копирайт</label>
                         <input class="field-input" id="site-footer-copy">
                     </div>
+                    <div class="field-group">
+                        <label class="field-label">Адрес организации</label>
+                        <input class="field-input" id="site-footer-address" placeholder="г. Ташкент, Юнусободский район">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">ИНН / реквизиты</label>
+                        <input class="field-input" id="site-footer-inn" placeholder="XXXXXXXXXXXXX">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Режим работы</label>
+                        <input class="field-input" id="site-footer-hours" placeholder="Пн–Пт: 09:00–18:00">
+                    </div>
                 </div>
+            </div>
+
+            <div class="section-card">
+                <h2>📊 Счётчики статистики</h2>
+                <p style="font-size:13px;color:#666;margin-bottom:16px">Отображаются на сайте под главным баннером</p>
+                <div id="stats-list"></div>
                 <hr class="divider">
                 <div class="save-bar">
-                    <button class="save-btn" id="site-save-btn" onclick="saveSite()">Сохранить</button>
+                    <button class="save-btn" id="site-save-btn" onclick="saveSite()">Сохранить всё</button>
                     <span class="save-status" id="site-status"></span>
                 </div>
             </div>
@@ -1556,6 +1574,7 @@ function bgUploadField(labelText, currentUrl, onUploaded) {
 
 function saveSite() {
     saveWithStatus('site-save-btn', 'site-status', () => {
+        const stats = [...document.getElementById('stats-list').children].map(r => r._getData());
         const data = {
             header:  { logoText: document.getElementById('site-logo-text').value },
             hero: {
@@ -1569,12 +1588,29 @@ function saveSite() {
             footer: {
                 logoText:  document.getElementById('site-footer-logo').value,
                 copyright: document.getElementById('site-footer-copy').value,
+                address:   document.getElementById('site-footer-address').value,
+                inn:       document.getElementById('site-footer-inn').value,
+                workHours: document.getElementById('site-footer-hours').value,
             },
+            stats,
             globalBg:    _siteData.globalBg    || '',
             backgrounds: _siteData.backgrounds || {}
         };
         return apiPost('site', data);
     });
+}
+
+function renderStatItem(s) {
+    const row = document.createElement('div');
+    row.className = 'item-row cols-2';
+    row.style.marginBottom = '8px';
+    const valueIn = input(String(s.value), 'Число');
+    valueIn.type = 'number';
+    const labelIn = input(s.label, 'Подпись');
+    row.appendChild(fieldGroup('Число', valueIn));
+    row.appendChild(fieldGroup('Подпись', labelIn));
+    row._getData = () => ({ value: +valueIn.value || 0, label: labelIn.value });
+    return row;
 }
 
 function saveSectionBg(key) {
@@ -1970,8 +2006,15 @@ async function loadAllSections() {
         document.getElementById('site-btn1-href').value     = data.hero?.btn1Href    || '';
         document.getElementById('site-btn2-text').value     = data.hero?.btn2Text    || '';
         document.getElementById('site-btn2-href').value     = data.hero?.btn2Href    || '';
-        document.getElementById('site-footer-logo').value   = data.footer?.logoText  || '';
-        document.getElementById('site-footer-copy').value     = data.footer?.copyright  || '';
+        document.getElementById('site-footer-logo').value    = data.footer?.logoText  || '';
+        document.getElementById('site-footer-copy').value    = data.footer?.copyright || '';
+        document.getElementById('site-footer-address').value = data.footer?.address   || '';
+        document.getElementById('site-footer-inn').value     = data.footer?.inn       || '';
+        document.getElementById('site-footer-hours').value   = data.footer?.workHours || '';
+
+        const statsList = document.getElementById('stats-list');
+        statsList.innerHTML = '';
+        (data.stats || []).forEach(s => statsList.appendChild(renderStatItem(s)));
         // Глобальный фон
         const globalField = bgUploadField('Фото фона', data.globalBg || '', url => { _siteData.globalBg = url; });
         document.getElementById('site-global-bg-field').appendChild(globalField);

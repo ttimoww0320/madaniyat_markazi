@@ -74,25 +74,8 @@
         </div>
     </section>
 
-    <!-- ===== СЧЁТЧИКИ ===== -->
-    <section class="stats-bar">
-        <div class="stat-item">
-            <span class="stat-num" data-target="5000">0</span>
-            <span class="stat-label">посетителей в год</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-num" data-target="20">0</span>
-            <span class="stat-label">кружков и секций</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-num" data-target="15">0</span>
-            <span class="stat-label">лет работы</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-num" data-target="50">0</span>
-            <span class="stat-label">мероприятий в год</span>
-        </div>
-    </section>
+    <!-- ===== СЧЁТЧИКИ (рендерятся из site.json) ===== -->
+    <section class="stats-bar" id="stats-bar"></section>
 
     <!-- ===== КОНТЕЙНЕРЫ ДЛЯ СЕКЦИЙ ===== -->
     <div id="section-news"></div>
@@ -119,10 +102,8 @@
                 </div>
                 <span class="footer-text" id="footer-logo-text">Дом культуры</span>
             </div>
-            <div class="footer-requisites">
-                <p>Yunusobod tuman Madaniyat bo'limi</p>
-                <p>Юнусободский район, г. Ташкент</p>
-                <p>Режим работы: Пн–Пт 09:00–18:00</p>
+            <div class="footer-requisites" id="footer-requisites">
+                <!-- заполняется из site.json -->
             </div>
             <div class="footer-links">
                 <a href="#news">Новости</a>
@@ -250,34 +231,33 @@
     })();
 
     // ===== АНИМАЦИЯ СЧЁТЧИКОВ =====
-    (function() {
-        const nums = document.querySelectorAll('.stat-num');
+    // Вызывается из main.js после того как счётчики отрендерились из site.json
+    window.initStatsAnimation = function() {
+        const bar = document.getElementById('stats-bar');
+        if (!bar) return;
         let animated = false;
 
         function animateCounters() {
             if (animated) return;
             animated = true;
-            nums.forEach(el => {
+            bar.querySelectorAll('.stat-num').forEach(el => {
                 const target = +el.dataset.target;
-                const duration = 1800;
-                const step = 16;
-                const steps = duration / step;
+                const steps = 1800 / 16;
                 let current = 0;
                 const inc = target / steps;
                 const timer = setInterval(() => {
                     current = Math.min(current + inc, target);
                     el.textContent = Math.floor(current).toLocaleString('ru');
                     if (current >= target) clearInterval(timer);
-                }, step);
+                }, 16);
             });
         }
 
         const observer = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting) animateCounters();
         }, { threshold: 0.3 });
-        const bar = document.querySelector('.stats-bar');
-        if (bar) observer.observe(bar);
-    })();
+        observer.observe(bar);
+    };
     </script>
 
     <!-- ===== МОДАЛ: ЗАПИСЬ НА КРУЖОК ===== -->
