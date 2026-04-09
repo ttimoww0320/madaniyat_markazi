@@ -1,11 +1,13 @@
 // Список секций: id контейнера → render-функция
 const SECTIONS = [
-    { id: 'section-events',    api: 'events',    render: () => window.renderEvents    },
-    { id: 'section-circles',   api: 'circles',   render: () => window.renderCircles   },
-    { id: 'section-team',      api: 'team',      render: () => window.renderTeam      },
-    { id: 'section-documents', api: 'documents', render: () => window.renderDocuments },
-    { id: 'section-gallery',   api: 'gallery',   render: () => window.renderGallery   },
-    { id: 'section-contact',   api: 'contact',   render: () => window.renderContact   },
+    { id: 'section-news',         api: 'news',         render: () => window.renderNews         },
+    { id: 'section-events',       api: 'events',       render: () => window.renderEvents       },
+    { id: 'section-circles',      api: 'circles',      render: () => window.renderCircles      },
+    { id: 'section-achievements', api: 'achievements', render: () => window.renderAchievements },
+    { id: 'section-team',         api: 'team',         render: () => window.renderTeam         },
+    { id: 'section-documents',    api: 'documents',    render: () => window.renderDocuments    },
+    { id: 'section-gallery',      api: 'gallery',      render: () => window.renderGallery      },
+    { id: 'section-contact',      api: 'contact',      render: () => window.renderContact      },
 ];
 
 // Секции у которых есть .section-gray обёртка

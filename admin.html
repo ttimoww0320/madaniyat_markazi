@@ -388,12 +388,15 @@
 
     <nav class="admin-tabs">
         <button class="tab-btn active" onclick="showTab('events',this)">📅 Афиша</button>
+        <button class="tab-btn"        onclick="showTab('news',this)">📰 Новости</button>
         <button class="tab-btn"        onclick="showTab('circles',this)">🎨 Кружки</button>
+        <button class="tab-btn"        onclick="showTab('achievements',this)">🏆 Достижения</button>
         <button class="tab-btn"        onclick="showTab('team',this)">👥 Команда</button>
         <button class="tab-btn"        onclick="showTab('documents',this)">📄 Документы</button>
         <button class="tab-btn"        onclick="showTab('site',this)">🏠 Сайт</button>
         <button class="tab-btn"        onclick="showTab('gallery',this)">🖼 Галерея</button>
         <button class="tab-btn"        onclick="showTab('contact',this)">📞 Контакты</button>
+        <button class="tab-btn"        onclick="showTab('qr',this)">📱 QR-код</button>
     </nav>
 
     <div class="admin-content">
@@ -416,6 +419,20 @@
                 <div class="save-bar" style="margin-top:12px">
                     <button class="save-btn" id="bg-save-btn-events" onclick="saveSectionBg('events')">Сохранить фон</button>
                     <span class="save-status" id="bg-status-events"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== НОВОСТИ ===== -->
+        <div id="tab-news" class="tab-panel">
+            <div class="section-card">
+                <h2>📰 Новости</h2>
+                <div id="news-list"></div>
+                <button class="add-btn" onclick="addNews()">+ Добавить новость</button>
+                <hr class="divider">
+                <div class="save-bar">
+                    <button class="save-btn" onclick="saveSection('news', collectNews)">Сохранить</button>
+                    <span class="save-status" id="news-status"></span>
                 </div>
             </div>
         </div>
@@ -523,6 +540,20 @@
                 <div class="save-bar" style="margin-top:12px">
                     <button class="save-btn" id="bg-save-btn-documents" onclick="saveSectionBg('documents')">Сохранить фон</button>
                     <span class="save-status" id="bg-status-documents"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ДОСТИЖЕНИЯ ===== -->
+        <div id="tab-achievements" class="tab-panel">
+            <div class="section-card">
+                <h2>🏆 Достижения и награды</h2>
+                <div id="achievements-list"></div>
+                <button class="add-btn" onclick="addAchievement()">+ Добавить достижение</button>
+                <hr class="divider">
+                <div class="save-bar">
+                    <button class="save-btn" onclick="saveSection('achievements', collectAchievements)">Сохранить</button>
+                    <span class="save-status" id="achievements-status"></span>
                 </div>
             </div>
         </div>
@@ -676,6 +707,25 @@
                 <div class="save-bar">
                     <button class="save-btn" id="site-save-btn" onclick="saveSite()">Сохранить</button>
                     <span class="save-status" id="site-status"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== QR-КОД ===== -->
+        <div id="tab-qr" class="tab-panel">
+            <div class="section-card">
+                <h2>📱 QR-код сайта</h2>
+                <p style="color:#666;font-size:14px;margin-bottom:20px">Распечатайте QR-код и разместите на стендах, листовках и афишах — посетители смогут сразу перейти на сайт.</p>
+                <div class="field-group" style="max-width:400px">
+                    <label class="field-label">URL сайта</label>
+                    <input class="field-input" id="qr-url" placeholder="https://ваш-сайт.ru" oninput="generateQR()">
+                </div>
+                <div id="qr-preview" style="margin:20px 0;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+                    <canvas id="qr-canvas" style="border-radius:12px;border:1px solid #e5e5e5"></canvas>
+                    <div>
+                        <p style="font-size:13px;color:#666;margin-bottom:12px">Размер: 300×300 px — подходит для печати до A5</p>
+                        <button class="save-btn" onclick="downloadQR()">⬇ Скачать PNG</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1976,6 +2026,156 @@ async function loadAllSections() {
         socialList.innerHTML = '';
         data.socials.forEach(s => socialList.appendChild(renderSocialItem(s)));
     });
+
+    // News
+    apiGet('news').then(data => {
+        const list = document.getElementById('news-list');
+        list.innerHTML = '';
+        data.forEach(n => list.appendChild(renderNewsItem(n)));
+    });
+
+    // Achievements
+    apiGet('achievements').then(data => {
+        const list = document.getElementById('achievements-list');
+        list.innerHTML = '';
+        data.forEach(a => list.appendChild(renderAchievementItem(a)));
+    });
+}
+
+// =====================================================
+// NEWS
+// =====================================================
+function renderNewsItem(n) {
+    const row = document.createElement('div');
+    row.className = 'item-row cols-2';
+
+    const titleIn = input(n.title, 'Заголовок');
+    const dateIn  = input(n.date,  'ДД.ММ.ГГГГ');
+    const textIn  = document.createElement('textarea');
+    textIn.className = 'field-input';
+    textIn.placeholder = 'Текст новости...';
+    textIn.value = n.text || '';
+    textIn.rows = 3;
+    textIn.style.cssText = 'resize:vertical;font-family:inherit;font-size:14px;';
+    const photoField = makePhotoField(n.image || '');
+
+    const delWrapper = document.createElement('div');
+    delWrapper.className = 'field-group';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label'; lbl.textContent = '\u00a0';
+    delWrapper.appendChild(lbl);
+    delWrapper.appendChild(deleteBtn(() => row.remove()));
+
+    row.appendChild(fieldGroup('Заголовок', titleIn));
+    row.appendChild(fieldGroup('Дата', dateIn));
+    row.appendChild(Object.assign(fieldGroup('Текст', textIn), { style: 'grid-column:1/-1' }));
+    row.appendChild(photoField.element);
+    row.appendChild(delWrapper);
+
+    row._getData = () => ({ id: n.id || Date.now(), title: titleIn.value, date: dateIn.value, text: textIn.value, image: photoField.getUrl() });
+    return row;
+}
+
+function addNews() {
+    document.getElementById('news-list').appendChild(
+        renderNewsItem({ id: Date.now(), title: '', date: '', text: '', image: '' })
+    );
+}
+
+function collectNews() {
+    return [...document.getElementById('news-list').children].map(r => r._getData());
+}
+
+// =====================================================
+// ACHIEVEMENTS
+// =====================================================
+function renderAchievementItem(a) {
+    const row = document.createElement('div');
+    row.className = 'item-row cols-2';
+
+    const titleIn = input(a.title,       'Название награды');
+    const yearIn  = input(a.year,        'Год');
+    const descIn  = document.createElement('textarea');
+    descIn.className = 'field-input';
+    descIn.placeholder = 'Описание...';
+    descIn.value = a.description || '';
+    descIn.rows = 2;
+    descIn.style.cssText = 'resize:vertical;font-family:inherit;font-size:14px;';
+    const photoField = makePhotoField(a.image || '');
+
+    const delWrapper = document.createElement('div');
+    delWrapper.className = 'field-group';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label'; lbl.textContent = '\u00a0';
+    delWrapper.appendChild(lbl);
+    delWrapper.appendChild(deleteBtn(() => row.remove()));
+
+    row.appendChild(fieldGroup('Название', titleIn));
+    row.appendChild(fieldGroup('Год', yearIn));
+    row.appendChild(Object.assign(fieldGroup('Описание', descIn), { style: 'grid-column:1/-1' }));
+    row.appendChild(photoField.element);
+    row.appendChild(delWrapper);
+
+    row._getData = () => ({ id: a.id || Date.now(), title: titleIn.value, year: yearIn.value, description: descIn.value, image: photoField.getUrl() });
+    return row;
+}
+
+function addAchievement() {
+    document.getElementById('achievements-list').appendChild(
+        renderAchievementItem({ id: Date.now(), title: '', year: new Date().getFullYear().toString(), description: '', image: '' })
+    );
+}
+
+function collectAchievements() {
+    return [...document.getElementById('achievements-list').children].map(r => r._getData());
+}
+
+// =====================================================
+// QR-КОД (qrcode-generator CDN)
+// =====================================================
+(function loadQRLib() {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+    s.onload = () => {
+        const url = window.location.origin;
+        document.getElementById('qr-url').value = url;
+        generateQR();
+    };
+    document.head.appendChild(s);
+})();
+
+let _qrInstance = null;
+
+function generateQR() {
+    const url = document.getElementById('qr-url').value.trim();
+    const canvas = document.getElementById('qr-canvas');
+    if (!url || typeof QRCode === 'undefined') return;
+
+    canvas.width = 300; canvas.height = 300;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, 300, 300);
+
+    // Используем временный div для QRCode библиотеки
+    const tmp = document.createElement('div');
+    tmp.style.display = 'none';
+    document.body.appendChild(tmp);
+    if (_qrInstance) { try { _qrInstance.clear(); } catch(e) {} }
+    _qrInstance = new QRCode(tmp, { text: url, width: 300, height: 300, correctLevel: QRCode.CorrectLevel.H });
+
+    // Копируем canvas из tmp на наш
+    setTimeout(() => {
+        const src = tmp.querySelector('canvas');
+        if (src) ctx.drawImage(src, 0, 0);
+        document.body.removeChild(tmp);
+    }, 100);
+}
+
+function downloadQR() {
+    const canvas = document.getElementById('qr-canvas');
+    const a = document.createElement('a');
+    a.download = 'qrcode-madaniyat.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
 }
 </script>
 </body>

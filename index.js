@@ -41,7 +41,7 @@ const MIME_TYPES = {
 };
 
 // Разрешённые секции для API
-const ALLOWED_SECTIONS = ['events', 'circles', 'team', 'documents', 'gallery', 'contact', 'site'];
+const ALLOWED_SECTIONS = ['events', 'circles', 'team', 'documents', 'gallery', 'contact', 'site', 'news', 'achievements'];
 
 // Отправить JSON-ответ
 function sendJSON(res, status, data) {
