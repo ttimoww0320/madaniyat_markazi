@@ -1,1 +1,6 @@
-[{"id":1,"title":"Танцы","age":"5–14 лет","color":"purple"},{"id":2,"title":"Рисование","age":"7–16 лет","color":"green"},{"id":3,"title":"Музыка","age":"6–18 лет","color":"yellow"},{"id":4,"title":"Театр","age":"8–17 лет","color":"pink"}]
+[
+  {"id": 1, "title": {"ru": "Танцы",   "uz": "Raqs",     "oz": "Рақс"},    "age": {"ru": "5–14 лет",  "uz": "5–14 yosh",  "oz": "5–14 ёш"},  "color": "purple"},
+  {"id": 2, "title": {"ru": "Рисование","uz": "Rasm",     "oz": "Расм"},    "age": {"ru": "7–16 лет",  "uz": "7–16 yosh",  "oz": "7–16 ёш"},  "color": "green"},
+  {"id": 3, "title": {"ru": "Музыка",  "uz": "Musiqa",   "oz": "Мусиқа"},  "age": {"ru": "6–18 лет",  "uz": "6–18 yosh",  "oz": "6–18 ёш"},  "color": "yellow"},
+  {"id": 4, "title": {"ru": "Театр",   "uz": "Teatr",    "oz": "Театр"},   "age": {"ru": "8–17 лет",  "uz": "8–17 yosh",  "oz": "8–17 ёш"},  "color": "pink"}
+]

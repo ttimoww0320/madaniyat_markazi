@@ -13,8 +13,16 @@
     <!-- Favicon — герб в SVG -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%231A3C6E'/><path d='M16 4a10.5 10.5 0 100 22 8 8 0 110-16 10.5 10.5 0 010-6z' fill='%23C8A84B'/><polygon points='20,6 21.5,10.5 26,10.5 22.5,13.5 24,18 20,15.5 16,18 17.5,13.5 14,10.5 18.5,10.5' fill='%23C8A84B'/></svg>">
     <link rel="stylesheet" href="css/styles.css">
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Turf.js — нарезка полигонов по границе района -->
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
 
+    <!-- i18n движок — загружать ДО секций -->
+    <script src="js/i18n.js"></script>
     <!-- Секции: каждый файл записывает свой HTML в window.sectionXxx -->
+    <script src="sections/map.js" defer></script>
     <script src="sections/events.js" defer></script>
     <script src="sections/circles.js" defer></script>
     <script src="sections/team.js" defer></script>
@@ -25,6 +33,35 @@
     <script src="sections/achievements.js" defer></script>
 </head>
 <body>
+
+    <!-- ===== SPLASH SCREEN (приветствие) ===== -->
+    <div id="splash-screen" aria-hidden="true">
+        <div class="splash-flag">
+            <div class="sf-blue"></div>
+            <div class="sf-white"></div>
+            <div class="sf-green"></div>
+        </div>
+        <div class="splash-content">
+            <div class="splash-logo-row">
+                <img src="uploads/логотип.png" alt="Логотип" class="splash-logo-img">
+                <div class="splash-divider"></div>
+                <div class="splash-text-wrapper">
+                    <div class="splash-flag-cover"></div>
+                    <div class="splash-text-block">
+                        <span class="splash-text-top">TOSHKENT SHAHAR</span>
+                        <span class="splash-text-main">YUNUSOBOD</span>
+                        <span class="splash-text-bottom">TUMANI MADANIYAT BO'LIMI</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ФОНОВОЕ ВИДЕО (весь сайт) ===== -->
+    <video id="site-bg-video" autoplay loop muted playsinline>
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260403_050628_c4e32401-fab4-4a27-b7a8-6e9291cd5959.mp4" type="video/mp4">
+    </video>
+    <div id="site-bg-overlay"></div>
 
     <!-- ===== ФЛАГ УЗБЕКИСТАНА ===== -->
     <div class="flag-stripe" aria-hidden="true">
@@ -41,29 +78,29 @@
     <!-- ===== ШАПКА ===== -->
     <header class="header">
         <div class="logo">
-            <!-- Герб Узбекистана (упрощённый) -->
             <div class="logo-emblem" aria-hidden="true">
-                <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                    <circle cx="16" cy="16" r="14" fill="#1A3C6E"/>
-                    <!-- Полумесяц и звезда -->
-                    <path d="M16 6a9.5 9.5 0 100 20 7 7 0 110-14 9.5 9.5 0 010-6z" fill="#C8A84B"/>
-                    <polygon points="20,7 21,10 24,10 21.5,12 22.5,15 20,13 17.5,15 18.5,12 16,10 19,10" fill="#C8A84B"/>
-                </svg>
+                <img src="uploads/логотип.png" alt="Логотип" width="44" height="44" style="object-fit:contain;">
             </div>
             <span class="logo-text" id="logo-text">Дом культуры</span>
         </div>
         <nav class="nav" id="main-nav" aria-label="Основная навигация">
-            <a href="#news"         onclick="closeMenu()">Новости</a>
-            <a href="#events"       onclick="closeMenu()">Афиша</a>
-            <a href="#circles"      onclick="closeMenu()">Кружки</a>
-            <a href="#achievements" onclick="closeMenu()">Достижения</a>
-            <a href="#team"         onclick="closeMenu()">Команда</a>
-            <a href="#documents"    onclick="closeMenu()">Документы</a>
-            <a href="#gallery"      onclick="closeMenu()">Галерея</a>
-            <a href="#contact"      onclick="closeMenu()">Контакты</a>
+            <a id="nav-news"         href="#news"         onclick="closeMenu()">Новости</a>
+            <a id="nav-events"       href="#events"       onclick="closeMenu()">Афиша</a>
+            <a id="nav-circles"      href="#circles"      onclick="closeMenu()">Кружки</a>
+            <a id="nav-map"          href="#map"          onclick="closeMenu()">Карта</a>
+            <a id="nav-achievements" href="#achievements" onclick="closeMenu()">Достижения</a>
+            <a id="nav-team"         href="#team"         onclick="closeMenu()">Команда</a>
+            <a id="nav-gallery"      href="#gallery"      onclick="closeMenu()">Галерея</a>
+            <a id="nav-documents"    href="#documents"    onclick="closeMenu()">Документы</a>
         </nav>
         <!-- Кнопки доступности + бургер -->
         <div class="header-right">
+        <!-- Переключатель языка -->
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="ru" onclick="window.i18n.setLang('ru')">RU</button>
+            <button class="lang-btn"        data-lang="uz" onclick="window.i18n.setLang('uz')">UZ</button>
+            <button class="lang-btn"        data-lang="oz" onclick="window.i18n.setLang('oz')">ЎЗ</button>
+        </div>
         <div class="access-btns" aria-label="Доступность">
             <button class="access-btn" onclick="changeFontSize(1)" title="Увеличить шрифт" aria-label="Увеличить шрифт">A+</button>
             <button class="access-btn" onclick="changeFontSize(-1)" title="Уменьшить шрифт" aria-label="Уменьшить шрифт">A-</button>
@@ -79,11 +116,13 @@
 
     <!-- ===== ГЛАВНЫЙ БАННЕР ===== -->
     <section class="hero">
-        <h1 id="hero-title">Культура начинается здесь</h1>
-        <p id="hero-subtitle">Мероприятия, кружки и творческие мастерские для всей семьи</p>
-        <div class="hero-buttons">
-            <a id="hero-btn1" href="#events" class="btn-primary">Смотреть афишу</a>
-            <a id="hero-btn2" href="#contact" class="btn-secondary">Записаться</a>
+        <div class="hero-content">
+            <h1 id="hero-title">Культура начинается здесь</h1>
+            <p id="hero-subtitle">Мероприятия, кружки и творческие мастерские для всей семьи</p>
+            <div class="hero-buttons">
+                <a id="hero-btn1" href="#events" class="btn-primary">Смотреть афишу</a>
+                <a id="hero-btn2" href="#contact" class="btn-secondary">Записаться</a>
+            </div>
         </div>
     </section>
 
@@ -94,42 +133,271 @@
     <div id="section-news"></div>
     <div id="section-events"></div>
     <div id="section-circles"></div>
+    <div id="section-map"></div>
     <div id="section-achievements"></div>
     <div id="section-team"></div>
-    <div id="section-documents"></div>
     <div id="section-gallery"></div>
-    <div id="section-contact"></div>
+    <div id="section-documents"></div>
+
+    <!-- ===== ФОРМА ЗАЯВКИ ===== -->
+    <section class="section" id="contact">
+        <div style="text-align:center;margin-bottom:32px;">
+            <h2 class="section-title" id="contact-form-title">Оставить заявку</h2>
+            <p class="section-subtitle" id="contact-form-subtitle" style="margin-top:8px;">Мы ответим на все ваши вопросы в течение рабочего дня</p>
+        </div>
+        <div class="request-form-wrap">
+            <form class="contact-form" id="contact-form" novalidate>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" id="lbl-name" for="field-name">Ваше имя *</label>
+                        <input type="text" id="field-name" class="form-input" placeholder="Введите ваше имя" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" id="lbl-phone" for="field-phone">Телефон *</label>
+                        <input type="tel" id="field-phone" class="form-input" placeholder="+998 (__) ___-__-__" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" id="lbl-email" for="field-email">Email</label>
+                        <input type="email" id="field-email" class="form-input" placeholder="Необязательно">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" id="lbl-topic" for="field-topic">Тема обращения</label>
+                        <select id="field-topic" class="form-select">
+                            <option value="">Выберите тему</option>
+                            <option value="circle">Запись в кружок</option>
+                            <option value="rent">Аренда зала</option>
+                            <option value="partner">Сотрудничество</option>
+                            <option value="feedback">Жалоба или предложение</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="lbl-message" for="field-message">Сообщение *</label>
+                    <textarea id="field-message" class="form-textarea" placeholder="Напишите ваше сообщение..." required></textarea>
+                </div>
+                <div class="form-checkbox">
+                    <input type="checkbox" id="consent">
+                    <label id="lbl-consent" for="consent">Я согласен на обработку персональных данных в соответствии с <a href="#documents">политикой конфиденциальности</a></label>
+                </div>
+                <button type="submit" class="form-submit">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span id="btn-submit">Отправить заявку</span>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+    // Обработчик формы заявки — подключается сразу, не зависит от порядка загрузки main.js
+    (function() {
+        var form = document.getElementById('contact-form');
+        if (!form) return;
+
+        var topicLabels = { circle: 'Запись в кружок', rent: 'Аренда зала', partner: 'Сотрудничество', feedback: 'Жалоба или предложение', other: 'Другое' };
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var name    = document.getElementById('field-name');
+            var phone   = document.getElementById('field-phone');
+            var email   = document.getElementById('field-email');
+            var topic   = document.getElementById('field-topic');
+            var message = document.getElementById('field-message');
+            var consent = document.getElementById('consent');
+            var btn     = form.querySelector('.form-submit');
+
+            // Валидация
+            var valid = true;
+            [name, phone, message].forEach(function(f) {
+                if (!f.value.trim()) { f.style.borderColor = '#e53e3e'; valid = false; }
+                else f.style.borderColor = '';
+            });
+            if (!consent.checked) {
+                consent.closest('.form-checkbox').style.outline = '2px solid #e53e3e';
+                valid = false;
+            } else {
+                consent.closest('.form-checkbox').style.outline = '';
+            }
+            if (!valid) return;
+
+            var originalHTML = btn.innerHTML;
+            btn.innerHTML = 'Отправляем...';
+            btn.disabled  = true;
+
+            fetch('/api/send-message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name:    name.value.trim(),
+                    phone:   phone.value.trim(),
+                    email:   email ? email.value.trim() : '',
+                    topic:   topic ? topic.value : '',
+                    message: message.value.trim()
+                })
+            })
+            .then(function(res) {
+                if (res.ok) {
+                    btn.innerHTML = '✓ Заявка отправлена!';
+                    btn.style.background = '#1D9E75';
+                    form.reset();
+                } else {
+                    btn.innerHTML = '✗ Ошибка, попробуйте снова';
+                    btn.style.background = '#e53e3e';
+                    btn.disabled = false;
+                }
+            })
+            .catch(function() {
+                btn.innerHTML = '✗ Нет соединения с сервером';
+                btn.style.background = '#e53e3e';
+                btn.disabled = false;
+            })
+            .finally(function() {
+                setTimeout(function() {
+                    btn.innerHTML = originalHTML;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 4000);
+            });
+        });
+
+        // Убираем красную обводку при исправлении
+        form.querySelectorAll('.form-input, .form-textarea').forEach(function(f) {
+            f.addEventListener('input', function() { f.style.borderColor = ''; });
+        });
+        document.getElementById('consent').addEventListener('change', function() {
+            this.closest('.form-checkbox').style.outline = '';
+        });
+    })();
+    </script>
 
     </main>
 
     <!-- ===== ПОДВАЛ ===== -->
     <footer class="footer">
-        <div class="footer-top">
-            <div class="footer-logo">
-                <div class="footer-logo-icon" aria-hidden="true">
-                    <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
-                        <circle cx="16" cy="16" r="14" fill="#1A3C6E"/>
-                        <path d="M16 6a9.5 9.5 0 100 20 7 7 0 110-14 9.5 9.5 0 010-6z" fill="#C8A84B"/>
-                        <polygon points="20,7 21,10 24,10 21.5,12 22.5,15 20,13 17.5,15 18.5,12 16,10 19,10" fill="#C8A84B"/>
-                    </svg>
+
+        <!-- Верхняя полоска — флаг Узбекистана -->
+        <div class="footer-flag">
+            <div class="footer-flag-blue"></div>
+            <div class="footer-flag-white"></div>
+            <div class="footer-flag-green"></div>
+        </div>
+
+        <div class="footer-body">
+
+            <!-- Колонка 1: Лого + описание -->
+            <div class="footer-col footer-col--brand">
+                <div class="footer-logo">
+                    <div class="footer-logo-icon">
+                        <img src="uploads/логотип.png" alt="Логотип" width="40" height="40" style="object-fit:contain;">
+                    </div>
+                    <span class="footer-logo-text" id="footer-logo-text">Дом культуры</span>
                 </div>
-                <span class="footer-text" id="footer-logo-text">Дом культуры</span>
+                <p class="footer-brand-desc" id="footer-requisites"></p>
+                <!-- Соцсети -->
+                <div class="footer-socials-row" id="footer-socials-row"></div>
             </div>
-            <div class="footer-requisites" id="footer-requisites">
-                <!-- заполняется из site.json -->
+
+            <div class="footer-divider-v"></div>
+
+            <!-- Колонка 2: Навигация -->
+            <div class="footer-col">
+                <div class="footer-col-title">Разделы сайта</div>
+                <div class="footer-nav-grid">
+                    <a href="#news">📰 Новости</a>
+                    <a href="#events">📅 Афиша</a>
+                    <a href="#circles">🎨 Кружки</a>
+                    <a href="#map">🗺 Карта</a>
+                    <a href="#achievements">🏆 Достижения</a>
+                    <a href="#team">👥 Команда</a>
+                    <a href="#gallery">🖼 Галерея</a>
+                    <a href="#documents">📄 Документы</a>
+                </div>
             </div>
-            <div class="footer-links">
-                <a href="#news">Новости</a>
-                <a href="#events">Афиша</a>
-                <a href="#circles">Кружки</a>
-                <a href="#contact">Контакты</a>
+
+            <div class="footer-divider-v"></div>
+
+            <!-- Колонка 3: Контакты -->
+            <div class="footer-col">
+                <div class="footer-col-title">Контакты</div>
+                <div class="footer-contact-list" id="footer-contact-list"></div>
             </div>
+
+            <div class="footer-divider-v"></div>
+
+            <!-- Колонка 4: Герб Узбекистана -->
+            <div class="footer-col footer-col--emblem">
+                <div class="footer-emblem-wrap">
+                    <img src="/uploads/Emblem_of_Uzbekistan.svg.png" alt="Герб Узбекистана" class="footer-emblem-svg">
+                </div>
+            </div>
+
         </div>
+
+        <!-- Нижняя строка -->
         <div class="footer-bottom">
-            <p class="footer-copy" id="footer-copyright">© 2026 Все права защищены</p>
-            <p class="footer-official">Официальный сайт государственного учреждения</p>
+            <div class="footer-bottom-left">
+                <div class="footer-flag-mini">
+                    <span style="background:#1DAEEF"></span>
+                    <span style="background:#fff"></span>
+                    <span style="background:#1EB57E"></span>
+                </div>
+                <p class="footer-copy" id="footer-copyright">© 2026 Все права защищены</p>
+            </div>
+            <p class="footer-official" id="footer-official">Официальный сайт государственного учреждения</p>
         </div>
+
     </footer>
+
+    <!-- ===== SPLASH SCREEN LOGIC ===== -->
+    <script>
+    (function() {
+        function fitText() {
+            var main   = document.querySelector('.splash-text-main');
+            var top    = document.querySelector('.splash-text-top');
+            var bottom = document.querySelector('.splash-text-bottom');
+            if (!main || !top || !bottom) return;
+
+            // Сбросить letter-spacing перед измерением
+            top.style.letterSpacing    = '0px';
+            bottom.style.letterSpacing = '0px';
+            main.style.letterSpacing   = '2px';
+
+            // Принудительный reflow
+            main.offsetWidth;
+
+            // Ширина YUNUSOBOD — эталон
+            var targetW = main.scrollWidth;
+            var topW    = top.scrollWidth;
+            var botW    = bottom.scrollWidth;
+
+            // letter-spacing = (нужная ширина - текущая) / кол-во символов
+            if (topW < targetW) {
+                var topGaps = top.textContent.trim().length;
+                top.style.letterSpacing = ((targetW - topW) / topGaps).toFixed(2) + 'px';
+            }
+            if (botW < targetW) {
+                var botGaps = bottom.textContent.trim().length;
+                bottom.style.letterSpacing = ((targetW - botW) / botGaps).toFixed(2) + 'px';
+            }
+        }
+
+        setTimeout(fitText, 0);
+        setTimeout(fitText, 150);
+        window.addEventListener('load', fitText);
+        window.addEventListener('resize', fitText);
+
+        var splash = document.getElementById('splash-screen');
+        setTimeout(function() {
+            splash.classList.add('hide');
+            setTimeout(function() { splash.remove(); }, 800);
+        }, 3200);
+    })();
+    </script>
 
     <script src="js/main.js"></script>
     <script>
@@ -329,6 +597,7 @@
         <button class="lb-arrow lb-prev" id="lb-prev" onclick="window.lbPrev()" aria-label="Назад">&#8592;</button>
         <div class="lb-img-wrap">
             <img id="lb-img" src="" alt="">
+            <p id="lb-title" class="lb-title"></p>
         </div>
         <button class="lb-arrow lb-next" id="lb-next" onclick="window.lbNext()" aria-label="Вперёд">&#8594;</button>
         <span class="lb-counter" id="lb-counter"></span>

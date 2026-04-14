@@ -34,36 +34,36 @@ window.renderGallery = function(data) {
             ? `<span class="gallery-count">${count > 9 ? '9+' : count + '+'}</span>`
             : '';
 
-        const overlay = (item.alt || count > 1)
-            ? `<div class="gallery-overlay">
-                   <span class="gallery-title">${item.alt || ''}</span>
-                   ${countBadge}
-               </div>`
+        const overlay = count > 1
+            ? `<div class="gallery-overlay">${countBadge}</div>`
             : '';
 
         const classes = ['gallery-item', item.large ? 'large' : '', clickable ? 'clickable' : '', extra ? 'gallery-extra-item' : '']
             .filter(Boolean).join(' ');
 
         return `
-        <div class="${classes}" aria-label="${item.alt || ''}" ${styleAttr}
+        <div class="${classes}" aria-label="${window.tData(item.alt)}" ${styleAttr}
              ${clickable ? `onclick="window.openGalleryItem(${idx})"` : ''}>
             ${placeholder}
             ${overlay}
         </div>`;
     }).join('');
 
-    const headerRight = hasMore
-        ? `<button class="section-link-btn" id="gallery-toggle-btn" onclick="window.toggleGallery()">Смотреть все →</button>`
-        : `<span class="section-link" style="opacity:.4">Смотреть все →</span>`;
-
     return `
 <div class="section-gray">
     <section class="section" id="gallery">
         <div class="section-header">
-            <h2 class="section-title">Галерея</h2>
-            ${headerRight}
+            <h2 class="section-title">${window.t('sections.gallery')}</h2>
         </div>
         <div class="gallery-grid">${items}</div>
+        ${hasMore ? `
+        <div style="text-align:center;margin-top:32px;margin-bottom:40px;">
+            <button id="gallery-toggle-btn" onclick="window.toggleGallery()" style="
+                display:inline-flex;align-items:center;gap:8px;
+                padding:11px 32px;border-radius:10px;border:2px solid #1A3C6E;
+                background:#fff;color:#1A3C6E;font-size:15px;font-weight:600;
+                cursor:pointer;font-family:inherit;transition:background .2s,color .2s;">${window.t('btn.showAll')}</button>
+        </div>` : ''}
     </section>
 </div>`;
 };
@@ -74,17 +74,19 @@ window.toggleGallery = function() {
     if (!items.length || !btn) return;
     const open = items[0].style.display === 'none';
     items.forEach(el => el.style.display = open ? '' : 'none');
-    btn.textContent = open ? 'Скрыть ↑' : 'Смотреть все →';
+    btn.textContent = open ? window.t('btn.hideAll') : window.t('btn.showAll');
 };
 
 // ── Lightbox ──────────────────────────────────────────
 let _lbPhotos  = [];
 let _lbCurrent = 0;
+let _lbTitle   = '';
 
 window.openGalleryItem = function(idx) {
     const item = window._galleryData[idx];
     if (!item || !item.photos || !item.photos.length) return;
     _lbPhotos  = item.photos;
+    _lbTitle   = window.tData(item.alt) || '';
     _lbCurrent = 0;
     _lbRender();
     document.getElementById('lightbox').style.display = 'flex';
@@ -112,6 +114,8 @@ function _lbRender() {
         _lbPhotos.length > 1 ? `${_lbCurrent + 1} / ${_lbPhotos.length}` : '';
     document.getElementById('lb-prev').style.display = _lbPhotos.length > 1 ? '' : 'none';
     document.getElementById('lb-next').style.display = _lbPhotos.length > 1 ? '' : 'none';
+    const titleEl = document.getElementById('lb-title');
+    if (titleEl) { titleEl.textContent = _lbTitle; titleEl.style.display = _lbTitle ? '' : 'none'; }
 }
 
 document.addEventListener('keydown', e => {

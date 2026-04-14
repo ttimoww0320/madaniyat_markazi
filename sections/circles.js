@@ -10,7 +10,7 @@ const CIRCLE_ICONS = {
 };
 
 window.renderCircles = function(data) {
-    const hasMore = data.length > 5;
+    const hasMore = data.length > 4;
 
     const cardsHTML = data.map((c, i) => {
         const card = `
@@ -20,28 +20,33 @@ window.renderCircles = function(data) {
                     ${CIRCLE_ICONS[c.color] || CIRCLE_ICONS.purple}
                 </svg>
             </div>
-            <h3 class="circle-title">${c.title}</h3>
-            <p class="circle-age">${c.age}</p>
-            <button class="circle-enroll-btn" onclick="window.openEnroll('${c.title.replace(/'/g,"\\'")}')">Записаться</button>
+            <h3 class="circle-title">${window.tData(c.title)}</h3>
+            <p class="circle-age">${window.tData(c.age)}</p>
+            <button class="circle-enroll-btn" onclick="window.openEnroll('${window.tData(c.title).replace(/'/g,"\\'")}')">
+                ${window.t('btn.enroll')}
+            </button>
         </div>`;
-        if (i >= 5) {
+        if (i >= 4) {
             return `<div class="circle-extra-item" style="display:none">${card}</div>`;
         }
         return card;
     }).join('');
 
-    const headerRight = hasMore
-        ? `<button class="section-link-btn" id="circles-toggle-btn" onclick="window.toggleCircles()">Все кружки →</button>`
-        : `<span class="section-link" style="opacity:.4">Все кружки →</span>`;
-
     return `
 <div class="section-gray">
     <section class="section" id="circles">
         <div class="section-header">
-            <h2 class="section-title">Кружки и секции</h2>
-            ${headerRight}
+            <h2 class="section-title">${window.t('sections.circles')}</h2>
         </div>
         <div class="grid-4" id="circles-grid">${cardsHTML}</div>
+        ${hasMore ? `
+        <div style="text-align:center;margin-top:32px;margin-bottom:40px;">
+            <button id="circles-toggle-btn" onclick="window.toggleCircles()" style="
+                display:inline-flex;align-items:center;gap:8px;
+                padding:11px 32px;border-radius:10px;border:2px solid #1A3C6E;
+                background:#fff;color:#1A3C6E;font-size:15px;font-weight:600;
+                cursor:pointer;font-family:inherit;transition:background .2s,color .2s;">${window.t('btn.showAll')}</button>
+        </div>` : ''}
     </section>
 </div>`;
 };
@@ -52,5 +57,5 @@ window.toggleCircles = function() {
     if (!items.length || !btn) return;
     const open = items[0].style.display === 'none';
     items.forEach(el => el.style.display = open ? '' : 'none');
-    btn.textContent = open ? 'Скрыть ↑' : 'Все кружки →';
+    btn.textContent = open ? window.t('btn.hideAll') : window.t('btn.showAll');
 };

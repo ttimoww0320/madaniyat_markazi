@@ -1,1 +1,31 @@
-{"header":{"logoText":"Yunusobod tuman Madaniyat bo'limi"},"hero":{"title":"Madaniyat shu yerdan boshlanadi!","subtitle":"Yunusobod tuman Madaniyat bo'limining rasmiy sayti","btn1Text":"Tadbirlar","btn1Href":"#events","btn2Text":"Jamoalar, to'garak, kurs va studiyalar","btn2Href":"#contact"},"footer":{"logoText":"Yunusobod tuman Madaniyat bo'limi","copyright":"© 2026 Barcha huquqlar himoyalangan","address":"Toshkent shahri, Yunusobod tumani","inn":"","workHours":"Du–Ju: 09:00–18:00"},"stats":[{"label":"посетителей в год","value":5000},{"label":"кружков и секций","value":33},{"label":"лет работы","value":25,"suffix":"+"},{"label":"мероприятий в год","value":700,"suffix":"+"}],"globalBg":"","backgrounds":{"hero":"","events":"","circles":"","team":"","documents":"/uploads/1775586017920_16.______.jpg","gallery":"","contact":""}}
+{
+  "header": {
+    "logoText": {"ru": "Отдел культуры Юнусабадского района", "uz": "Yunusobod tuman Madaniyat bo'limi", "oz": "Юнусобод туман Маданият бўлими"}
+  },
+  "hero": {
+    "title":    {"ru": "Культура начинается здесь!", "uz": "Madaniyat shu yerdan boshlanadi!", "oz": "Маданият шу ердан бошланади!"},
+    "subtitle": {"ru": "Официальный сайт Отдела культуры Юнусабадского района", "uz": "Yunusobod tuman Madaniyat bo'limining rasmiy sayti", "oz": "Юнусобод туман Маданият бўлимининг расмий сайти"},
+    "btn1Text": {"ru": "Смотреть афишу", "uz": "Afishani ko'rish", "oz": "Афишани кўриш"},
+    "btn1Href": "#events",
+    "btn2Text": {"ru": "Записаться", "uz": "Yozilish", "oz": "Ёзилиш"},
+    "btn2Href": "#contact"
+  },
+  "footer": {
+    "logoText":  {"ru": "Отдел культуры Юнусабадского района", "uz": "Yunusobod tuman Madaniyat bo'limi", "oz": "Юнусобод туман Маданият бўлими"},
+    "copyright": {"ru": "© 2026 Все права защищены", "uz": "© 2026 Barcha huquqlar himoyalangan", "oz": "© 2026 Барча ҳуқуқлар ҳимояланган"},
+    "address":   {"ru": "г. Ташкент, Юнусабадский район", "uz": "Toshkent shahri, Yunusobod tumani", "oz": "Тошкент шаҳри, Юнусобод тумани"},
+    "inn":       "",
+    "workHours": {"ru": "Пн–Пт: 09:00–18:00", "uz": "Du–Ju: 09:00–18:00", "oz": "Ду–Жу: 09:00–18:00"}
+  },
+  "stats": [
+    {"value": 5000, "label": {"ru": "посетителей в год",    "uz": "yiliga tashrif buyuruvchi", "oz": "йилига ташриф буюрувчи"}},
+    {"value": 34,   "label": {"ru": "кружков и секций",     "uz": "to'garak va seksiyalar",    "oz": "тўгарак ва секциялар"}},
+    {"value": 25,   "label": {"ru": "лет работы",           "uz": "yillik tajriba",             "oz": "йиллик тажриба"}},
+    {"value": 700,  "label": {"ru": "мероприятий в год",    "uz": "yiliga tadbirlar",           "oz": "йилига тадбирлар"}}
+  ],
+  "globalBg": "",
+  "backgrounds": {
+    "hero": "", "events": "", "circles": "", "team": "",
+    "documents": "", "gallery": "", "contact": ""
+  }
+}

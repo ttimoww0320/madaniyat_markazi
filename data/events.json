@@ -1,1 +1,20 @@
-[{"id":2,"date":"15 апреля","color":"yellow","title":"Выставка живописи","place":"Галерея","time":"10:00–20:00","image":"/uploads/1775582368406_photo_2026-04-01_15-57-03_1080x1440.jpg"},{"id":3,"date":"20 апреля","color":"green","title":"Джазовый вечер","place":"Камерный зал","time":"19:30","image":""}]
+[
+  {
+    "id": 2,
+    "date": {"ru": "15 апреля", "uz": "15 aprel", "oz": "15 апрель"},
+    "color": "yellow",
+    "title": {"ru": "Выставка живописи", "uz": "Rassomchilik ko'rgazmasi", "oz": "Рассомчилик кўргазмаси"},
+    "place": {"ru": "Галерея", "uz": "Galereya", "oz": "Галерея"},
+    "time": "10:00–20:00",
+    "image": "/uploads/1776143738716_1_rPVTIMA.width-1290.jpg"
+  },
+  {
+    "id": 3,
+    "date": {"ru": "20 апреля", "uz": "20 aprel", "oz": "20 апрель"},
+    "color": "green",
+    "title": {"ru": "Джазовый вечер", "uz": "Jazz kechasi", "oz": "Жазз кечаси"},
+    "place": {"ru": "Камерный зал", "uz": "Kamera zali", "oz": "Камера зали"},
+    "time": "19:30",
+    "image": "/uploads/1776143762130_images.jpg"
+  }
+]

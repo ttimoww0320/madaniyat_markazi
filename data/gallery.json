@@ -1,1 +1,38 @@
-[{"id":1,"alt":"Navro‘z bu - tinchlik, totuvlik, farovonlik bayrami.  Millati, dinidan qat’iy nazar, shu yurtda yashayotgan barcha millatlar, elatlar uchun birdek sevimli ayyom, keksayu yosh uchun birdek aziz shodiyona!","large":true,"photos":["/uploads/1775733513452_photo_2026-03-22_09-22-47.jpg","/uploads/1775733524229_photo_2026-03-22_09-22-48.jpg","/uploads/1775733598412_photo_2026-03-22_09-22-49.jpg","/uploads/1775733613709_photo_2026-03-22_09-24-51.jpg","/uploads/1775733632755_photo_2026-03-22_09-20-46.jpg"]},{"id":3,"alt":"Фото 3","large":false,"photos":[]},{"id":4,"alt":"Фото 4","large":false,"photos":[]},{"id":5,"alt":"Фото 5","large":false,"photos":[]},{"id":1775576293795,"alt":"12321","large":true,"photos":["/uploads/1775576317316_photo_2026-04-01_15-57-03_1080x1440.jpg"]},{"id":1775576300494,"alt":"321","large":false,"photos":[]}]
+[
+  {
+    "id": 1,
+    "alt":   {"ru": "Навруз байрами — праздник мира, единства и процветания", "uz": "Navro'z bayrami — tinchlik, totuvlik va farovonlik bayrami", "oz": "Навруз байрами — тинчлик, тотувлик ва фаровонлик байрами"},
+    "large": true,
+    "photos": [
+      "/uploads/1775733513452_photo_2026-03-22_09-22-47.jpg",
+      "/uploads/1775733524229_photo_2026-03-22_09-22-48.jpg",
+      "/uploads/1775733598412_photo_2026-03-22_09-22-49.jpg",
+      "/uploads/1775733613709_photo_2026-03-22_09-24-51.jpg",
+      "/uploads/1775733632755_photo_2026-03-22_09-20-46.jpg"
+    ]
+  },
+  {
+    "id": 3,
+    "alt":   {"ru": "8 марта — Международный женский день", "uz": "8 mart — Xalqaro xotin-qizlar kuni", "oz": "8 март — Халқаро хотин-қизлар куни"},
+    "large": false,
+    "photos": ["/uploads/1776144280566_KTdEfBLcIbNupvipamXwSUXfywzUodvESaUvEwDk.jpg_width_1200Xheight_700Xtype_1.jpg"]
+  },
+  {
+    "id": 4,
+    "alt":   {"ru": "9 мая — День памяти и почестей", "uz": "9 may — Xotira va qadriyatlar kuni", "oz": "9 май — Хотира ва қадриятлар куни"},
+    "large": false,
+    "photos": ["/uploads/1776144323999_183488162_807261706579844_6502247703899048398_n.jpg"]
+  },
+  {
+    "id": 5,
+    "alt":   {"ru": "1 сентября — День независимости", "uz": "1 sentabr — Mustaqillik kuni", "oz": "1 сентябр — Мустақиллик куни"},
+    "large": false,
+    "photos": ["/uploads/1776144355376_49678deb1134e9ed1fc504570f44fcfb_f17d779e-0878-45a6-b605-adb518cb8e94_300x300.jpg"]
+  },
+  {
+    "id": 1775576300494,
+    "alt":   {"ru": "1 октября — День учителя и наставника", "uz": "1 oktabr — O'qituvchi va murabbiylar kuni", "oz": "1 октябр — Ўқитувчи ва мураббийлар куни"},
+    "large": false,
+    "photos": ["/uploads/1776144393866_kursiv-td-card_______v_________p-_________b_v_m-1-_________p-3-2-1024x1024.webp"]
+  }
+]

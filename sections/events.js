@@ -11,7 +11,7 @@ const EVENT_ICONS = {
 
 function buildEventCard(ev) {
     const imageContent = ev.image
-        ? `<img src="${ev.image}" alt="${ev.title}" style="width:100%;height:100%;object-fit:cover;">`
+        ? `<img src="${ev.image}" alt="${window.tData(ev.title)}" style="width:100%;height:100%;object-fit:cover;">`
         : `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                ${EVENT_ICONS[ev.color] || EVENT_ICONS.blue}
            </svg>`;
@@ -22,18 +22,16 @@ function buildEventCard(ev) {
             ${imageContent}
         </div>
         <div class="event-content">
-            <span class="event-date ${ev.color !== 'blue' ? ev.color : ''}">${ev.date}</span>
-            <h3 class="event-title">${ev.title}</h3>
-            <p class="event-meta">${ev.place} • ${ev.time}</p>
+            <span class="event-date ${ev.color !== 'blue' ? ev.color : ''}">${window.tData(ev.date)}</span>
+            <h3 class="event-title">${window.tData(ev.title)}</h3>
+            <p class="event-meta">${window.tData(ev.place)} • ${ev.time}</p>
         </div>
     </div>`;
 }
 
-
 window.renderEvents = function(data) {
     const hasMore = data.length > 3;
 
-    // Все карточки в одной сетке — 4-я и далее скрыты
     const cardsHTML = data.map((ev, i) => {
         if (i >= 3) {
             return `<div class="event-extra-item" style="display:none">${buildEventCard(ev)}</div>`;
@@ -41,17 +39,20 @@ window.renderEvents = function(data) {
         return buildEventCard(ev);
     }).join('');
 
-    const headerRight = hasMore
-        ? `<button class="section-link-btn" id="events-toggle-btn" onclick="window.toggleEvents()">Все события →</button>`
-        : `<span class="section-link" style="opacity:.4">Все события →</span>`;
-
     return `
 <section class="section" id="events">
     <div class="section-header">
-        <h2 class="section-title">Ближайшие события</h2>
-        ${headerRight}
+        <h2 class="section-title">${window.t('sections.events')}</h2>
     </div>
     <div class="grid-3" id="events-grid">${cardsHTML}</div>
+    ${hasMore ? `
+    <div style="text-align:center;margin-top:32px;margin-bottom:40px;">
+        <button id="events-toggle-btn" onclick="window.toggleEvents()" style="
+            display:inline-flex;align-items:center;gap:8px;
+            padding:11px 32px;border-radius:10px;border:2px solid #1A3C6E;
+            background:#fff;color:#1A3C6E;font-size:15px;font-weight:600;
+            cursor:pointer;font-family:inherit;transition:background .2s,color .2s;">${window.t('btn.showAll')}</button>
+    </div>` : ''}
 </section>`;
 };
 
@@ -61,5 +62,5 @@ window.toggleEvents = function() {
     if (!items.length || !btn) return;
     const open = items[0].style.display === 'none';
     items.forEach(el => el.style.display = open ? '' : 'none');
-    btn.textContent = open ? 'Скрыть ↑' : 'Все события →';
+    btn.textContent = open ? window.t('btn.hideAll') : window.t('btn.showAll');
 };

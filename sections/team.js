@@ -15,15 +15,24 @@ function photoAvatar(photo, cssClass, fallbackSvg) {
 
 const DEPUTY_COLORS = { green: '#0F6E56', blue: '#185FA5', yellow: '#854F0B' };
 
+window.toggleDeputies = function() {
+    const items = document.querySelectorAll('.deputy-extra-item');
+    const btn   = document.getElementById('deputy-toggle-btn');
+    if (!items.length || !btn) return;
+    const open = items[0].style.display === 'none';
+    items.forEach(el => el.style.display = open ? '' : 'none');
+    btn.textContent = open ? window.t('btn.hideAll') : window.t('btn.showAll');
+};
+
 window.renderTeam = function(data) {
     const { director, deputies, staff } = data;
 
-    const deputyCards = deputies.map(d => `
-        <div class="deputy-card">
+    const deputyCards = deputies.map((d, i) => `
+        <div class="deputy-card${i >= 3 ? ' deputy-extra-item' : ''}"${i >= 3 ? ' style="display:none"' : ''}>
             ${photoAvatar(d.photo, `md ${d.color}`, personSVG(36, DEPUTY_COLORS[d.color] || '#888'))}
-            <span class="badge sm ${d.color}">${d.role}</span>
+            <span class="badge sm ${d.color}">${window.tData(d.role)}</span>
             <h3 class="name-md">${d.name}</h3>
-            <p class="title-sm">${d.department}</p>
+            <p class="title-sm">${window.tData(d.department)}</p>
             <p class="contact-text"><a href="tel:${d.phone}">${d.phone}</a></p>
             <p class="contact-text"><a href="mailto:${d.email}" class="contact-email">${d.email}</a></p>
         </div>
@@ -33,32 +42,34 @@ window.renderTeam = function(data) {
         <div class="staff-card">
             ${photoAvatar(s.photo, 'sm', personSVG(28, '#888'))}
             <h4 class="name-sm">${s.name}</h4>
-            <p class="title-xs">${s.role}</p>
+            <p class="title-xs">${window.tData(s.role)}</p>
             <a href="tel:${s.phone}" class="phone-sm">${s.phone}</a>
         </div>
     `).join('');
 
-    const hourLines = director.hours.map(h => `<p>${h}</p>`).join('');
+    const hourLines = (director.hours || []).map(h =>
+        `<p>${window.tData(h)}</p>`
+    ).join('');
 
     return `
 <section class="section" id="team">
     <div class="section-center">
-        <h2 class="section-title">Наша команда</h2>
-        <p class="section-subtitle">Профессионалы, которые делают культуру ближе</p>
+        <h2 class="section-title">${window.t('sections.team')}</h2>
+        <p class="section-subtitle">${window.t('sections.teamSub')}</p>
     </div>
 
     <div class="director-card">
         ${photoAvatar(director.photo, 'lg', personSVG(56, '#1A3C6E'))}
-        <span class="badge purple">Директор</span>
+        <span class="badge purple">${window.t('team.director')}</span>
         <h3 class="name-lg">${director.name}</h3>
-        <p class="title-text">${director.title}</p>
+        <p class="title-text">${window.tData(director.title)}</p>
         <div class="hours-box">
             <div class="hours-title">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <rect x="3" y="4" width="18" height="18" rx="2" stroke="#1A3C6E" stroke-width="1.5"/>
                     <path d="M16 2v4M8 2v4M3 10h18" stroke="#1A3C6E" stroke-width="1.5"/>
                 </svg>
-                Приёмные часы
+                ${window.t('team.hours')}
             </div>
             ${hourLines}
         </div>
@@ -78,6 +89,14 @@ window.renderTeam = function(data) {
     </div>
 
     <div class="deputies-grid">${deputyCards}</div>
+    ${deputies.length > 3 ? `
+    <div style="text-align:center;margin-top:32px;margin-bottom:40px;">
+        <button id="deputy-toggle-btn" onclick="window.toggleDeputies()" style="
+            display:inline-flex;align-items:center;gap:8px;
+            padding:11px 32px;border-radius:10px;border:2px solid #1A3C6E;
+            background:#fff;color:#1A3C6E;font-size:15px;font-weight:600;
+            cursor:pointer;font-family:inherit;transition:background .2s,color .2s;">${window.t('btn.showAll')}</button>
+    </div>` : ''}
     <div class="staff-grid">${staffCards}</div>
 </section>`;
 };

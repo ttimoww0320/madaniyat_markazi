@@ -3,13 +3,13 @@ const https = require('https');
 const fs    = require('fs');
 const path  = require('path');
 
-const PORT           = 3000;
+const PORT           = 3001;
 const ROOT           = __dirname;
 const ADMIN_PASSWORD = 'madaniyat_yunusobod';
 
-const TG_TOKEN   = '8214512522:AAH1HzTLfI3WAYrkXRo41BgBAi1SOAxlPEo';
-const TG_CHAT_ID = '-5259348022';
 
+const TG_TOKEN   = '8214512522:AAH1HzTLfI3WAYrkXRo41BgBAi1SOAxlPEo';
+const TG_CHAT_ID = '-1003999308794';
 function sendTelegram(text) {
     return new Promise((resolve, reject) => {
         const body = JSON.stringify({ chat_id: TG_CHAT_ID, text, parse_mode: 'HTML' });
@@ -21,9 +21,24 @@ function sendTelegram(text) {
         }, res => {
             let data = '';
             res.on('data', c => data += c);
-            res.on('end', () => resolve(JSON.parse(data)));
+            res.on('end', () => {
+                try {
+                    const parsed = JSON.parse(data);
+                    console.log('[Telegram ответ]:', JSON.stringify(parsed));
+                    if (parsed.ok) {
+                        resolve(parsed);
+                    } else {
+                        reject(new Error(`Telegram: ${parsed.description || 'неизвестная ошибка'}`));
+                    }
+                } catch (e) {
+                    reject(e);
+                }
+            });
         });
-        req.on('error', reject);
+        req.on('error', err => {
+            console.error('[Telegram ошибка сети]:', err.message);
+            reject(err);
+        });
         req.write(body);
         req.end();
     });
@@ -36,12 +51,17 @@ const MIME_TYPES = {
     '.json': 'application/json; charset=utf-8',
     '.png':  'image/png',
     '.jpg':  'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.webp': 'image/webp',
     '.svg':  'image/svg+xml',
     '.ico':  'image/x-icon',
+    '.doc':  'application/msword',
+    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '.pdf':  'application/pdf',
 };
 
 // Разрешённые секции для API
-const ALLOWED_SECTIONS = ['events', 'circles', 'team', 'documents', 'gallery', 'contact', 'site', 'news', 'achievements'];
+const ALLOWED_SECTIONS = ['events', 'circles', 'team', 'documents', 'gallery', 'contact', 'site', 'news', 'achievements', 'map'];
 
 // Отправить JSON-ответ
 function sendJSON(res, status, data) {

@@ -348,7 +348,54 @@
             .admin-header { padding: 0 16px; }
             .admin-tabs   { padding: 0 16px; }
         }
+
+        /* ===== CROP MODAL ===== */
+        #crop-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.82);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            padding: 24px;
+        }
+        #crop-modal.open { display: flex; }
+        #crop-container {
+            max-width: min(680px, 92vw);
+            max-height: 60vh;
+            overflow: hidden;
+            border-radius: 10px;
+            background: #111;
+        }
+        #crop-container img { display: block; max-width: 100%; }
+        .crop-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .crop-btn {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .crop-btn-ok     { background: #1A3C6E; color: #fff; }
+        .crop-btn-ok:hover { background: #142e56; }
+        .crop-btn-cancel { background: rgba(255,255,255,.15); color: #fff; }
+        .crop-btn-cancel:hover { background: rgba(255,255,255,.25); }
+
+        /* ===== ML INPUT ===== */
+        .ml-wrap { display:flex; flex-direction:column; gap:3px; }
+        .ml-row  { display:flex; align-items:center; gap:6px; }
+        .ml-lbl  { font-size:10px; font-weight:700; color:#1A3C6E; min-width:20px; flex-shrink:0; }
+        .ml-row .field-input { flex:1; }
+        .ml-row textarea.field-input { min-height:52px; resize:vertical; }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
 </head>
 <body>
 
@@ -397,6 +444,7 @@
         <button class="tab-btn"        onclick="showTab('gallery',this)">🖼 Галерея</button>
         <button class="tab-btn"        onclick="showTab('contact',this)">📞 Контакты</button>
         <button class="tab-btn"        onclick="showTab('qr',this)">📱 QR-код</button>
+        <button class="tab-btn"        onclick="showTab('map',this)">🗺 Карта</button>
     </nav>
 
     <div class="admin-content">
@@ -471,7 +519,7 @@
                     </div>
                     <div class="field-group">
                         <label class="field-label">Должность / звание</label>
-                        <input class="field-input" id="dir-title">
+                        <div id="dir-title-wrap"></div>
                     </div>
                     <div class="field-group">
                         <label class="field-label">Телефон</label>
@@ -483,7 +531,7 @@
                     </div>
                     <div class="field-group" style="grid-column:1/-1">
                         <label class="field-label">Приёмные часы (каждая строка — отдельное время)</label>
-                        <textarea class="field-textarea" id="dir-hours"></textarea>
+                        <div id="dir-hours-wrap"></div>
                     </div>
                     <div id="dir-photo-field" style="grid-column:1/-1"></div>
                 </div>
@@ -587,11 +635,11 @@
                 <div class="item-row cols-2">
                     <div class="field-group">
                         <label class="field-label">Адрес</label>
-                        <input class="field-input" id="con-address">
+                        <div id="con-address-wrap"></div>
                     </div>
                     <div class="field-group">
                         <label class="field-label">Ориентир</label>
-                        <input class="field-input" id="con-landmark">
+                        <div id="con-landmark-wrap"></div>
                     </div>
                 </div>
             </div>
@@ -613,11 +661,11 @@
                 <div class="item-row cols-2" style="margin-top:8px">
                     <div class="field-group">
                         <label class="field-label">Пн–Пт</label>
-                        <input class="field-input" id="con-weekdays">
+                        <div id="con-weekdays-wrap"></div>
                     </div>
                     <div class="field-group">
                         <label class="field-label">Сб–Вс</label>
-                        <input class="field-input" id="con-weekends">
+                        <div id="con-weekends-wrap"></div>
                     </div>
                 </div>
             </div>
@@ -654,7 +702,7 @@
                 <div class="item-row cols-2">
                     <div class="field-group">
                         <label class="field-label">Название (логотип)</label>
-                        <input class="field-input" id="site-logo-text">
+                        <div id="site-logo-text-wrap"></div>
                     </div>
                 </div>
             </div>
@@ -663,17 +711,17 @@
                 <div class="item-row cols-2">
                     <div class="field-group">
                         <label class="field-label">Заголовок</label>
-                        <input class="field-input" id="site-hero-title">
+                        <div id="site-hero-title-wrap"></div>
                     </div>
                     <div class="field-group">
                         <label class="field-label">Подзаголовок</label>
-                        <input class="field-input" id="site-hero-subtitle">
+                        <div id="site-hero-subtitle-wrap"></div>
                     </div>
                 </div>
                 <div class="item-row cols-2" style="margin-top:8px">
                     <div class="field-group">
                         <label class="field-label">Кнопка 1 — текст</label>
-                        <input class="field-input" id="site-btn1-text">
+                        <div id="site-btn1-text-wrap"></div>
                     </div>
                     <div class="field-group">
                         <label class="field-label">Кнопка 1 — ссылка</label>
@@ -683,7 +731,7 @@
                 <div class="item-row cols-2" style="margin-top:8px">
                     <div class="field-group">
                         <label class="field-label">Кнопка 2 — текст</label>
-                        <input class="field-input" id="site-btn2-text">
+                        <div id="site-btn2-text-wrap"></div>
                     </div>
                     <div class="field-group">
                         <label class="field-label">Кнопка 2 — ссылка</label>
@@ -696,15 +744,15 @@
                 <div class="item-row cols-2">
                     <div class="field-group">
                         <label class="field-label">Название (логотип)</label>
-                        <input class="field-input" id="site-footer-logo">
+                        <div id="site-footer-logo-wrap"></div>
                     </div>
                     <div class="field-group">
                         <label class="field-label">Копирайт</label>
-                        <input class="field-input" id="site-footer-copy">
+                        <div id="site-footer-copy-wrap"></div>
                     </div>
                     <div class="field-group">
                         <label class="field-label">Адрес организации</label>
-                        <input class="field-input" id="site-footer-address" placeholder="г. Ташкент, Юнусободский район">
+                        <div id="site-footer-address-wrap"></div>
                     </div>
                     <div class="field-group">
                         <label class="field-label">ИНН / реквизиты</label>
@@ -712,7 +760,7 @@
                     </div>
                     <div class="field-group">
                         <label class="field-label">Режим работы</label>
-                        <input class="field-input" id="site-footer-hours" placeholder="Пн–Пт: 09:00–18:00">
+                        <div id="site-footer-hours-wrap"></div>
                     </div>
                 </div>
             </div>
@@ -744,6 +792,20 @@
                         <p style="font-size:13px;color:#666;margin-bottom:12px">Размер: 300×300 px — подходит для печати до A5</p>
                         <button class="save-btn" onclick="downloadQR()">⬇ Скачать PNG</button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== КАРТА (МФЙ) ===== -->
+        <div id="tab-map" class="tab-panel">
+            <div class="section-card">
+                <h2>🗺 Интерактивная карта — секторы и МФЙ</h2>
+                <p style="font-size:13px;color:#666;margin-bottom:20px">Для каждого сектора введите название, для каждой МФЙ — название, имя руководителя, телефон и фото.</p>
+                <div id="map-sectors-list"></div>
+                <hr class="divider">
+                <div class="save-bar">
+                    <button class="save-btn" onclick="saveSection('map', collectMap)">Сохранить карту</button>
+                    <span class="save-status" id="map-status"></span>
                 </div>
             </div>
         </div>
@@ -1123,11 +1185,62 @@ function fieldGroup(label, input) {
 }
 
 function input(value = '', placeholder = '') {
+    // value может быть строкой или {ru,uz,oz} — берём текущее значение для отображения
+    const strVal = (value && typeof value === 'object') ? (value.ru || value.uz || '') : (value || '');
     const i = document.createElement('input');
     i.className = 'field-input';
-    i.value = value;
+    i.value = strVal;
     i.placeholder = placeholder;
     return i;
+}
+
+// Мультиязычный input: value = string | {ru,uz,oz}
+function mlInput(value, placeholder) {
+    const v = (value && typeof value === 'object')
+        ? { ru: value.ru || '', uz: value.uz || '', oz: value.oz || '' }
+        : { ru: value || '', uz: value || '', oz: value || '' };
+
+    const wrap = document.createElement('div');
+    wrap.className = 'ml-wrap';
+    const inputs = {};
+    [['ru','RU'],['uz','UZ'],['oz','ЎЗ']].forEach(([lang, lbl]) => {
+        const row = document.createElement('div');
+        row.className = 'ml-row';
+        const label = document.createElement('span');
+        label.className = 'ml-lbl'; label.textContent = lbl;
+        const inp = document.createElement('input');
+        inp.className = 'field-input'; inp.placeholder = placeholder || ''; inp.value = v[lang];
+        inputs[lang] = inp;
+        row.appendChild(label); row.appendChild(inp);
+        wrap.appendChild(row);
+    });
+    wrap.getValue = () => ({ ru: inputs.ru.value, uz: inputs.uz.value, oz: inputs.oz.value });
+    return wrap;
+}
+
+// Мультиязычный textarea: value = string | {ru,uz,oz}
+function mlTextarea(value, placeholder) {
+    const v = (value && typeof value === 'object')
+        ? { ru: value.ru || '', uz: value.uz || '', oz: value.oz || '' }
+        : { ru: value || '', uz: value || '', oz: value || '' };
+
+    const wrap = document.createElement('div');
+    wrap.className = 'ml-wrap';
+    const inputs = {};
+    [['ru','RU'],['uz','UZ'],['oz','ЎЗ']].forEach(([lang, lbl]) => {
+        const row = document.createElement('div');
+        row.className = 'ml-row'; row.style.alignItems = 'flex-start';
+        const label = document.createElement('span');
+        label.className = 'ml-lbl'; label.textContent = lbl; label.style.marginTop = '6px';
+        const ta = document.createElement('textarea');
+        ta.className = 'field-input'; ta.placeholder = placeholder || ''; ta.value = v[lang]; ta.rows = 2;
+        ta.style.cssText = 'flex:1;resize:vertical;font-family:inherit;font-size:14px;';
+        inputs[lang] = ta;
+        row.appendChild(label); row.appendChild(ta);
+        wrap.appendChild(row);
+    });
+    wrap.getValue = () => ({ ru: inputs.ru.value, uz: inputs.uz.value, oz: inputs.oz.value });
+    return wrap;
 }
 
 function select(options, value) {
@@ -1163,9 +1276,9 @@ function renderEventItem(ev) {
     const fields = document.createElement('div');
     fields.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;';
 
-    const dateIn   = input(ev.date, '12 апреля');
-    const titleIn  = input(ev.title, 'Название события');
-    const placeIn  = input(ev.place, 'Зал');
+    const dateIn   = mlInput(ev.date, '12 апреля');
+    const titleIn  = mlInput(ev.title, 'Название события');
+    const placeIn  = mlInput(ev.place, 'Зал');
     const timeIn   = input(ev.time, '18:00');
     const colorSel = select([['blue','🔵 Синий'],['yellow','🟡 Жёлтый'],['green','🟢 Зелёный']], ev.color);
 
@@ -1277,8 +1390,8 @@ function renderEventItem(ev) {
 
     row._getData = () => ({
         id: ev.id || Date.now(),
-        date: dateIn.value, color: colorSel.value,
-        title: titleIn.value, place: placeIn.value,
+        date: dateIn.getValue(), color: colorSel.value,
+        title: titleIn.getValue(), place: placeIn.getValue(),
         time: timeIn.value, image: imageUrl
     });
 
@@ -1302,8 +1415,8 @@ function renderCircleItem(c) {
     const row = document.createElement('div');
     row.className = 'item-row cols-4';
 
-    const titleIn = input(c.title, 'Название кружка');
-    const ageIn   = input(c.age, '6–14 лет');
+    const titleIn = mlInput(c.title, 'Название кружка');
+    const ageIn   = mlInput(c.age, '6–14 лет');
     const colorSel = select([
         ['purple','🟣 Фиолетовый'],['green','🟢 Зелёный'],
         ['yellow','🟡 Жёлтый'],['pink','🩷 Розовый']
@@ -1321,7 +1434,7 @@ function renderCircleItem(c) {
     row.appendChild(fieldGroup('Цвет', colorSel));
     row.appendChild(delWrapper);
 
-    row._getData = () => ({ id: c.id || Date.now(), title: titleIn.value, age: ageIn.value, color: colorSel.value });
+    row._getData = () => ({ id: c.id || Date.now(), title: titleIn.getValue(), age: ageIn.getValue(), color: colorSel.value });
     return row;
 }
 
@@ -1419,8 +1532,8 @@ function renderDeputyItem(d) {
     row.className = 'item-row cols-3';
 
     const nameIn  = input(d.name, 'ФИО');
-    const roleIn  = input(d.role, 'Должность');
-    const deptIn  = input(d.department, 'Отдел');
+    const roleIn  = mlInput(d.role, 'Должность');
+    const deptIn  = mlInput(d.department, 'Отдел');
     const phoneIn = input(d.phone, '+998...');
     const emailIn = input(d.email, 'email@...');
     const colorSel = select([['green','🟢 Зелёный'],['blue','🔵 Синий'],['yellow','🟡 Жёлтый']], d.color);
@@ -1442,7 +1555,7 @@ function renderDeputyItem(d) {
     row.appendChild(photoField.element);
     row.appendChild(delWrapper);
 
-    row._getData = () => ({ id: d.id || Date.now(), name: nameIn.value, role: roleIn.value, department: deptIn.value, color: colorSel.value, phone: phoneIn.value, email: emailIn.value, photo: photoField.getUrl() });
+    row._getData = () => ({ id: d.id || Date.now(), name: nameIn.value, role: roleIn.getValue(), department: deptIn.getValue(), color: colorSel.value, phone: phoneIn.value, email: emailIn.value, photo: photoField.getUrl() });
     return row;
 }
 
@@ -1457,7 +1570,7 @@ function renderStaffItem(s) {
     row.className = 'item-row cols-4';
 
     const nameIn  = input(s.name, 'Фамилия И.О.');
-    const roleIn  = input(s.role, 'Должность');
+    const roleIn  = mlInput(s.role, 'Должность');
     const phoneIn = input(s.phone, '+998...');
     const photoField = makePhotoField(s.photo || '');
 
@@ -1474,7 +1587,7 @@ function renderStaffItem(s) {
     row.appendChild(photoField.element);
     row.appendChild(delWrapper);
 
-    row._getData = () => ({ id: s.id || Date.now(), name: nameIn.value, role: roleIn.value, phone: phoneIn.value, photo: photoField.getUrl() });
+    row._getData = () => ({ id: s.id || Date.now(), name: nameIn.value, role: roleIn.getValue(), phone: phoneIn.value, photo: photoField.getUrl() });
     return row;
 }
 
@@ -1485,13 +1598,23 @@ function addStaff() {
 }
 
 function collectTeam() {
+    // Собрать приёмные часы из ml-textarea (каждая строка = один час)
+    const hoursVal = _mlFields.dirHours ? _mlFields.dirHours.getValue() : { ru: '', uz: '', oz: '' };
+    const ruLines = hoursVal.ru.split('\n').map(s => s.trim()).filter(Boolean);
+    const uzLines = hoursVal.uz.split('\n').map(s => s.trim()).filter(Boolean);
+    const ozLines = hoursVal.oz.split('\n').map(s => s.trim()).filter(Boolean);
+    const len = Math.max(ruLines.length, uzLines.length, ozLines.length);
+    const hours = Array.from({ length: len }, (_, i) => ({
+        ru: ruLines[i] || '', uz: uzLines[i] || '', oz: ozLines[i] || ''
+    }));
+
     return {
         director: {
             name:  document.getElementById('dir-name').value,
-            title: document.getElementById('dir-title').value,
+            title: _mlFields.dirTitle ? _mlFields.dirTitle.getValue() : '',
             phone: document.getElementById('dir-phone').value,
             email: document.getElementById('dir-email').value,
-            hours: document.getElementById('dir-hours').value.split('\n').map(s => s.trim()).filter(Boolean),
+            hours,
             photo: _dirPhoto ? _dirPhoto.getUrl() : ''
         },
         deputies: [...document.getElementById('deputies-list').children].map(r => r._getData()),
@@ -1503,6 +1626,19 @@ function collectTeam() {
 // SITE
 // =====================================================
 let _siteData = {};
+
+// Хранилище ml-виджетов для статических полей
+const _mlFields = {};
+
+// Вспомогательная функция: создать mlInput/mlTextarea и вставить в контейнер
+function injectMlField(wrapId, value, placeholder, isTextarea) {
+    const wrap = document.getElementById(wrapId);
+    if (!wrap) return null;
+    const el = isTextarea ? mlTextarea(value, placeholder) : mlInput(value, placeholder);
+    wrap.innerHTML = '';
+    wrap.appendChild(el);
+    return el;
+}
 
 function bgUploadField(labelText, currentUrl, onUploaded) {
     let url = currentUrl || '';
@@ -1592,23 +1728,24 @@ function bgUploadField(labelText, currentUrl, onUploaded) {
 
 function saveSite() {
     saveWithStatus('site-save-btn', 'site-status', () => {
+        const ml = _mlFields;
         const stats = [...document.getElementById('stats-list').children].map(r => r._getData());
         const data = {
-            header:  { logoText: document.getElementById('site-logo-text').value },
+            header:  { logoText: ml.siteLogoText?.getValue() || '' },
             hero: {
-                title:    document.getElementById('site-hero-title').value,
-                subtitle: document.getElementById('site-hero-subtitle').value,
-                btn1Text: document.getElementById('site-btn1-text').value,
+                title:    ml.siteHeroTitle?.getValue()    || '',
+                subtitle: ml.siteHeroSubtitle?.getValue() || '',
+                btn1Text: ml.siteBtn1Text?.getValue()     || '',
                 btn1Href: document.getElementById('site-btn1-href').value,
-                btn2Text: document.getElementById('site-btn2-text').value,
+                btn2Text: ml.siteBtn2Text?.getValue()     || '',
                 btn2Href: document.getElementById('site-btn2-href').value,
             },
             footer: {
-                logoText:  document.getElementById('site-footer-logo').value,
-                copyright: document.getElementById('site-footer-copy').value,
-                address:   document.getElementById('site-footer-address').value,
+                logoText:  ml.siteFooterLogo?.getValue()    || '',
+                copyright: ml.siteFooterCopy?.getValue()    || '',
+                address:   ml.siteFooterAddress?.getValue() || '',
                 inn:       document.getElementById('site-footer-inn').value,
-                workHours: document.getElementById('site-footer-hours').value,
+                workHours: ml.siteFooterHours?.getValue()   || '',
             },
             stats,
             globalBg:    _siteData.globalBg    || '',
@@ -1624,10 +1761,10 @@ function renderStatItem(s) {
     row.style.marginBottom = '8px';
     const valueIn = input(String(s.value), 'Число');
     valueIn.type = 'number';
-    const labelIn = input(s.label, 'Подпись');
+    const labelIn = mlInput(s.label, 'Подпись');
     row.appendChild(fieldGroup('Число', valueIn));
     row.appendChild(fieldGroup('Подпись', labelIn));
-    row._getData = () => ({ value: +valueIn.value || 0, label: labelIn.value });
+    row._getData = () => ({ value: +valueIn.value || 0, label: labelIn.getValue() });
     return row;
 }
 
@@ -1714,8 +1851,8 @@ function renderDocMainItem(doc) {
     const row = document.createElement('div');
     row.className = 'item-row cols-3';
 
-    const titleIn  = input(doc.title, 'Название документа');
-    const descIn   = input(doc.description || '', 'Описание');
+    const titleIn  = mlInput(doc.title, 'Название документа');
+    const descIn   = mlInput(doc.description || '', 'Описание');
     const colorSel = select([['red','🔴 Красный'],['green','🟢 Зелёный'],['blue','🔵 Синий'],['yellow','🟡 Жёлтый']], doc.color);
 
     const fileField = docUploadField(doc.file, doc.size, () => {});
@@ -1735,8 +1872,8 @@ function renderDocMainItem(doc) {
 
     row._getData = () => ({
         id: doc.id || Date.now(),
-        title: titleIn.value,
-        description: descIn.value,
+        title: titleIn.getValue(),
+        description: descIn.getValue(),
         size: fileField._getSize() || doc.size,
         color: colorSel.value,
         file: fileField._getFile()
@@ -1754,7 +1891,7 @@ function renderDocSmallItem(doc) {
     const row = document.createElement('div');
     row.className = 'item-row cols-4';
 
-    const titleIn  = input(doc.title, 'Название документа');
+    const titleIn  = mlInput(doc.title, 'Название документа');
     const fileField = docUploadField(doc.file, doc.size, () => {});
 
     const delWrapper = document.createElement('div');
@@ -1770,7 +1907,7 @@ function renderDocSmallItem(doc) {
 
     row._getData = () => ({
         id: doc.id || Date.now(),
-        title: titleIn.value,
+        title: titleIn.getValue(),
         size: fileField._getSize() || doc.size,
         file: fileField._getFile()
     });
@@ -1798,7 +1935,7 @@ function renderGalleryItem(item) {
     row.className = 'item-row';
     row.style.flexWrap = 'wrap';
 
-    const altIn = input(item.alt || '', 'Название альбома / описание');
+    const altIn = mlInput(item.alt || '', 'Название альбома / описание');
 
     const largeLabel = document.createElement('label');
     largeLabel.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;';
@@ -1852,24 +1989,28 @@ function renderGalleryItem(item) {
         addBtn.style.marginTop = '0'; addBtn.textContent = '+ Фото';
         addBtn.onclick = () => fileIn.click();
 
-        fileIn.addEventListener('change', async () => {
+        fileIn.addEventListener('change', () => {
             const file = fileIn.files[0];
             if (!file) return;
-            addBtn.disabled = true; addBtn.textContent = '...';
-            try {
-                const fname = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-                const res = await fetch(`/api/upload?name=${fname}`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${PASSWORD}` },
-                    body: file
-                });
-                const json = await res.json();
-                photos.push(json.url);
-                renderThumbs();
-            } catch(e) {
-                alert('Ошибка загрузки фото');
-            }
-            addBtn.disabled = false; addBtn.textContent = '+ Фото';
+            fileIn.value = '';   // сбрасываем, чтобы можно было выбрать тот же файл снова
+
+            window.openCropModal(file, async (blob, origName) => {
+                addBtn.disabled = true; addBtn.textContent = '...';
+                try {
+                    const fname = `${Date.now()}_${origName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+                    const res = await fetch(`/api/upload?name=${fname}`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${PASSWORD}` },
+                        body: blob
+                    });
+                    const json = await res.json();
+                    photos.push(json.url);
+                    renderThumbs();
+                } catch(e) {
+                    alert('Ошибка загрузки фото');
+                }
+                addBtn.disabled = false; addBtn.textContent = '+ Фото';
+            });
         });
 
         photosWrap.appendChild(addBtn);
@@ -1891,7 +2032,7 @@ function renderGalleryItem(item) {
     row.appendChild(delWrapper);
     row.appendChild(photosField);
 
-    row._getData = () => ({ id: item.id || Date.now(), alt: altIn.value, large: largeCheck.checked, photos });
+    row._getData = () => ({ id: item.id || Date.now(), alt: altIn.getValue(), large: largeCheck.checked, photos });
     return row;
 }
 
@@ -1961,14 +2102,15 @@ function addSocial() {
 }
 
 function collectContact() {
+    const ml = _mlFields;
     return {
-        address:  document.getElementById('con-address').value,
-        landmark: document.getElementById('con-landmark').value,
+        address:  ml.conAddress?.getValue()  || '',
+        landmark: ml.conLandmark?.getValue() || '',
         phones:   [...document.getElementById('phones-list').children].map(r => r._getData()),
         email:    document.getElementById('con-email').value,
         hours: {
-            weekdays: document.getElementById('con-weekdays').value,
-            weekends: document.getElementById('con-weekends').value,
+            weekdays: ml.conWeekdays?.getValue() || '',
+            weekends: ml.conWeekends?.getValue() || '',
         },
         socials: [...document.getElementById('socials-list').children].map(r => r._getData()),
     };
@@ -1995,10 +2137,19 @@ async function loadAllSections() {
     // Team
     apiGet('team').then(data => {
         document.getElementById('dir-name').value  = data.director.name;
-        document.getElementById('dir-title').value = data.director.title;
         document.getElementById('dir-phone').value = data.director.phone;
         document.getElementById('dir-email').value = data.director.email;
-        document.getElementById('dir-hours').value = data.director.hours.join('\n');
+
+        _mlFields.dirTitle = injectMlField('dir-title-wrap', data.director.title, 'Руководитель отдела...');
+
+        // hours — массив {ru,uz,oz}; каждая строка в textarea = одна запись
+        const hrs = data.director.hours || [];
+        const hoursVal = {
+            ru: hrs.map(h => (typeof h === 'string' ? h : (h.ru || ''))).join('\n'),
+            uz: hrs.map(h => (typeof h === 'object' ? (h.uz || '') : '')).join('\n'),
+            oz: hrs.map(h => (typeof h === 'object' ? (h.oz || '') : '')).join('\n'),
+        };
+        _mlFields.dirHours = injectMlField('dir-hours-wrap', hoursVal, 'Среда, Пятница: 10:00–12:00', true);
 
         const dirPhotoContainer = document.getElementById('dir-photo-field');
         dirPhotoContainer.innerHTML = '';
@@ -2017,18 +2168,20 @@ async function loadAllSections() {
     // Site
     apiGet('site').then(data => {
         _siteData = data;
-        document.getElementById('site-logo-text').value     = data.header?.logoText  || '';
-        document.getElementById('site-hero-title').value    = data.hero?.title       || '';
-        document.getElementById('site-hero-subtitle').value = data.hero?.subtitle    || '';
-        document.getElementById('site-btn1-text').value     = data.hero?.btn1Text    || '';
-        document.getElementById('site-btn1-href').value     = data.hero?.btn1Href    || '';
-        document.getElementById('site-btn2-text').value     = data.hero?.btn2Text    || '';
-        document.getElementById('site-btn2-href').value     = data.hero?.btn2Href    || '';
-        document.getElementById('site-footer-logo').value    = data.footer?.logoText  || '';
-        document.getElementById('site-footer-copy').value    = data.footer?.copyright || '';
-        document.getElementById('site-footer-address').value = data.footer?.address   || '';
-        document.getElementById('site-footer-inn').value     = data.footer?.inn       || '';
-        document.getElementById('site-footer-hours').value   = data.footer?.workHours || '';
+
+        _mlFields.siteLogoText      = injectMlField('site-logo-text-wrap',      data.header?.logoText,    'Отдел культуры...');
+        _mlFields.siteHeroTitle     = injectMlField('site-hero-title-wrap',     data.hero?.title,         'Заголовок');
+        _mlFields.siteHeroSubtitle  = injectMlField('site-hero-subtitle-wrap',  data.hero?.subtitle,      'Подзаголовок');
+        _mlFields.siteBtn1Text      = injectMlField('site-btn1-text-wrap',      data.hero?.btn1Text,      'Смотреть афишу');
+        _mlFields.siteBtn2Text      = injectMlField('site-btn2-text-wrap',      data.hero?.btn2Text,      'Записаться');
+        _mlFields.siteFooterLogo    = injectMlField('site-footer-logo-wrap',    data.footer?.logoText,    'Название');
+        _mlFields.siteFooterCopy    = injectMlField('site-footer-copy-wrap',    data.footer?.copyright,   '© 2026...');
+        _mlFields.siteFooterAddress = injectMlField('site-footer-address-wrap', data.footer?.address,     'г. Ташкент...');
+        _mlFields.siteFooterHours   = injectMlField('site-footer-hours-wrap',   data.footer?.workHours,   'Пн–Пт: 09:00–18:00');
+
+        document.getElementById('site-btn1-href').value = data.hero?.btn1Href || '';
+        document.getElementById('site-btn2-href').value = data.hero?.btn2Href || '';
+        document.getElementById('site-footer-inn').value = data.footer?.inn   || '';
 
         const statsList = document.getElementById('stats-list');
         statsList.innerHTML = '';
@@ -2073,11 +2226,11 @@ async function loadAllSections() {
 
     // Contact
     apiGet('contact').then(data => {
-        document.getElementById('con-address').value  = data.address;
-        document.getElementById('con-landmark').value = data.landmark;
-        document.getElementById('con-email').value    = data.email;
-        document.getElementById('con-weekdays').value = data.hours.weekdays;
-        document.getElementById('con-weekends').value = data.hours.weekends;
+        _mlFields.conAddress  = injectMlField('con-address-wrap',  data.address,          'г. Ташкент...');
+        _mlFields.conLandmark = injectMlField('con-landmark-wrap', data.landmark,         'Ориентир');
+        _mlFields.conWeekdays = injectMlField('con-weekdays-wrap', data.hours?.weekdays,  'Пн–Пт: 09:00–18:00');
+        _mlFields.conWeekends = injectMlField('con-weekends-wrap', data.hours?.weekends,  'Сб–Вс: выходной');
+        document.getElementById('con-email').value = data.email;
 
         const phoneList = document.getElementById('phones-list');
         phoneList.innerHTML = '';
@@ -2101,6 +2254,9 @@ async function loadAllSections() {
         list.innerHTML = '';
         data.forEach(a => list.appendChild(renderAchievementItem(a)));
     });
+
+    // Map
+    apiGet('map').then(data => loadMap(data));
 }
 
 // =====================================================
@@ -2110,14 +2266,9 @@ function renderNewsItem(n) {
     const row = document.createElement('div');
     row.className = 'item-row cols-2';
 
-    const titleIn = input(n.title, 'Заголовок');
+    const titleIn = mlInput(n.title, 'Заголовок');
     const dateIn  = input(n.date,  'ДД.ММ.ГГГГ');
-    const textIn  = document.createElement('textarea');
-    textIn.className = 'field-input';
-    textIn.placeholder = 'Текст новости...';
-    textIn.value = n.text || '';
-    textIn.rows = 3;
-    textIn.style.cssText = 'resize:vertical;font-family:inherit;font-size:14px;';
+    const textIn  = mlTextarea(n.text, 'Текст новости...');
     const photoField = makePhotoField(n.image || '', null);
 
     const delWrapper = document.createElement('div');
@@ -2133,7 +2284,7 @@ function renderNewsItem(n) {
     row.appendChild(photoField.element);
     row.appendChild(delWrapper);
 
-    row._getData = () => ({ id: n.id || Date.now(), title: titleIn.value, date: dateIn.value, text: textIn.value, image: photoField.getUrl() });
+    row._getData = () => ({ id: n.id || Date.now(), title: titleIn.getValue(), date: dateIn.value, text: textIn.getValue(), image: photoField.getUrl() });
     return row;
 }
 
@@ -2154,14 +2305,9 @@ function renderAchievementItem(a) {
     const row = document.createElement('div');
     row.className = 'item-row cols-2';
 
-    const titleIn = input(a.title,       'Название награды');
-    const yearIn  = input(a.year,        'Год');
-    const descIn  = document.createElement('textarea');
-    descIn.className = 'field-input';
-    descIn.placeholder = 'Описание...';
-    descIn.value = a.description || '';
-    descIn.rows = 2;
-    descIn.style.cssText = 'resize:vertical;font-family:inherit;font-size:14px;';
+    const titleIn = mlInput(a.title, 'Название награды');
+    const yearIn  = input(a.year,    'Год');
+    const descIn  = mlTextarea(a.description, 'Описание...');
     const photoField = makePhotoField(a.image || '', null);
 
     const delWrapper = document.createElement('div');
@@ -2177,7 +2323,7 @@ function renderAchievementItem(a) {
     row.appendChild(photoField.element);
     row.appendChild(delWrapper);
 
-    row._getData = () => ({ id: a.id || Date.now(), title: titleIn.value, year: yearIn.value, description: descIn.value, image: photoField.getUrl() });
+    row._getData = () => ({ id: a.id || Date.now(), title: titleIn.getValue(), year: yearIn.value, description: descIn.getValue(), image: photoField.getUrl() });
     return row;
 }
 
@@ -2238,6 +2384,223 @@ function downloadQR() {
     a.href = canvas.toDataURL('image/png');
     a.click();
 }
+
+// =====================================================
+// MAP (ИНТЕРАКТИВНАЯ КАРТА — МФЙ)
+// =====================================================
+let _mapData = null;
+
+function renderMapMahallaItem(m) {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'border:1px solid #e5e5e5;border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fafafa;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'font-weight:600;font-size:13px;color:#534AB7;margin-bottom:10px;';
+    header.textContent = m.name;
+    wrap.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;';
+
+    const mahallNameIn = input(m.name, 'Название МФЙ');
+    const leaderNameIn = input(m.leader.name, 'ФИО руководителя');
+    const leaderPhoneIn = input(m.leader.phone, '+998 90-000-00-00');
+
+    grid.appendChild(fieldGroup('Название МФЙ', mahallNameIn));
+    grid.appendChild(fieldGroup('ФИО руководителя', leaderNameIn));
+    grid.appendChild(fieldGroup('Телефон', leaderPhoneIn));
+
+    // Фото руководителя
+    let photoUrl = m.leader.photo || '';
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+
+    const preview = document.createElement('img');
+    preview.style.cssText = 'width:60px;height:60px;object-fit:cover;border-radius:50%;border:2px solid #e5e5e5;display:' + (photoUrl ? 'block' : 'none');
+    if (photoUrl) preview.src = photoUrl;
+
+    const uploadBtn = document.createElement('button');
+    uploadBtn.type = 'button';
+    uploadBtn.textContent = photoUrl ? '🖼 Заменить фото' : '📷 Фото';
+    uploadBtn.style.cssText = 'padding:8px 14px;background:#f4f4f8;border:1px solid #e5e5e5;border-radius:8px;font-size:12px;cursor:pointer;';
+
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        showCropModal(file, async blob => {
+            const fname = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+            const formData = new FormData();
+            formData.append('file', blob, fname);
+            const r = await fetch(`/api/upload?name=${fname}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${PASSWORD}` },
+                body: blob
+            });
+            const json = await r.json();
+            photoUrl = json.url;
+            preview.src = photoUrl;
+            preview.style.display = 'block';
+            uploadBtn.textContent = '🖼 Заменить фото';
+        }, 1);
+    });
+
+    uploadBtn.addEventListener('click', () => fileInput.click());
+
+    const photoGroup = document.createElement('div');
+    photoGroup.className = 'field-group';
+    const photoLabel = document.createElement('label');
+    photoLabel.className = 'field-label';
+    photoLabel.textContent = 'Фото';
+    const photoRow = document.createElement('div');
+    photoRow.style.cssText = 'display:flex;align-items:center;gap:10px;';
+    photoRow.appendChild(preview);
+    photoRow.appendChild(uploadBtn);
+    photoRow.appendChild(fileInput);
+    photoGroup.appendChild(photoLabel);
+    photoGroup.appendChild(photoRow);
+    grid.appendChild(photoGroup);
+
+    wrap.appendChild(grid);
+
+    wrap._collect = () => ({
+        id: m.id,
+        name: mahallNameIn.value.trim() || m.name,
+        leader: {
+            name: leaderNameIn.value.trim(),
+            phone: leaderPhoneIn.value.trim(),
+            photo: photoUrl
+        }
+    });
+
+    return wrap;
+}
+
+function renderMapSectorItem(sector) {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'border:2px solid #e5e5e5;border-radius:12px;padding:16px;margin-bottom:16px;';
+
+    const title = document.createElement('div');
+    title.style.cssText = 'font-size:15px;font-weight:700;color:#1A3C6E;margin-bottom:12px;';
+    title.textContent = `Сектор ${sector.id}`;
+    wrap.appendChild(title);
+
+    const sectorNameIn = input(sector.name, 'Название сектора');
+    const nameGroup = fieldGroup('Название сектора', sectorNameIn);
+    nameGroup.style.marginBottom = '14px';
+    wrap.appendChild(nameGroup);
+
+    const mahallaTitle = document.createElement('div');
+    mahallaTitle.style.cssText = 'font-size:13px;font-weight:600;color:#666;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;';
+    mahallaTitle.textContent = 'МФЙ';
+    wrap.appendChild(mahallaTitle);
+
+    const mahallaList = document.createElement('div');
+    sector.mahallas.forEach(m => mahallaList.appendChild(renderMapMahallaItem(m)));
+    wrap.appendChild(mahallaList);
+
+    // Кнопка добавить МФЙ
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.textContent = '+ Добавить МФЙ';
+    addBtn.style.cssText = 'margin-top:6px;padding:8px 16px;background:#f4f4f8;border:1px dashed #ccc;border-radius:8px;font-size:13px;cursor:pointer;color:#534AB7;';
+    addBtn.addEventListener('click', () => {
+        const newId = sector.id * 100 + mahallaList.children.length + 1;
+        const newM = { id: newId, name: 'Новый МФЙ', leader: { name: '', phone: '', photo: '' } };
+        mahallaList.appendChild(renderMapMahallaItem(newM));
+    });
+    wrap.appendChild(addBtn);
+
+    wrap._collect = () => ({
+        id: sector.id,
+        name: sectorNameIn.value.trim() || sector.name,
+        mahallas: Array.from(mahallaList.children).map(el => el._collect())
+    });
+
+    return wrap;
+}
+
+function loadMap(data) {
+    _mapData = data;
+    const list = document.getElementById('map-sectors-list');
+    list.innerHTML = '';
+    (data.sectors || []).forEach(s => list.appendChild(renderMapSectorItem(s)));
+}
+
+function collectMap() {
+    const list = document.getElementById('map-sectors-list');
+    return {
+        sectors: Array.from(list.children).map(el => el._collect())
+    };
+}
+</script>
+
+<!-- ===== CROP MODAL ===== -->
+<div id="crop-modal">
+    <div id="crop-container"><img id="crop-img" src="" alt=""></div>
+    <div class="crop-actions">
+        <button class="crop-btn crop-btn-ok"     id="crop-ok">Обрезать и загрузить</button>
+        <button class="crop-btn crop-btn-cancel" id="crop-cancel">Отмена</button>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+<script>
+(function () {
+    let _cropper     = null;
+    let _onCropped   = null;   // callback(blob, originalName)
+    let _origName    = '';
+
+    const modal    = document.getElementById('crop-modal');
+    const cropImg  = document.getElementById('crop-img');
+    const btnOk    = document.getElementById('crop-ok');
+    const btnCancel= document.getElementById('crop-cancel');
+
+    function openCropModal(file, callback) {
+        _origName  = file.name;
+        _onCropped = callback;
+        const url  = URL.createObjectURL(file);
+        cropImg.src = url;
+        modal.classList.add('open');
+
+        // Ждём пока img загрузится и инициализируем Cropper
+        cropImg.onload = () => {
+            if (_cropper) { _cropper.destroy(); _cropper = null; }
+            _cropper = new Cropper(cropImg, {
+                viewMode: 1,
+                autoCropArea: 0.9,
+                movable: true,
+                zoomable: true,
+                scalable: false,
+                rotatable: false,
+            });
+        };
+    }
+
+    btnOk.addEventListener('click', () => {
+        if (!_cropper) return;
+        btnOk.disabled = true; btnOk.textContent = 'Обрезаем...';
+        const canvas = _cropper.getCroppedCanvas({ maxWidth: 1920, maxHeight: 1920 });
+        canvas.toBlob(blob => {
+            closeCropModal();
+            if (_onCropped) _onCropped(blob, _origName);
+            btnOk.disabled = false; btnOk.textContent = 'Обрезать и загрузить';
+        }, 'image/jpeg', 0.9);
+    });
+
+    btnCancel.addEventListener('click', closeCropModal);
+
+    function closeCropModal() {
+        modal.classList.remove('open');
+        if (_cropper) { _cropper.destroy(); _cropper = null; }
+        URL.revokeObjectURL(cropImg.src);
+        cropImg.src = '';
+        _onCropped = null;
+    }
+
+    // Делаем функцию глобальной, чтобы использовать в gallery
+    window.openCropModal = openCropModal;
+})();
 </script>
 </body>
 </html>
