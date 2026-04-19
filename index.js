@@ -429,6 +429,26 @@ const MIME_TYPES = {
 };
 
 const ALLOWED_SECTIONS = ['events', 'circles', 'team', 'documents', 'gallery', 'contact', 'site', 'news', 'achievements', 'map'];
+
+// ===== СЧЁТЧИК ПОСЕТИТЕЛЕЙ =====
+const VISITORS_FILE = path.join(ROOT, 'data', 'visitors.json');
+
+function readVisitors() {
+    try { return JSON.parse(fs.readFileSync(VISITORS_FILE, 'utf8')); } catch { return { total: 0, days: {} }; }
+}
+
+function trackVisit() {
+    try {
+        const data  = readVisitors();
+        const today = new Date().toISOString().slice(0, 10);
+        data.total        = (data.total || 0) + 1;
+        data.days[today]  = (data.days[today] || 0) + 1;
+        // Оставляем только последние 90 дней
+        const cutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+        for (const d of Object.keys(data.days)) { if (d < cutoff) delete data.days[d]; }
+        fs.writeFile(VISITORS_FILE, JSON.stringify(data, null, 2), 'utf8', () => {});
+    } catch {}
+}
 const ALLOWED_UPLOAD_EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg', '.pdf', '.doc', '.docx']);
 
 function sendJSON(res, status, data) {
@@ -676,6 +696,25 @@ const server = http.createServer(async (req, res) => {
             return;
         }
 
+        // GET /api/visitors — статистика посетителей (только для админа)
+        if (section === 'visitors') {
+            if (!checkAuth(req)) { sendJSON(res, 401, { error: 'Неверный пароль' }); return; }
+            if (req.method !== 'GET') { sendJSON(res, 405, { error: 'Метод не разрешён' }); return; }
+            const data  = readVisitors();
+            const today = new Date().toISOString().slice(0, 10);
+            const days  = data.days || {};
+            // Последние 30 дней для графика
+            const last30 = [];
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+                last30.push({ date: d, count: days[d] || 0 });
+            }
+            const week  = last30.slice(-7).reduce((s, d) => s + d.count, 0);
+            const month = last30.reduce((s, d) => s + d.count, 0);
+            sendJSON(res, 200, { total: data.total || 0, today: days[today] || 0, week, month, last30 });
+            return;
+        }
+
         if (!ALLOWED_SECTIONS.includes(section)) {
             sendJSON(res, 404, { error: 'Секция не найдена' });
             return;
@@ -729,6 +768,9 @@ const server = http.createServer(async (req, res) => {
         res.end('400 Bad Request');
         return;
     }
+
+    // Считаем посетителей главной страницы
+    if (urlPath === '/' || urlPath === '/dom-kultury.html') trackVisit();
 
     let filePath = urlPath === '/'
         ? path.join(ROOT, 'dom-kultury.html')

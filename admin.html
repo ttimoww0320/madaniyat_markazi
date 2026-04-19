@@ -246,6 +246,50 @@
         .save-btn:hover    { background: #4339a0; }
         .save-btn:disabled { opacity: .6; cursor: not-allowed; }
 
+        .visitors-card {
+            background: #f7f8fc;
+            border: 1px solid #e8eaf0;
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+        }
+        .visitors-num {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A3C6E;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .visitors-label {
+            font-size: 13px;
+            color: #888;
+        }
+        .vis-bar {
+            flex: 1;
+            background: #534AB7;
+            border-radius: 3px 3px 0 0;
+            min-height: 2px;
+            opacity: .75;
+            transition: opacity .2s;
+            position: relative;
+            cursor: default;
+        }
+        .vis-bar:hover { opacity: 1; }
+        .vis-bar[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: calc(100% + 4px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
         .save-status { font-size: 14px; min-height: 20px; }
         .save-status.ok  { color: #1D9E75; }
         .save-status.err { color: #e53e3e; }
@@ -445,6 +489,7 @@
         <button class="tab-btn"        onclick="showTab('contact',this)">📞 Контакты</button>
         <button class="tab-btn"        onclick="showTab('qr',this)">📱 QR-код</button>
         <button class="tab-btn"        onclick="showTab('map',this)">🗺 Карта</button>
+        <button class="tab-btn"        onclick="showTab('visitors',this)">📊 Статистика</button>
     </nav>
 
     <div class="admin-content">
@@ -805,6 +850,28 @@
         </div>
 
         <!-- ===== КАРТА (МФЙ) ===== -->
+        <!-- ===== СТАТИСТИКА ПОСЕТИТЕЛЕЙ ===== -->
+        <div id="tab-visitors" class="tab-panel">
+            <div class="section-card">
+                <h2>📊 Статистика посетителей</h2>
+                <p style="font-size:13px;color:#888;margin-bottom:24px">Считаются уникальные открытия главной страницы сайта.</p>
+
+                <div id="visitors-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px">
+                    <div class="visitors-card"><div class="visitors-num" id="vis-today">—</div><div class="visitors-label">Сегодня</div></div>
+                    <div class="visitors-card"><div class="visitors-num" id="vis-week">—</div><div class="visitors-label">7 дней</div></div>
+                    <div class="visitors-card"><div class="visitors-num" id="vis-month">—</div><div class="visitors-label">30 дней</div></div>
+                    <div class="visitors-card"><div class="visitors-num" id="vis-total">—</div><div class="visitors-label">Всего</div></div>
+                </div>
+
+                <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;color:#333">График за последние 30 дней</h3>
+                <div id="visitors-chart" style="display:flex;align-items:flex-end;gap:3px;height:120px;padding:0 4px"></div>
+                <div id="visitors-chart-labels" style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#aaa;padding:0 4px">
+                    <span id="vis-label-start"></span><span id="vis-label-end"></span>
+                </div>
+                <button class="save-btn" style="margin-top:24px" onclick="loadVisitors()">↻ Обновить</button>
+            </div>
+        </div>
+
         <div id="tab-map" class="tab-panel">
             <div class="section-card">
                 <h2>🗺 Интерактивная карта — секторы и МФЙ</h2>
@@ -1117,6 +1184,7 @@ function showTab(name, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(`tab-${name}`).classList.add('active');
     btn.classList.add('active');
+    if (name === 'visitors') loadVisitors();
 }
 
 // =====================================================
@@ -2243,6 +2311,46 @@ function collectContact() {
 // =====================================================
 // LOAD ALL
 // =====================================================
+// =====================================================
+// СТАТИСТИКА ПОСЕТИТЕЛЕЙ
+// =====================================================
+async function loadVisitors() {
+    try {
+        const r = await fetch('/api/visitors', { headers: { 'Authorization': `Bearer ${PASSWORD}` } });
+        if (!r.ok) {
+            console.error('Ошибка /api/visitors:', r.status);
+            ['vis-today','vis-week','vis-month','vis-total'].forEach(id => {
+                document.getElementById(id).textContent = '—';
+            });
+            return;
+        }
+        const data = await r.json();
+
+        document.getElementById('vis-today').textContent = data.today.toLocaleString('ru');
+        document.getElementById('vis-week').textContent  = data.week.toLocaleString('ru');
+        document.getElementById('vis-month').textContent = data.month.toLocaleString('ru');
+        document.getElementById('vis-total').textContent = data.total.toLocaleString('ru');
+
+        // График
+        const chart  = document.getElementById('visitors-chart');
+        chart.innerHTML = '';
+        const max = Math.max(...data.last30.map(d => d.count), 1);
+        data.last30.forEach(d => {
+            const bar = document.createElement('div');
+            bar.className = 'vis-bar';
+            bar.style.height = `${Math.max(2, Math.round(d.count / max * 120))}px`;
+            bar.title = `${d.date}: ${d.count} посет.`;
+            chart.appendChild(bar);
+        });
+
+        const fmt = s => { const [y,m,d] = s.split('-'); return `${d}.${m}`; };
+        document.getElementById('vis-label-start').textContent = fmt(data.last30[0].date);
+        document.getElementById('vis-label-end').textContent   = fmt(data.last30[29].date);
+    } catch(e) {
+        console.error('Ошибка загрузки статистики:', e.message);
+    }
+}
+
 async function loadAllSections() {
     // Events
     apiGet('events').then(data => {
@@ -2390,6 +2498,9 @@ async function loadAllSections() {
 
     // Map
     apiGet('map').then(data => loadMap(data));
+
+    // Visitors
+    loadVisitors();
 }
 
 // =====================================================
