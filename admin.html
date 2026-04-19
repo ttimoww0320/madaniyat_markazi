@@ -1033,20 +1033,27 @@ function confirmCrop() {
     const scaleX = _cropImg.width  / _cropCanvas.width;
     const scaleY = _cropImg.height / _cropCanvas.height;
 
+    const MAX_DIM = 1920;
+    let rawW = Math.round(s.w * scaleX);
+    let rawH = Math.round(s.h * scaleY);
+    const scale = Math.min(1, MAX_DIM / Math.max(rawW, rawH));
+    const outW = Math.round(rawW * scale);
+    const outH = Math.round(rawH * scale);
+
     const out = document.createElement('canvas');
-    out.width  = Math.round(s.w * scaleX);
-    out.height = Math.round(s.h * scaleY);
+    out.width  = outW;
+    out.height = outH;
     out.getContext('2d').drawImage(
         _cropImg,
-        s.x * scaleX, s.y * scaleY, s.w * scaleX, s.h * scaleY,
-        0, 0, out.width, out.height
+        s.x * scaleX, s.y * scaleY, rawW, rawH,
+        0, 0, outW, outH
     );
 
     out.toBlob(blob => {
         document.getElementById('crop-modal').style.display = 'none';
         if (_cropCallback) _cropCallback(blob);
         _cropCallback = null;
-    }, 'image/jpeg', 0.93);
+    }, 'image/jpeg', 0.82);
 }
 
 function cancelCrop() {
@@ -2242,6 +2249,7 @@ async function loadAllSections() {
         const list = document.getElementById('events-list');
         list.innerHTML = '';
         data.forEach(ev => list.appendChild(renderEventItem(ev)));
+        makeSortable(list);
     });
 
     // Circles
@@ -2249,6 +2257,7 @@ async function loadAllSections() {
         const list = document.getElementById('circles-list');
         list.innerHTML = '';
         data.forEach(c => list.appendChild(renderCircleItem(c)));
+        makeSortable(list);
     });
 
     // Team
@@ -2276,10 +2285,12 @@ async function loadAllSections() {
         const depList = document.getElementById('deputies-list');
         depList.innerHTML = '';
         data.deputies.forEach(d => depList.appendChild(renderDeputyItem(d)));
+        makeSortable(depList);
 
         const staffList = document.getElementById('staff-list');
         staffList.innerHTML = '';
         data.staff.forEach(s => staffList.appendChild(renderStaffItem(s)));
+        makeSortable(staffList);
     });
 
     // Site
@@ -2328,10 +2339,12 @@ async function loadAllSections() {
         const mainList = document.getElementById('docs-main-list');
         mainList.innerHTML = '';
         data.main.forEach(d => mainList.appendChild(renderDocMainItem(d)));
+        makeSortable(mainList);
 
         const smallList = document.getElementById('docs-small-list');
         smallList.innerHTML = '';
         data.small.forEach(d => smallList.appendChild(renderDocSmallItem(d)));
+        makeSortable(smallList);
     });
 
     // Gallery
@@ -2339,6 +2352,7 @@ async function loadAllSections() {
         const list = document.getElementById('gallery-list');
         list.innerHTML = '';
         data.forEach(item => list.appendChild(renderGalleryItem(item)));
+        makeSortable(list);
     });
 
     // Contact
@@ -2363,6 +2377,7 @@ async function loadAllSections() {
         const list = document.getElementById('news-list');
         list.innerHTML = '';
         data.forEach(n => list.appendChild(renderNewsItem(n)));
+        makeSortable(list);
     });
 
     // Achievements
@@ -2370,10 +2385,66 @@ async function loadAllSections() {
         const list = document.getElementById('achievements-list');
         list.innerHTML = '';
         data.forEach(a => list.appendChild(renderAchievementItem(a)));
+        makeSortable(list);
     });
 
     // Map
     apiGet('map').then(data => loadMap(data));
+}
+
+// =====================================================
+// DRAG & DROP СОРТИРОВКА
+// =====================================================
+function makeSortable(list) {
+    let dragging = null;
+
+    function addHandle(row) {
+        if (!row || row.querySelector('.drag-handle')) return;
+        const handle = document.createElement('div');
+        handle.className = 'drag-handle';
+        handle.title = 'Перетащить для сортировки';
+        handle.innerHTML = '&#8942;&#8942;';
+        handle.addEventListener('mousedown', () => { row.draggable = true; });
+        handle.addEventListener('mouseup',   () => { row.draggable = false; });
+        row.insertBefore(handle, row.firstChild);
+    }
+
+    [...list.children].forEach(addHandle);
+
+    const obs = new MutationObserver(muts =>
+        muts.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) addHandle(n); }))
+    );
+    obs.observe(list, { childList: true });
+
+    list.addEventListener('dragstart', e => {
+        dragging = e.target.closest('.item-row');
+        if (!dragging) return;
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => { if (dragging) dragging.style.opacity = '0.4'; }, 0);
+    });
+
+    list.addEventListener('dragend', () => {
+        if (dragging) dragging.style.opacity = '';
+        list.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+        dragging = null;
+    });
+
+    list.addEventListener('dragover', e => {
+        e.preventDefault();
+        const target = e.target.closest('.item-row');
+        if (!target || target === dragging || !dragging) return;
+        list.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+        target.classList.add('drag-over');
+        const mid = target.getBoundingClientRect().top + target.getBoundingClientRect().height / 2;
+        list.insertBefore(dragging, e.clientY < mid ? target : target.nextSibling);
+    });
+
+    list.addEventListener('dragleave', e => {
+        if (!list.contains(e.relatedTarget))
+            list.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+    });
+
+    list.addEventListener('drop', e => e.preventDefault());
 }
 
 // =====================================================

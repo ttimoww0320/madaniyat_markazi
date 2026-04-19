@@ -2263,3 +2263,81 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
 #back-to-top:hover {
     background: #14305a;
 }
+
+/* =============================================
+   SKELETON LOADING
+   ============================================= */
+@keyframes skl-shine {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+}
+.skl {
+    background: linear-gradient(90deg, rgba(255,255,255,.08) 25%, rgba(255,255,255,.18) 50%, rgba(255,255,255,.08) 75%);
+    background-size: 200% 100%;
+    animation: skl-shine 1.4s ease infinite;
+    border-radius: 8px;
+}
+.skl-section {
+    padding: 48px 24px;
+}
+.skl-title {
+    height: 30px;
+    width: 180px;
+    margin: 0 auto 32px;
+    border-radius: 8px;
+}
+.skl-row {
+    display: flex;
+    gap: 20px;
+    overflow: hidden;
+}
+.skl-card {
+    flex: 0 0 280px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255,255,255,.06);
+}
+.skl-card-img { height: 160px; }
+.skl-card-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.skl-line { height: 13px; border-radius: 4px; }
+.skl-line.s60 { width: 60%; }
+.skl-line.s80 { width: 80%; }
+.skl-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+.skl-grid-card { height: 200px; border-radius: 12px; }
+
+/* =============================================
+   SCROLL ANIMATIONS
+   ============================================= */
+.anim-card {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .45s ease, transform .45s ease;
+}
+.anim-card.in-view {
+    opacity: 1;
+    transform: none;
+}
+
+/* =============================================
+   DRAG & DROP (admin)
+   ============================================= */
+.drag-handle {
+    cursor: grab;
+    color: #bbb;
+    font-size: 18px;
+    padding: 4px 8px 4px 0;
+    user-select: none;
+    flex-shrink: 0;
+    align-self: center;
+    letter-spacing: -2px;
+}
+.drag-handle:active { cursor: grabbing; }
+.item-row.drag-over {
+    outline: 2px dashed #534AB7;
+    border-radius: 10px;
+    background: rgba(83,74,183,.06);
+}

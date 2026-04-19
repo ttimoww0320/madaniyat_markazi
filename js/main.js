@@ -26,7 +26,10 @@ async function loadSections() {
                 const data = await res.json();
                 _cache[api] = data;
                 const el   = document.getElementById(id);
-                if (el) el.innerHTML = render()(data);
+                if (el) {
+                    el.innerHTML = render()(data);
+                    applyScrollAnimation(el);
+                }
                 if (api === 'map' && window._mapAfterRender) window._mapAfterRender(data);
             } catch (err) {
                 console.error(`Ошибка загрузки секции "${api}":`, err);
@@ -40,7 +43,10 @@ function rerenderSections() {
     SECTIONS.forEach(({ id, api, render }) => {
         if (!_cache[api]) return;
         const el = document.getElementById(id);
-        if (el) el.innerHTML = render()(_cache[api]);
+        if (el) {
+            el.innerHTML = render()(_cache[api]);
+            applyScrollAnimation(el);
+        }
         if (api === 'map' && window._mapAfterRender) window._mapAfterRender(_cache[api]);
     });
 }
@@ -333,6 +339,27 @@ document.addEventListener('langchange', () => {
     }
     loadContactFooter();
 });
+
+// Scroll-анимация карточек через IntersectionObserver
+const _scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            e.target.classList.add('in-view');
+            _scrollObserver.unobserve(e.target);
+        }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+function applyScrollAnimation(containerEl) {
+    const cards = containerEl.querySelectorAll(
+        '.news-card, .ach-card, .deputy-card, .staff-card, .doc-card, .circle-card, .gallery-card, .circle-extra-item > .circle-card'
+    );
+    cards.forEach((card, i) => {
+        card.classList.add('anim-card');
+        card.style.transitionDelay = `${Math.min(i * 60, 300)}ms`;
+        _scrollObserver.observe(card);
+    });
+}
 
 // Общая утилита для кнопок «показать ещё / скрыть»
 window._toggleSection = function(itemSelector, btnId) {
