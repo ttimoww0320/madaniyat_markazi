@@ -2,7 +2,7 @@
   "address":  {"ru": "г. Ташкент, Юнусабадский район, ул. Азия, д. 40", "uz": "Toshkent shahri, Yunusobod tumani, Osiyo ko'chasi, 40-uy", "oz": "Тошкент шаҳри, Юнусобод тумани, Осиё кўчаси, 40-уй"},
   "landmark": {"ru": "Ориентир: вблизи метро Минор",                     "uz": "Mo'ljal: Minor metro bekati yaqinida",                    "oz": "Мўлжал: Минор метро бекати яқинида"},
   "phones": [
-    {"number": "+998997494304", "label": "Ma'lumot uchun"}
+    {"number": "+998997494304", "label": {"ru": "Для справок", "uz": "Ma'lumot uchun", "oz": "Маълумот учун"}}
   ],
   "email": "info@domkultura.uz",
   "hours": {

@@ -233,12 +233,15 @@ async function loadContactFooter() {
                 Facebook:  `<svg viewBox="0 0 24 24" fill="none"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" stroke="currentColor" stroke-width="1.8"/></svg>`,
                 YouTube:   `<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M10 9l5 3-5 3V9z" fill="currentColor"/></svg>`,
             };
+            const safeUrl = u => { try { const p = new URL(u); return (p.protocol === 'https:' || p.protocol === 'http:') ? p.href : '#'; } catch { return '#'; } };
             socEl.innerHTML = d.socials.map(s => `
-                <a href="${s.url}" target="_blank" rel="noopener" class="footer-soc-btn" title="${esc(s.name)}">
+                <a href="${safeUrl(s.url)}" target="_blank" rel="noopener" class="footer-soc-btn" title="${esc(s.name)}">
                     ${icons[s.name] || '🔗'}
                 </a>`).join('');
         }
-    } catch (e) {}
+    } catch (e) {
+        console.warn('[loadContactFooter] Не удалось загрузить контакты:', e.message);
+    }
 }
 
 function initContactForm() {
@@ -330,6 +333,16 @@ document.addEventListener('langchange', () => {
     }
     loadContactFooter();
 });
+
+// Общая утилита для кнопок «показать ещё / скрыть»
+window._toggleSection = function(itemSelector, btnId) {
+    const items = document.querySelectorAll(itemSelector);
+    const btn   = document.getElementById(btnId);
+    if (!items.length || !btn) return;
+    const open = items[0].style.display === 'none';
+    items.forEach(el => el.style.display = open ? '' : 'none');
+    btn.textContent = open ? window.t('btn.hideAll') : window.t('btn.showAll');
+};
 
 // Запускаем после загрузки DOM
 document.addEventListener('DOMContentLoaded', async () => {

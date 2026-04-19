@@ -1,0 +1,92 @@
+{
+  "nav": {
+    "news":         "Yangiliklar",
+    "events":       "Afisha",
+    "circles":      "To'garaklar",
+    "map":          "Xarita",
+    "achievements": "Yutuqlar",
+    "team":         "Jamoa",
+    "gallery":      "Galereya",
+    "documents":    "Hujjatlar",
+    "contact":      "Aloqa"
+  },
+  "sections": {
+    "news":            "Yangiliklar",
+    "events":          "Yaqinlashayotgan tadbirlar",
+    "circles":         "To'garaklar va seksiyalar",
+    "map":             "Interaktiv xarita",
+    "mapSubtitle":     "Yunusobod tumani, Toshkent shahri",
+    "mapPlaceholder":  "Xaritadan sektor tanlang",
+    "achievements":    "Bizning yutuqlarimiz",
+    "achievementsSub": "Yillar davomida erishilgan mukofotlar",
+    "team":            "Bizning jamoamiz",
+    "teamSub":         "Madaniyatni yaqinlashtiruvchi mutaxassislar",
+    "gallery":         "Galereya",
+    "documents":       "Hujjatlar",
+    "documentsSub":    "Rasmiy hujjatlar va litsenziyalar"
+  },
+  "btn": {
+    "showAll":  "Barchasini ko'rish →",
+    "hideAll":  "Yashirish ↑",
+    "enroll":   "Yozilish",
+    "download": "↓ Yuklab olish"
+  },
+  "team": {
+    "director": "Rahbar",
+    "hours":    "Qabul soatlari",
+    "bioBtn":   "📋 Batafsil",
+    "bio": {
+      "born":           "Tug'ilgan yili",
+      "education":      "Ma'lumoti",
+      "specialization": "Mutaxassisligi",
+      "career":         "Mehnat faoliyati"
+    }
+  },
+  "map": {
+    "selectSector": "Xaritadan sektor tanlang"
+  },
+  "contact": {
+    "title":           "Ariza qoldirish",
+    "subtitle":        "Barcha savollaringizga ish kuni davomida javob beramiz",
+    "name":            "Ismingiz *",
+    "namePh":          "Ismingizni kiriting",
+    "phone":           "Telefon *",
+    "phonePh":         "+998 (__) ___-__-__",
+    "email":           "Email",
+    "emailPh":         "Ixtiyoriy",
+    "topic":           "Murojaat mavzusi",
+    "topicPh":         "Mavzuni tanlang",
+    "topicCircle":     "To'garakka yozilish",
+    "topicRent":       "Zal ijarasi",
+    "topicPartner":    "Hamkorlik",
+    "topicFeedback":   "Shikoyat yoki taklif",
+    "topicOther":      "Boshqa",
+    "message":         "Xabar *",
+    "messagePh":       "Xabaringizni yozing...",
+    "consent":         "Maxfiylik siyosatiga muvofiq shaxsiy ma'lumotlarni qayta ishlashga roziman",
+    "submit":          "Ariza yuborish",
+    "sending":         "Yuborilmoqda...",
+    "sent":            "✓ Ariza yuborildi!",
+    "error":           "✗ Xatolik, qayta urinib ko'ring",
+    "noConn":          "✗ Ulanish yo'q"
+  },
+  "enroll": {
+    "title":         "To'garakka yozilish",
+    "name":          "Ismingiz *",
+    "namePh":        "Ism familiya",
+    "phone":         "Telefon *",
+    "child":         "Bola ismi va yoshi",
+    "childPh":       "Masalan: Alisher, 10 yosh",
+    "submit":        "Ariza yuborish",
+    "sending":       "Yuborilmoqda...",
+    "errorRequired": "Iltimos, ism va telefonni kiriting.",
+    "errorSend":     "Xatolik yuz berdi. Qayta urinib ko'ring.",
+    "successTitle":  "Ariza qabul qilindi!",
+    "successText":   "Tez orada siz bilan bog'lanamiz.",
+    "circleLabel":   "To'garak",
+    "childLabel":    "Bola"
+  },
+  "footer": {
+    "official": "Rasmiy sayt"
+  }
+}

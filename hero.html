@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VEX</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Liquid Glass ── */
+    .liquid-glass {
+      background: rgba(0, 0, 0, 0.4);
+      background-blend-mode: luminosity;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: none;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .liquid-glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1.4px;
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.3) 0%,
+        rgba(255,255,255,0.1) 20%,
+        rgba(255,255,255,0)   40%,
+        rgba(255,255,255,0)   60%,
+        rgba(255,255,255,0.1) 80%,
+        rgba(255,255,255,0.3) 100%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box,
+                    linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* ── Hero wrapper ── */
+    #hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Video background ── */
+    #bg-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    /* ── All content above video ── */
+    .hero-content-wrapper {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding-left: 1.5rem;   /* px-6 */
+      padding-right: 1.5rem;
+    }
+
+    /* ── Navbar ── */
+    .navbar-row {
+      padding-top: 1.5rem;   /* pt-6 */
+    }
+    .navbar-bar {
+      border-radius: 0.75rem; /* rounded-xl */
+      padding: 0.5rem 1rem;   /* py-2 px-4 */
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 1.5rem;      /* text-2xl */
+      font-weight: 600;       /* font-semibold */
+      letter-spacing: -0.025em; /* tracking-tight */
+      color: #fff;
+      text-decoration: none;
+    }
+    .nav-links {
+      display: none;
+      gap: 2rem;              /* gap-8 */
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.875rem;    /* text-sm */
+      color: #fff;
+      text-decoration: none;
+      transition: color 200ms;
+    }
+    .nav-links a:hover {
+      color: #d1d5db;         /* gray-300 */
+    }
+    .nav-cta {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 0.5rem 1.5rem; /* py-2 px-6 */
+      border-radius: 0.5rem;  /* rounded-lg */
+      font-size: 0.875rem;    /* text-sm */
+      font-weight: 500;       /* font-medium */
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background 200ms;
+    }
+    .nav-cta:hover {
+      background: #f3f4f6;    /* gray-100 */
+    }
+
+    /* ── Bottom hero area ── */
+    .hero-bottom {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding-bottom: 3rem;   /* pb-12 */
+    }
+    .hero-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* ── Left column ── */
+    .hero-left {}
+
+    .hero-heading {
+      font-weight: 400;       /* font-normal */
+      font-size: 2.25rem;     /* text-4xl */
+      margin-bottom: 1rem;    /* mb-4 */
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+
+    .char-span {
+      display: inline-block;
+      opacity: 0;
+      transform: translateX(-18px);
+      transition: opacity 500ms, transform 500ms;
+    }
+    .char-span.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .hero-sub {
+      font-size: 1rem;        /* text-base */
+      color: #d1d5db;         /* text-gray-300 */
+      margin-bottom: 1.25rem; /* mb-5 */
+      opacity: 0;
+      transition: opacity 1000ms;
+    }
+    .hero-sub.visible { opacity: 1; }
+
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;              /* gap-4 */
+      opacity: 0;
+      transition: opacity 1000ms;
+    }
+    .hero-buttons.visible { opacity: 1; }
+
+    .btn-primary {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 0.75rem 2rem;  /* py-3 px-8 */
+      border-radius: 0.5rem;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 200ms;
+    }
+    .btn-primary:hover { background: #f3f4f6; }
+
+    .btn-glass {
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 0.75rem 2rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 200ms, color 200ms;
+      background: transparent;
+    }
+    .btn-glass:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    /* ── Right column ── */
+    .hero-right {
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+    }
+    .hero-tag {
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 0.75rem 1.5rem; /* py-3 px-6 */
+      border-radius: 0.75rem;  /* rounded-xl */
+      font-size: 1.125rem;     /* text-lg */
+      font-weight: 300;        /* font-light */
+      opacity: 0;
+      transition: opacity 1000ms;
+    }
+    .hero-tag.visible { opacity: 1; }
+
+    /* ── Responsive ── */
+    @media (min-width: 768px) {
+      .hero-content-wrapper {
+        padding-left: 3rem;     /* md:px-12 */
+        padding-right: 3rem;
+      }
+      .nav-links {
+        display: flex;
+      }
+      .hero-heading {
+        font-size: 3rem;        /* md:text-5xl */
+      }
+      .hero-sub {
+        font-size: 1.125rem;    /* md:text-lg */
+      }
+      .hero-tag {
+        font-size: 1.25rem;     /* md:text-xl */
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .hero-content-wrapper {
+        padding-left: 4rem;     /* lg:px-16 */
+        padding-right: 4rem;
+      }
+      .hero-bottom {
+        padding-bottom: 4rem;   /* lg:pb-16 */
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: flex-end;
+      }
+      .hero-heading {
+        font-size: 3.75rem;     /* lg:text-6xl */
+      }
+      .hero-right {
+        justify-content: flex-end;
+      }
+      .hero-tag {
+        font-size: 1.5rem;      /* lg:text-2xl */
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .hero-heading {
+        font-size: 4.5rem;      /* xl:text-7xl */
+      }
+    }
+  </style>
+</head>
+<body>
+
+<section id="hero">
+  <!-- Video background — no overlays -->
+  <video
+    id="bg-video"
+    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260403_050628_c4e32401-fab4-4a27-b7a8-6e9291cd5959.mp4"
+    autoplay
+    loop
+    muted
+    playsinline
+  ></video>
+
+  <div class="hero-content-wrapper">
+
+    <!-- Navbar -->
+    <div class="navbar-row">
+      <nav class="navbar-bar liquid-glass">
+        <a href="#" class="nav-logo">VEX</a>
+
+        <ul class="nav-links">
+          <li><a href="#">Story</a></li>
+          <li><a href="#">Investing</a></li>
+          <li><a href="#">Building</a></li>
+          <li><a href="#">Advisory</a></li>
+        </ul>
+
+        <button class="nav-cta">Start a Chat</button>
+      </nav>
+    </div>
+
+    <!-- Bottom hero -->
+    <div class="hero-bottom">
+      <div class="hero-grid">
+
+        <!-- Left column -->
+        <div class="hero-left">
+          <h1 class="hero-heading" id="hero-heading" aria-label="Shaping tomorrow with vision and action."></h1>
+          <p class="hero-sub" id="hero-sub">
+            We back visionaries and craft ventures that define what comes next.
+          </p>
+          <div class="hero-buttons" id="hero-buttons">
+            <button class="btn-primary">Start a Chat</button>
+            <button class="btn-glass liquid-glass">Explore Now</button>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div class="hero-right">
+          <div class="hero-tag liquid-glass" id="hero-tag">
+            Investing. Building. Advisory.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  (function () {
+    const LINES = [
+      'Shaping tomorrow',
+      'with vision and action.'
+    ];
+    const CHAR_DELAY = 30;       // ms per character
+    const INITIAL_DELAY = 200;   // ms before first char
+
+    const headingEl = document.getElementById('hero-heading');
+
+    // Build character spans
+    LINES.forEach(function (line, lineIndex) {
+      const chars = line.split('');
+      const lineBaseDelay = LINES.slice(0, lineIndex).reduce(function (sum, l) {
+        return sum + l.length * CHAR_DELAY;
+      }, 0);
+
+      chars.forEach(function (ch, charIndex) {
+        const span = document.createElement('span');
+        span.className = 'char-span';
+        span.textContent = ch === ' ' ? '\u00A0' : ch;
+
+        const delay = INITIAL_DELAY + lineBaseDelay + charIndex * CHAR_DELAY;
+        setTimeout(function () {
+          span.classList.add('visible');
+        }, delay);
+
+        headingEl.appendChild(span);
+      });
+
+      // Line break between lines
+      if (lineIndex < LINES.length - 1) {
+        headingEl.appendChild(document.createElement('br'));
+      }
+    });
+
+    // Fade-in helpers
+    function fadeIn(id, delayMs) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      setTimeout(function () {
+        el.classList.add('visible');
+      }, delayMs);
+    }
+
+    fadeIn('hero-sub',     800);
+    fadeIn('hero-buttons', 1200);
+    fadeIn('hero-tag',     1400);
+  })();
+</script>
+
+</body>
+</html>

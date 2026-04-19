@@ -15,26 +15,28 @@ function photoAvatar(photo, cssClass, fallbackSvg) {
 
 const DEPUTY_COLORS = { green: '#0F6E56', blue: '#185FA5', yellow: '#854F0B' };
 
+// Хранилище данных для модалки
+window._deputiesData = [];
+
 window.toggleDeputies = function() {
-    const items = document.querySelectorAll('.deputy-extra-item');
-    const btn   = document.getElementById('deputy-toggle-btn');
-    if (!items.length || !btn) return;
-    const open = items[0].style.display === 'none';
-    items.forEach(el => el.style.display = open ? '' : 'none');
-    btn.textContent = open ? window.t('btn.hideAll') : window.t('btn.showAll');
+    window._toggleSection('.deputy-extra-item', 'deputy-toggle-btn');
 };
 
 window.renderTeam = function(data) {
     const { director, deputies, staff } = data;
 
+    // Сохраняем данные для модалки
+    window._deputiesData = deputies;
+
     const deputyCards = deputies.map((d, i) => `
-        <div class="deputy-card${i >= 3 ? ' deputy-extra-item' : ''}"${i >= 3 ? ' style="display:none"' : ''}>
+        <div class="deputy-card${i >= 4 ? ' deputy-extra-item' : ''}"${i >= 4 ? ' style="display:none"' : ''}>
             ${photoAvatar(d.photo, `md ${d.color}`, personSVG(36, DEPUTY_COLORS[d.color] || '#888'))}
             <span class="badge sm ${d.color}">${window.tData(d.role)}</span>
             <h3 class="name-md">${d.name}</h3>
             <p class="title-sm">${window.tData(d.department)}</p>
             <p class="contact-text"><a href="tel:${d.phone}">${d.phone}</a></p>
             <p class="contact-text"><a href="mailto:${d.email}" class="contact-email">${d.email}</a></p>
+            ${d.bio ? `<button onclick="window.openBioModal(${i})" style="margin-top:auto;padding:7px 18px;border-radius:8px;border:1.5px solid #1A3C6E;background:#fff;color:#1A3C6E;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;align-self:center;">${window.t('team.bioBtn')}</button>` : '<div style="margin-top:auto;"></div>'}
         </div>
     `).join('');
 
@@ -89,7 +91,7 @@ window.renderTeam = function(data) {
     </div>
 
     <div class="deputies-grid">${deputyCards}</div>
-    ${deputies.length > 3 ? `
+    ${deputies.length > 4 ? `
     <div style="text-align:center;margin-top:32px;margin-bottom:40px;">
         <button id="deputy-toggle-btn" onclick="window.toggleDeputies()" style="
             display:inline-flex;align-items:center;gap:8px;
@@ -100,3 +102,48 @@ window.renderTeam = function(data) {
     <div class="staff-grid">${staffCards}</div>
 </section>`;
 };
+
+window.openBioModal = function(idx) {
+    const d = window._deputiesData[idx];
+    if (!d || !d.bio) return;
+    const bio = d.bio;
+
+    const careerRows = (bio.career || []).map(c =>
+        `<tr>
+            <td style="white-space:nowrap;padding:6px 12px 6px 0;color:#888;font-size:13px;vertical-align:top;">${c.years}</td>
+            <td style="padding:6px 0;font-size:14px;line-height:1.5;">${c.place}</td>
+        </tr>`
+    ).join('');
+
+    document.getElementById('bio-modal-content').innerHTML = `
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+            ${d.photo
+                ? `<img src="${d.photo}" alt="" style="width:72px;height:72px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+                : `<div style="width:72px;height:72px;border-radius:50%;background:#e8eef7;flex-shrink:0;"></div>`}
+            <div>
+                <div style="font-size:18px;font-weight:700;color:#1A3C6E;">${d.name}</div>
+                <div style="font-size:14px;color:#555;margin-top:4px;">${window.tData(d.department)}</div>
+            </div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+            <tr><td style="padding:6px 12px 6px 0;color:#888;font-size:13px;width:130px;">${window.t('team.bio.born')}</td><td style="font-size:14px;">${bio.born || '—'}</td></tr>
+            <tr><td style="padding:6px 12px 6px 0;color:#888;font-size:13px;">${window.t('team.bio.education')}</td><td style="font-size:14px;">${bio.education || '—'}</td></tr>
+            <tr><td style="padding:6px 12px 6px 0;color:#888;font-size:13px;">${window.t('team.bio.specialization')}</td><td style="font-size:14px;">${bio.specialization || '—'}</td></tr>
+        </table>
+        <div style="font-size:14px;font-weight:700;color:#1A3C6E;margin-bottom:10px;border-bottom:2px solid #e8eef7;padding-bottom:8px;">${window.t('team.bio.career')}</div>
+        <table style="width:100%;border-collapse:collapse;">${careerRows}</table>
+    `;
+
+    const modal = document.getElementById('bio-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeBioModal = function() {
+    document.getElementById('bio-modal').style.display = 'none';
+    document.body.style.overflow = '';
+};
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') window.closeBioModal();
+});

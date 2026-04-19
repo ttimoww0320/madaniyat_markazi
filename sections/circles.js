@@ -9,7 +9,10 @@ const CIRCLE_ICONS = {
              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="#D4537E" stroke-width="1.5"/>`,
 };
 
+window._circlesData = [];
+
 window.renderCircles = function(data) {
+    window._circlesData = data;
     const hasMore = data.length > 4;
 
     const cardsHTML = data.map((c, i) => {
@@ -22,7 +25,7 @@ window.renderCircles = function(data) {
             </div>
             <h3 class="circle-title">${window.tData(c.title)}</h3>
             <p class="circle-age">${window.tData(c.age)}</p>
-            <button class="circle-enroll-btn" onclick="window.openEnroll('${window.tData(c.title).replace(/'/g,"\\'")}')">
+            <button class="circle-enroll-btn" onclick="window.openEnroll(${i})">
                 ${window.t('btn.enroll')}
             </button>
         </div>`;
@@ -52,10 +55,5 @@ window.renderCircles = function(data) {
 };
 
 window.toggleCircles = function() {
-    const items = document.querySelectorAll('.circle-extra-item');
-    const btn   = document.getElementById('circles-toggle-btn');
-    if (!items.length || !btn) return;
-    const open = items[0].style.display === 'none';
-    items.forEach(el => el.style.display = open ? '' : 'none');
-    btn.textContent = open ? window.t('btn.hideAll') : window.t('btn.showAll');
+    window._toggleSection('.circle-extra-item', 'circles-toggle-btn');
 };

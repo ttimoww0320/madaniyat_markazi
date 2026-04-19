@@ -1,53 +1,49 @@
-const GALLERY_SVG_LG = `<svg width="64" height="64" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <rect x="3" y="3" width="18" height="18" rx="2" stroke="#fff" stroke-width="1.5"/>
-    <circle cx="8.5" cy="8.5" r="1.5" fill="#fff"/>
-    <path d="M21 15l-5-5L5 21" stroke="#fff" stroke-width="1.5"/>
-</svg>`;
-
-const GALLERY_SVG_SM = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <rect x="3" y="3" width="18" height="18" rx="2" stroke="#fff" stroke-width="1.5"/>
-    <circle cx="8.5" cy="8.5" r="1.5" fill="#fff"/>
-    <path d="M21 15l-5-5L5 21" stroke="#fff" stroke-width="1.5"/>
-</svg>`;
-
 window._galleryData = [];
 
 window.renderGallery = function(data) {
     window._galleryData = data;
-    const hasMore = data.length > 5;
 
-    const items = data.map((item, idx) => {
-        const photos    = item.photos || [];
-        const cover     = photos[0] || null;
-        const count     = photos.length;
-        const clickable = count > 0;
-        const extra     = idx >= 5;
+    if (!data.length) {
+        return `
+<div class="section-gray">
+    <section class="section" id="gallery">
+        <div class="section-header">
+            <h2 class="section-title">${window.t('sections.gallery')}</h2>
+        </div>
+    </section>
+</div>`;
+    }
 
-        const styles = [];
-        if (cover) styles.push(`background-image:url('${cover}')`, `background-size:cover`, `background-position:center`);
-        if (extra) styles.push(`display:none`);
-        const styleAttr = styles.length ? `style="${styles.join(';')}"` : '';
+    const makeCard = (item, idx) => {
+        const photos = item.photos || [];
+        const cover  = photos[0] || null;
+        const count  = photos.length;
 
-        const placeholder = !cover ? (item.large ? GALLERY_SVG_LG : GALLERY_SVG_SM) : '';
-
-        const countBadge = count > 1
-            ? `<span class="gallery-count">${count > 9 ? '9+' : count + '+'}</span>`
-            : '';
-
-        const overlay = count > 1
-            ? `<div class="gallery-overlay">${countBadge}</div>`
-            : '';
-
-        const classes = ['gallery-item', item.large ? 'large' : '', clickable ? 'clickable' : '', extra ? 'gallery-extra-item' : '']
-            .filter(Boolean).join(' ');
+        const imgEl = cover
+            ? `<div class="news-img news-img-loading">
+                <img src="${cover}" alt="" loading="lazy"
+                    onload="this.parentElement.classList.remove('news-img-loading')"
+                    onerror="this.parentElement.classList.add('news-img-error');this.remove()">
+                ${count > 1 ? `<span class="gallery-count">${count > 9 ? '9+' : count + '+'}</span>` : ''}
+               </div>`
+            : `<div class="news-img news-img-placeholder"></div>`;
 
         return `
-        <div class="${classes}" aria-label="${window.tData(item.alt)}" ${styleAttr}
-             ${clickable ? `onclick="window.openGalleryItem(${idx})"` : ''}>
-            ${placeholder}
-            ${overlay}
+        <div class="news-card gallery-card${count > 0 ? ' clickable' : ''}"
+             ${count > 0 ? `onclick="window.openGalleryItem(${idx})"` : ''}>
+            ${imgEl}
+            <div class="news-body">
+                <h3 class="news-title">${window.tData(item.alt)}</h3>
+            </div>
         </div>`;
-    }).join('');
+    };
+
+    // Дублируем карточки для бесшовной бегущей строки
+    const set1 = data.map((item, idx) => makeCard(item, idx)).join('');
+    const set2 = data.map((item, idx) => makeCard(item, idx)).join('');
+
+    // Скорость: ~8 секунд на карточку, минимум 40 сек
+    const duration = Math.max(40, data.length * 8);
 
     return `
 <div class="section-gray">
@@ -55,26 +51,14 @@ window.renderGallery = function(data) {
         <div class="section-header">
             <h2 class="section-title">${window.t('sections.gallery')}</h2>
         </div>
-        <div class="gallery-grid">${items}</div>
-        ${hasMore ? `
-        <div style="text-align:center;margin-top:32px;margin-bottom:40px;">
-            <button id="gallery-toggle-btn" onclick="window.toggleGallery()" style="
-                display:inline-flex;align-items:center;gap:8px;
-                padding:11px 32px;border-radius:10px;border:2px solid #1A3C6E;
-                background:#fff;color:#1A3C6E;font-size:15px;font-weight:600;
-                cursor:pointer;font-family:inherit;transition:background .2s,color .2s;">${window.t('btn.showAll')}</button>
-        </div>` : ''}
+        <div class="gallery-marquee-outer">
+            <div class="gallery-marquee-track" style="animation-duration:${duration}s">
+                <div class="gallery-marquee-set">${set1}</div>
+                <div class="gallery-marquee-set">${set2}</div>
+            </div>
+        </div>
     </section>
 </div>`;
-};
-
-window.toggleGallery = function() {
-    const items = document.querySelectorAll('.gallery-extra-item');
-    const btn   = document.getElementById('gallery-toggle-btn');
-    if (!items.length || !btn) return;
-    const open = items[0].style.display === 'none';
-    items.forEach(el => el.style.display = open ? '' : 'none');
-    btn.textContent = open ? window.t('btn.hideAll') : window.t('btn.showAll');
 };
 
 // ── Lightbox ──────────────────────────────────────────

@@ -1,46 +1,49 @@
 window.renderNews = function(data) {
     if (!data || !data.length) return '';
 
-    const hasMore = data.length > 3;
+    const TG_CHANNEL = 'madaniyatvazirligi';
 
-    const cards = data.map((n, i) => {
-        const extra = i >= 3;
+    const cards = data.map(n => {
         const img = n.image
-            ? `<div class="news-img" style="background-image:url('${n.image}')"></div>`
+            ? `<div class="news-img news-img-loading${n.isVideo ? ' news-img-video' : ''}">
+                <img src="${n.image}" alt="" loading="lazy" onload="this.parentElement.classList.remove('news-img-loading')" onerror="this.parentElement.classList.add('news-img-error');this.remove()">
+                ${n.isVideo ? `<div class="news-play-btn">▶</div>` : ''}
+               </div>`
             : `<div class="news-img news-img-placeholder"></div>`;
+        const tgLink = n.tgId ? `https://t.me/${TG_CHANNEL}/${n.tgId}` : null;
+        const tag = tgLink ? `a href="${tgLink}" target="_blank" rel="noopener"` : 'article';
+        const closeTag = tgLink ? 'a' : 'article';
         return `
-        <article class="news-card${extra ? ' news-extra' : ''}" style="${extra ? 'display:none' : ''}">
+        <${tag} class="news-card${tgLink ? ' news-card--link' : ''}">
             ${img}
             <div class="news-body">
                 ${n.date ? `<span class="news-date">${n.date}</span>` : ''}
                 <h3 class="news-title">${window.tData(n.title)}</h3>
                 <p class="news-text">${window.tData(n.text)}</p>
+                ${tgLink ? `<span class="news-tg-hint">Читать в Telegram →</span>` : ''}
             </div>
-        </article>`;
+        </${closeTag}>`;
     }).join('');
 
     return `
 <section class="section" id="news">
-    <div class="section-header">
+    <div class="news-section-header">
         <h2 class="section-title">${window.t('sections.news')}</h2>
+        <div class="news-nav-btns">
+            <button class="news-nav-btn" id="news-prev" onclick="window.scrollNews(-1)" aria-label="Назад">&#8592;</button>
+            <button class="news-nav-btn" id="news-next" onclick="window.scrollNews(1)" aria-label="Вперёд">&#8594;</button>
+        </div>
     </div>
-    <div class="news-grid">${cards}</div>
-    ${hasMore ? `
-    <div style="text-align:center;margin-top:32px;margin-bottom:40px;">
-        <button id="news-toggle-btn" onclick="window.toggleNews()" style="
-            display:inline-flex;align-items:center;gap:8px;
-            padding:11px 32px;border-radius:10px;border:2px solid #1A3C6E;
-            background:#fff;color:#1A3C6E;font-size:15px;font-weight:600;
-            cursor:pointer;font-family:inherit;transition:background .2s,color .2s;">${window.t('btn.showAll')}</button>
-    </div>` : ''}
+    <div class="news-track-wrap">
+        <div class="news-track" id="news-track">${cards}</div>
+    </div>
 </section>`;
 };
 
-window.toggleNews = function() {
-    const items = document.querySelectorAll('.news-extra');
-    const btn   = document.getElementById('news-toggle-btn');
-    if (!items.length || !btn) return;
-    const open = items[0].style.display === 'none';
-    items.forEach(el => el.style.display = open ? '' : 'none');
-    btn.textContent = open ? window.t('btn.hideAll') : window.t('btn.showAll');
+window.scrollNews = function(dir) {
+    const track = document.getElementById('news-track');
+    if (!track) return;
+    const card = track.querySelector('.news-card');
+    const step = card ? card.offsetWidth + 24 : 320;
+    track.scrollBy({ left: dir * step, behavior: 'smooth' });
 };

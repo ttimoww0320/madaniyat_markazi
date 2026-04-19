@@ -327,14 +327,6 @@
                 <div class="footer-contact-list" id="footer-contact-list"></div>
             </div>
 
-            <div class="footer-divider-v"></div>
-
-            <!-- Колонка 4: Герб Узбекистана -->
-            <div class="footer-col footer-col--emblem">
-                <div class="footer-emblem-wrap">
-                    <img src="/uploads/Emblem_of_Uzbekistan.svg.png" alt="Герб Узбекистана" class="footer-emblem-svg">
-                </div>
-            </div>
 
         </div>
 
@@ -404,9 +396,20 @@
     // ===== ЗАПИСЬ НА КРУЖОК =====
     let _enrollCircle = '';
 
-    window.openEnroll = function(circleName) {
+    window.openEnroll = function(idx) {
+        const circle = window._circlesData && window._circlesData[idx];
+        const circleName = circle ? window.tData(circle.title) : '';
         _enrollCircle = circleName;
+        document.getElementById('enroll-title').textContent        = window.t('enroll.title');
         document.getElementById('enroll-circle-label').textContent = '📌 ' + circleName;
+        document.getElementById('enroll-label-name').textContent   = window.t('enroll.name');
+        document.getElementById('enroll-label-phone').textContent  = window.t('enroll.phone');
+        document.getElementById('enroll-label-child').textContent  = window.t('enroll.child');
+        document.getElementById('enroll-name').placeholder         = window.t('enroll.namePh');
+        document.getElementById('enroll-child').placeholder        = window.t('enroll.childPh');
+        document.getElementById('enroll-submit-btn').textContent   = window.t('enroll.submit');
+        document.getElementById('enroll-success-title').textContent = window.t('enroll.successTitle');
+        document.getElementById('enroll-success-text').textContent  = window.t('enroll.successText');
         document.getElementById('enroll-name').value = '';
         document.getElementById('enroll-phone').value = '';
         document.getElementById('enroll-child').value = '';
@@ -428,7 +431,7 @@
         const err   = document.getElementById('enroll-error');
 
         if (!name || !phone) {
-            err.textContent = 'Пожалуйста, заполните имя и телефон.';
+            err.textContent = window.t('enroll.errorRequired');
             err.style.display = 'block';
             return;
         }
@@ -436,9 +439,9 @@
 
         const btn = document.getElementById('enroll-submit-btn');
         btn.disabled = true;
-        btn.textContent = 'Отправка...';
+        btn.textContent = window.t('enroll.sending');
 
-        const message = `Кружок: ${_enrollCircle}` + (child ? `\nРебёнок: ${child}` : '');
+        const message = `${window.t('enroll.circleLabel')}: ${_enrollCircle}` + (child ? `\n${window.t('enroll.childLabel')}: ${child}` : '');
         try {
             const r = await fetch('/api/send-message', {
                 method: 'POST',
@@ -450,7 +453,7 @@
                 document.getElementById('enroll-success').style.display = 'block';
                 setTimeout(window.closeEnroll, 3000);
             } else {
-                err.textContent = 'Ошибка отправки. Попробуйте ещё раз.';
+                err.textContent = window.t('enroll.errorSend');
                 err.style.display = 'block';
                 btn.disabled = false;
                 btn.textContent = 'Отправить заявку';
@@ -484,7 +487,12 @@
         btn.setAttribute('aria-expanded', 'false');
         document.body.style.overflow = '';
     };
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') window.closeMenu(); });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            window.closeMenu();
+            if (typeof window.closeAchModal === 'function') window.closeAchModal();
+        }
+    });
 
     // ===== ДОСТУПНОСТЬ =====
     let _fontSize = parseInt(localStorage.getItem('fontSize') || '0');
@@ -520,9 +528,12 @@
             const track = document.getElementById('announce-track');
             if (!events || !events.length) { bar.dataset.empty = 'true'; return; }
 
-            const items = events.map(e =>
-                `<span class="announce-item"><span class="announce-dot"></span>${e.date ? e.date + ' — ' : ''}${e.title}</span>`
-            ).join('');
+            const items = events.map(e => {
+                const td = window.tData || (v => v?.ru || v?.uz || v || '');
+                const date = e.date ? td(e.date) + ' — ' : '';
+                const title = td(e.title);
+                return `<span class="announce-item"><span class="announce-dot"></span>${date}${title}</span>`;
+            }).join('');
             // Дублируем для бесшовной анимации
             track.innerHTML = items + items;
         }).catch(() => {
@@ -565,29 +576,37 @@
     <div id="enroll-modal" onclick="if(event.target===this)window.closeEnroll()">
         <div class="enroll-box">
             <button class="enroll-close" onclick="window.closeEnroll()" aria-label="Закрыть">✕</button>
-            <h3>Записаться на кружок</h3>
+            <h3 id="enroll-title"></h3>
             <p class="enroll-circle-name" id="enroll-circle-label"></p>
             <div id="enroll-form-body">
                 <div class="enroll-field">
-                    <label>Ваше имя *</label>
-                    <input id="enroll-name" type="text" placeholder="Иванова Мария">
+                    <label id="enroll-label-name"></label>
+                    <input id="enroll-name" type="text">
                 </div>
                 <div class="enroll-field">
-                    <label>Телефон *</label>
+                    <label id="enroll-label-phone"></label>
                     <input id="enroll-phone" type="tel" placeholder="+998 90 123 45 67">
                 </div>
                 <div class="enroll-field">
-                    <label>Имя ребёнка и возраст</label>
-                    <input id="enroll-child" type="text" placeholder="Алёша, 10 лет">
+                    <label id="enroll-label-child"></label>
+                    <input id="enroll-child" type="text">
                 </div>
                 <p id="enroll-error" style="color:#e53e3e;font-size:13px;margin-bottom:10px;display:none"></p>
-                <button class="enroll-submit" id="enroll-submit-btn" onclick="window.submitEnroll()">Отправить заявку</button>
+                <button class="enroll-submit" id="enroll-submit-btn" onclick="window.submitEnroll()"></button>
             </div>
             <div class="enroll-success" id="enroll-success" style="display:none">
                 <div class="enroll-check">✅</div>
-                <h4>Заявка принята!</h4>
-                <p>Мы свяжемся с вами в ближайшее время.</p>
+                <h4 id="enroll-success-title"></h4>
+                <p id="enroll-success-text"></p>
             </div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА БИОГРАФИИ ===== -->
+    <div id="bio-modal" onclick="if(event.target===this)window.closeBioModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1100;align-items:center;justify-content:center;padding:20px;">
+        <div id="bio-modal-inner" style="background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+            <button onclick="window.closeBioModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1;">✕</button>
+            <div id="bio-modal-content"></div>
         </div>
     </div>
 
@@ -602,5 +621,17 @@
         <button class="lb-arrow lb-next" id="lb-next" onclick="window.lbNext()" aria-label="Вперёд">&#8594;</button>
         <span class="lb-counter" id="lb-counter"></span>
     </div>
+
+    <!-- Кнопка "Наверх" -->
+    <button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Наверх">&#8593;</button>
+
+    <script>
+    (function() {
+        const btn = document.getElementById('back-to-top');
+        window.addEventListener('scroll', function() {
+            btn.classList.toggle('visible', window.scrollY > 400);
+        }, { passive: true });
+    })();
+    </script>
 </body>
 </html>

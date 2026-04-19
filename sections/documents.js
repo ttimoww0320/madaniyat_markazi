@@ -12,22 +12,17 @@ const SMALL_DOC_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="non
 </svg>`;
 
 window.toggleDocuments = function() {
-    const items = document.querySelectorAll('.doc-extra-item');
-    const btn   = document.getElementById('docs-toggle-btn');
-    if (!items.length || !btn) return;
-    const open = items[0].style.display === 'none';
-    items.forEach(el => el.style.display = open ? '' : 'none');
-    btn.textContent = open ? window.t('btn.hideAll') : window.t('btn.showAll');
+    window._toggleSection('.doc-extra-item', 'docs-toggle-btn');
 };
 
 window.renderDocuments = function(data) {
-    const hasMore = data.main.length > 3;
+    const hasMore = data.main.length > 4;
 
     const mainCards = data.main.map((doc, i) => {
         const downloadBtn = doc.file
             ? `<a class="doc-download" href="${doc.file}" download="${window.tData(doc.title)}">${window.t('btn.download')}</a>`
             : `<span class="doc-download" style="opacity:.4;cursor:default">${window.t('btn.download')}</span>`;
-        const extra = i >= 3;
+        const extra = i >= 4;
         return `
         <div class="doc-card${extra ? ' doc-extra-item' : ''}"${extra ? ' style="display:none"' : ''}>
             <div class="doc-icon ${doc.color}">

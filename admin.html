@@ -478,6 +478,12 @@
                 <div id="news-list"></div>
                 <button class="add-btn" onclick="addNews()">+ Добавить новость</button>
                 <hr class="divider">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;padding:12px 16px;background:#f0f7ff;border-radius:8px;border:1px solid #c8dcf5;">
+                    <span style="font-size:13px;color:#1A3C6E;">📡 <b>Telegram</b> @madaniyatvazirligi</span>
+                    <button id="tg-sync-btn" onclick="syncTelegram()" style="padding:7px 18px;border-radius:8px;border:none;background:#1A3C6E;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Синхронизировать</button>
+                    <button onclick="syncImages()" style="padding:7px 18px;border-radius:8px;border:1px solid #1A3C6E;background:#fff;color:#1A3C6E;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">📥 Скачать фото локально</button>
+                    <span id="tg-sync-status" style="font-size:13px;color:#555;"></span>
+                </div>
                 <div class="save-bar">
                     <button class="save-btn" onclick="saveSection('news', collectNews)">Сохранить</button>
                     <span class="save-status" id="news-status"></span>
@@ -573,9 +579,6 @@
                 <button class="add-btn" onclick="addDocMain()">+ Добавить документ</button>
             </div>
             <div class="section-card">
-                <h2>📎 Дополнительные документы</h2>
-                <div id="docs-small-list"></div>
-                <button class="add-btn" onclick="addDocSmall()">+ Добавить документ</button>
                 <hr class="divider">
                 <div class="save-bar">
                     <button class="save-btn" onclick="saveSection('documents', collectDocuments)">Сохранить</button>
@@ -613,6 +616,11 @@
                 <div id="gallery-list"></div>
                 <button class="add-btn" onclick="addGalleryItem()">+ Добавить элемент</button>
                 <hr class="divider">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;padding:12px 16px;background:#f0f7ff;border-radius:8px;border:1px solid #c8dcf5;">
+                    <span style="font-size:13px;color:#1A3C6E;">📡 <b>Telegram</b> @madaniyatbolimi</span>
+                    <button id="tg-gallery-sync-btn" onclick="syncTelegramGallery()" style="padding:7px 18px;border-radius:8px;border:none;background:#1A3C6E;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Синхронизировать</button>
+                    <span id="tg-gallery-sync-status" style="font-size:13px;color:#555;"></span>
+                </div>
                 <div class="save-bar">
                     <button class="save-btn" onclick="saveSection('gallery', collectGallery)">Сохранить</button>
                     <span class="save-status" id="gallery-status"></span>
@@ -1527,6 +1535,79 @@ function makePhotoField(existingUrl, aspectRatio = 1) {
     return { element: fieldGroup('Фото', wrap), getUrl: () => imageUrl };
 }
 
+function makeMultiPhotoField(existingImages) {
+    let images = [...(existingImages || [])];
+
+    const thumbnailsWrap = document.createElement('div');
+    thumbnailsWrap.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;min-height:32px;';
+
+    function renderThumbnails() {
+        thumbnailsWrap.innerHTML = '';
+        images.forEach((url, i) => {
+            const thumb = document.createElement('div');
+            thumb.style.cssText = 'position:relative;flex-shrink:0;';
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.cssText = 'width:64px;height:64px;object-fit:cover;border-radius:8px;border:2px solid #e5e5e5;display:block;';
+            const del = document.createElement('button');
+            del.type = 'button';
+            del.textContent = '✕';
+            del.title = 'Удалить фото';
+            del.style.cssText = 'position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#e53e3e;border:none;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;';
+            del.onclick = () => { images.splice(i, 1); renderThumbnails(); };
+            thumb.appendChild(img);
+            thumb.appendChild(del);
+            thumbnailsWrap.appendChild(thumb);
+        });
+    }
+    renderThumbnails();
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.textContent = '+ Фото';
+    addBtn.style.cssText = 'padding:8px 14px;background:#f4f4f8;border:1px solid #e5e5e5;border-radius:8px;font-size:12px;cursor:pointer;white-space:nowrap;align-self:flex-end;';
+    addBtn.onmouseenter = () => addBtn.style.borderColor = '#534AB7';
+    addBtn.onmouseleave = () => addBtn.style.borderColor = '#e5e5e5';
+    addBtn.onclick = () => fileInput.click();
+
+    fileInput.onchange = () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        showCropModal(file, async (croppedBlob) => {
+            addBtn.textContent = '...';
+            addBtn.disabled = true;
+            try {
+                const fname = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+                const r = await fetch(`/api/upload?name=${fname}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${PASSWORD}` },
+                    body: croppedBlob
+                });
+                const json = await r.json();
+                if (json.url) { images.push(json.url); renderThumbnails(); }
+            } catch(e) {
+                alert('Ошибка загрузки: ' + e.message);
+            }
+            addBtn.textContent = '+ Фото';
+            addBtn.disabled = false;
+            fileInput.value = '';
+        }, null);
+    };
+
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;';
+    wrap.appendChild(fileInput);
+    wrap.appendChild(thumbnailsWrap);
+    wrap.appendChild(addBtn);
+
+    return { element: fieldGroup('Фото', wrap), getUrls: () => [...images] };
+}
+
 function renderDeputyItem(d) {
     const row = document.createElement('div');
     row.className = 'item-row cols-3';
@@ -1923,7 +2004,7 @@ function addDocSmall() {
 function collectDocuments() {
     return {
         main:  [...document.getElementById('docs-main-list').children].map(r => r._getData()),
-        small: [...document.getElementById('docs-small-list').children].map(r => r._getData())
+        small: []
     };
 }
 
@@ -2040,6 +2121,42 @@ function addGalleryItem() {
     document.getElementById('gallery-list').appendChild(
         renderGalleryItem({ id: Date.now(), alt: '', large: false, photos: [] })
     );
+}
+
+async function syncTelegramGallery() {
+    const btn    = document.getElementById('tg-gallery-sync-btn');
+    const status = document.getElementById('tg-gallery-sync-status');
+    btn.disabled = true;
+    btn.textContent = 'Загружаю...';
+    status.textContent = '';
+    try {
+        const resp = await fetch('/api/sync-tg-gallery', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${PASSWORD}` }
+        });
+        const data = await resp.json();
+        if (data.ok) {
+            status.style.color = '#1a7a1a';
+            status.textContent = data.added > 0
+                ? `✓ Добавлено новых: ${data.added}`
+                : '✓ Новых фото нет';
+            if (data.added > 0) {
+                apiGet('gallery').then(list => {
+                    const el = document.getElementById('gallery-list');
+                    el.innerHTML = '';
+                    list.forEach(n => el.appendChild(renderGalleryItem(n)));
+                });
+            }
+        } else {
+            status.style.color = '#c00';
+            status.textContent = '✗ ' + (data.error || 'Ошибка');
+        }
+    } catch (e) {
+        status.style.color = '#c00';
+        status.textContent = '✗ Нет связи с сервером';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Синхронизировать';
 }
 
 function collectGallery() {
@@ -2294,6 +2411,62 @@ function addNews() {
     );
 }
 
+async function syncTelegram() {
+    const btn = document.getElementById('tg-sync-btn');
+    const status = document.getElementById('tg-sync-status');
+    btn.disabled = true;
+    btn.textContent = 'Загружаю...';
+    status.textContent = '';
+    try {
+        const resp = await fetch('/api/sync-tg', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${PASSWORD}` }
+        });
+        const data = await resp.json();
+        if (data.ok) {
+            status.style.color = '#1a7a1a';
+            status.textContent = data.added > 0
+                ? `✓ Добавлено новых постов: ${data.added}`
+                : '✓ Новых постов нет';
+            if (data.added > 0) {
+                // Обновляем список новостей на странице
+                apiGet('news').then(newsList => {
+                    const list = document.getElementById('news-list');
+                    list.innerHTML = '';
+                    newsList.forEach(n => list.appendChild(renderNewsItem(n)));
+                });
+            }
+        } else {
+            status.style.color = '#c00';
+            status.textContent = '✗ ' + (data.error || 'Ошибка');
+        }
+    } catch (e) {
+        status.style.color = '#c00';
+        status.textContent = '✗ Нет связи с сервером';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Синхронизировать';
+}
+
+async function syncImages() {
+    const status = document.getElementById('tg-sync-status');
+    status.textContent = '⏳ Скачиваю фото... (может занять минуту)';
+    try {
+        const resp = await fetch('/api/sync-tg-images', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${PASSWORD}` }
+        });
+        const json = await resp.json();
+        if (json.ok) {
+            status.textContent = `✓ Скачано: ${json.downloaded}, не удалось: ${json.failed}`;
+        } else {
+            status.textContent = `✗ ${json.error}`;
+        }
+    } catch {
+        status.textContent = '✗ Нет связи с сервером';
+    }
+}
+
 function collectNews() {
     return [...document.getElementById('news-list').children].map(r => r._getData());
 }
@@ -2308,7 +2481,8 @@ function renderAchievementItem(a) {
     const titleIn = mlInput(a.title, 'Название награды');
     const yearIn  = input(a.year,    'Год');
     const descIn  = mlTextarea(a.description, 'Описание...');
-    const photoField = makePhotoField(a.image || '', null);
+    const existingImages = a.images && a.images.length ? a.images : (a.image ? [a.image] : []);
+    const photoField = makeMultiPhotoField(existingImages);
 
     const delWrapper = document.createElement('div');
     delWrapper.className = 'field-group';
@@ -2320,10 +2494,10 @@ function renderAchievementItem(a) {
     row.appendChild(fieldGroup('Название', titleIn));
     row.appendChild(fieldGroup('Год', yearIn));
     row.appendChild(Object.assign(fieldGroup('Описание', descIn), { style: 'grid-column:1/-1' }));
-    row.appendChild(photoField.element);
+    row.appendChild(Object.assign(photoField.element, { style: 'grid-column:1/-1' }));
     row.appendChild(delWrapper);
 
-    row._getData = () => ({ id: a.id || Date.now(), title: titleIn.getValue(), year: yearIn.value, description: descIn.getValue(), image: photoField.getUrl() });
+    row._getData = () => ({ id: a.id || Date.now(), title: titleIn.getValue(), year: yearIn.value, description: descIn.getValue(), images: photoField.getUrls() });
     return row;
 }
 
@@ -2392,11 +2566,25 @@ let _mapData = null;
 
 function renderMapMahallaItem(m) {
     const wrap = document.createElement('div');
-    wrap.style.cssText = 'border:1px solid #e5e5e5;border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fafafa;';
+    wrap.style.cssText = 'border:1px solid #e5e5e5;border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fafafa;position:relative;';
 
     const header = document.createElement('div');
-    header.style.cssText = 'font-weight:600;font-size:13px;color:#534AB7;margin-bottom:10px;';
-    header.textContent = m.name;
+    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;';
+
+    const headerTitle = document.createElement('span');
+    headerTitle.style.cssText = 'font-weight:600;font-size:13px;color:#534AB7;';
+    headerTitle.textContent = m.name;
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.innerHTML = '🗑 Удалить МФЙ';
+    delBtn.style.cssText = 'padding:4px 10px;background:#fff0f0;border:1px solid #fcc;border-radius:7px;font-size:12px;color:#c0392b;cursor:pointer;';
+    delBtn.addEventListener('click', () => {
+        if (confirm('Удалить этот МФЙ?')) wrap.remove();
+    });
+
+    header.appendChild(headerTitle);
+    header.appendChild(delBtn);
     wrap.appendChild(header);
 
     const grid = document.createElement('div');
@@ -2481,10 +2669,24 @@ function renderMapSectorItem(sector) {
     const wrap = document.createElement('div');
     wrap.style.cssText = 'border:2px solid #e5e5e5;border-radius:12px;padding:16px;margin-bottom:16px;';
 
+    const titleRow = document.createElement('div');
+    titleRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;';
+
     const title = document.createElement('div');
-    title.style.cssText = 'font-size:15px;font-weight:700;color:#1A3C6E;margin-bottom:12px;';
+    title.style.cssText = 'font-size:15px;font-weight:700;color:#1A3C6E;';
     title.textContent = `Сектор ${sector.id}`;
-    wrap.appendChild(title);
+
+    const delSectorBtn = document.createElement('button');
+    delSectorBtn.type = 'button';
+    delSectorBtn.innerHTML = '🗑 Удалить сектор';
+    delSectorBtn.style.cssText = 'padding:6px 14px;background:#fff0f0;border:1px solid #fcc;border-radius:8px;font-size:13px;color:#c0392b;cursor:pointer;font-weight:600;';
+    delSectorBtn.addEventListener('click', () => {
+        if (confirm(`Удалить сектор "${sector.name}" со всеми МФЙ?`)) wrap.remove();
+    });
+
+    titleRow.appendChild(title);
+    titleRow.appendChild(delSectorBtn);
+    wrap.appendChild(titleRow);
 
     const sectorNameIn = input(sector.name, 'Название сектора');
     const nameGroup = fieldGroup('Название сектора', sectorNameIn);
@@ -2526,12 +2728,25 @@ function loadMap(data) {
     const list = document.getElementById('map-sectors-list');
     list.innerHTML = '';
     (data.sectors || []).forEach(s => list.appendChild(renderMapSectorItem(s)));
+
+    const addSectorBtn = document.createElement('button');
+    addSectorBtn.type = 'button';
+    addSectorBtn.textContent = '+ Добавить сектор';
+    addSectorBtn.style.cssText = 'margin-top:4px;padding:10px 20px;background:#f4f4f8;border:1px dashed #aaa;border-radius:10px;font-size:14px;cursor:pointer;color:#1A3C6E;font-weight:600;';
+    addSectorBtn.addEventListener('click', () => {
+        const newId = list.children.length + 1;
+        const newSector = { id: newId, name: `Сектор ${newId}`, mahallas: [] };
+        list.insertBefore(renderMapSectorItem(newSector), addSectorBtn);
+    });
+    list.appendChild(addSectorBtn);
 }
 
 function collectMap() {
     const list = document.getElementById('map-sectors-list');
     return {
-        sectors: Array.from(list.children).map(el => el._collect())
+        sectors: Array.from(list.children)
+            .filter(el => typeof el._collect === 'function')
+            .map(el => el._collect())
     };
 }
 </script>
