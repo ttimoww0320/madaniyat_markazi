@@ -293,6 +293,50 @@
     100% { width: 100%; }
 }
 
+/* Мобильный сплэш — вертикальная раскладка */
+@media (max-width: 540px) {
+    .splash-logo-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .splash-logo-img {
+        width: 90px;
+        height: 90px;
+    }
+
+    .splash-divider {
+        width: clamp(120px, 50vw, 200px);
+        height: 4px;
+        background: linear-gradient(to right,
+            #1DAEEF 33.33%,
+            #FFFFFF 33.33%,
+            #FFFFFF 66.66%,
+            #1EB57E 66.66%
+        );
+    }
+
+    .splash-text-block {
+        align-items: center;
+        text-align: center;
+    }
+
+    .splash-text-top,
+    .splash-text-main,
+    .splash-text-bottom {
+        white-space: normal;
+        text-align: center;
+        max-width: 85vw;
+    }
+
+    .splash-text-top    { font-size: clamp(14px, 4vw, 20px); }
+    .splash-text-main   { font-size: clamp(28px, 8vw, 40px); }
+    .splash-text-bottom { font-size: clamp(13px, 3.8vw, 18px); }
+
+    .splash-loader-wrap { width: 140px; margin-top: 32px; }
+}
+
 /* =============================================
    RESET & BASE
    ============================================= */
