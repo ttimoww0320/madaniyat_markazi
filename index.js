@@ -819,10 +819,8 @@ server.listen(PORT, () => {
     setInterval(() => syncTelegramNews().catch(e => console.error('[TG Sync]', e.message)), 30 * 60 * 1000);
     setInterval(() => syncTelegramGallery().catch(e => console.error('[TG Gallery]', e.message)), 30 * 60 * 1000);
 
-    const { exec } = require('child_process');
-    const url = `http://localhost:${PORT}`;
-    const cmd = process.platform === 'win32'  ? `start ${url}`
-              : process.platform === 'darwin' ? `open ${url}`
-              : `xdg-open ${url}`;
-    exec(cmd);
+    if (process.platform === 'win32' || process.platform === 'darwin') {
+        const { exec } = require('child_process');
+        exec(process.platform === 'win32' ? `start http://localhost:${PORT}` : `open http://localhost:${PORT}`);
+    }
 });
