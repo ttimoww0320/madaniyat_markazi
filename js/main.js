@@ -167,6 +167,21 @@ function applyNavStrings() {
         const el = document.getElementById(id);
         if (el) el.textContent = window.t(key);
     });
+
+    const footerNavMap = {
+        'footer-fnav-news':         ['📰', 'nav.news'],
+        'footer-fnav-events':       ['📅', 'nav.events'],
+        'footer-fnav-circles':      ['🎨', 'nav.circles'],
+        'footer-fnav-map':          ['🗺', 'nav.map'],
+        'footer-fnav-achievements': ['🏆', 'nav.achievements'],
+        'footer-fnav-team':         ['👥', 'nav.team'],
+        'footer-fnav-gallery':      ['🖼', 'nav.gallery'],
+        'footer-fnav-documents':    ['📄', 'nav.documents'],
+    };
+    Object.entries(footerNavMap).forEach(([id, [emoji, key]]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = emoji + ' ' + window.t(key);
+    });
 }
 
 // Обновить форму контакта при смене языка
@@ -208,9 +223,13 @@ function applyContactStrings() {
         });
     }
 
-    // Footer official text
+    // Footer col titles + official text
     const off = document.getElementById('footer-official');
     if (off) off.textContent = window.t('footer.official');
+    const navTitle = document.getElementById('footer-col-nav-title');
+    if (navTitle) navTitle.textContent = window.t('footer.sections');
+    const contactsTitle = document.getElementById('footer-col-contacts-title');
+    if (contactsTitle) contactsTitle.textContent = window.t('nav.contact');
 }
 
 async function loadContactFooter() {

@@ -87,6 +87,7 @@
     "childLabel":    "Bola"
   },
   "footer": {
-    "official": "Rasmiy sayt"
+    "official": "Rasmiy sayt",
+    "sections": "Sayt bo'limlari"
   }
 }
