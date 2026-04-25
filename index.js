@@ -814,6 +814,29 @@ const server = http.createServer(async (req, res) => {
     });
 });
 
+function cleanOrphanedUploads() {
+    const uploadsDir = path.join(ROOT, 'uploads');
+    const dataDir    = path.join(ROOT, 'data');
+    try {
+        const used = new Set(['логотип.png']);
+        for (const f of fs.readdirSync(dataDir)) {
+            if (!f.endsWith('.json')) continue;
+            const raw = fs.readFileSync(path.join(dataDir, f), 'utf8');
+            for (const m of raw.matchAll(/uploads\/([^"'\s]+)/g)) used.add(m[1]);
+        }
+        let deleted = 0;
+        for (const f of fs.readdirSync(uploadsDir)) {
+            if (!used.has(f)) {
+                fs.unlinkSync(path.join(uploadsDir, f));
+                deleted++;
+            }
+        }
+        if (deleted > 0) console.log(`[Автоочистка] Удалено ${deleted} неиспользуемых файлов из uploads/`);
+    } catch (e) {
+        console.error('[Автоочистка] Ошибка:', e.message);
+    }
+}
+
 server.listen(PORT, () => {
     console.log(`Сервер запущен:  http://localhost:${PORT}`);
     console.log(`Админка:         http://localhost:${PORT}/admin.html`);
@@ -823,6 +846,7 @@ server.listen(PORT, () => {
     setTimeout(() => syncTelegramGallery().catch(e => console.error('[TG Gallery]', e.message)), 5000);
     setInterval(() => syncTelegramNews().catch(e => console.error('[TG Sync]', e.message)), 30 * 60 * 1000);
     setInterval(() => syncTelegramGallery().catch(e => console.error('[TG Gallery]', e.message)), 30 * 60 * 1000);
+    setInterval(cleanOrphanedUploads, 7 * 24 * 60 * 60 * 1000);
 
     if (process.platform === 'win32' || process.platform === 'darwin') {
         const { exec } = require('child_process');
