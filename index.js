@@ -804,7 +804,12 @@ const server = http.createServer(async (req, res) => {
             });
             return;
         }
-        res.writeHead(200, { 'Content-Type': mime, 'Cache-Control': cacheControl });
+        const headers = { 'Content-Type': mime, 'Cache-Control': cacheControl };
+        if (mime.startsWith('text/html')) {
+            headers['Content-Security-Policy'] = 'upgrade-insecure-requests';
+            headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains';
+        }
+        res.writeHead(200, headers);
         res.end(data);
     });
 });
