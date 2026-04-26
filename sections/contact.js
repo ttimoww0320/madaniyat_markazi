@@ -8,12 +8,15 @@ const SOCIAL_ICONS = {
 };
 
 window.renderContact = function(data) {
+    const esc = window.escapeHtml;
+    const safeUrl = u => /^https?:\/\/|^mailto:/.test(u) ? u : '#';
+
     const phoneLines = data.phones.map(p =>
-        `<a href="tel:${p.number.replace(/\s/g, '')}">${p.number}</a> (${p.label})`
+        `<a href="tel:${esc(p.number.replace(/\s/g, ''))}">${esc(p.number)}</a> (${esc(p.label)})`
     ).join('<br>');
 
     const socialLinks = data.socials.map(s => `
-        <a href="${s.url}" class="social-link" aria-label="${s.name}">
+        <a href="${safeUrl(s.url)}" class="social-link" aria-label="${esc(s.name)}">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 ${SOCIAL_ICONS[s.name] || ''}
             </svg>
@@ -84,7 +87,7 @@ window.renderContact = function(data) {
                         </div>
                         <div>
                             <p class="contact-item-label">Адрес</p>
-                            <p class="contact-item-value">${data.address}<br>${data.landmark}</p>
+                            <p class="contact-item-value">${esc(data.address)}<br>${esc(data.landmark)}</p>
                         </div>
                     </div>
                     <div class="contact-item">
@@ -108,7 +111,7 @@ window.renderContact = function(data) {
                         <div>
                             <p class="contact-item-label">Email</p>
                             <p class="contact-item-value">
-                                <a href="mailto:${data.email}" class="contact-link">${data.email}</a>
+                                <a href="mailto:${esc(data.email)}" class="contact-link">${esc(data.email)}</a>
                             </p>
                         </div>
                     </div>
@@ -121,7 +124,7 @@ window.renderContact = function(data) {
                         </div>
                         <div>
                             <p class="contact-item-label">Режим работы</p>
-                            <p class="contact-item-value">${data.hours.weekdays}<br>${data.hours.weekends}</p>
+                            <p class="contact-item-value">${esc(data.hours.weekdays)}<br>${esc(data.hours.weekends)}</p>
                         </div>
                     </div>
                 </div>

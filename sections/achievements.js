@@ -90,6 +90,7 @@ window.renderAchievements = function(data) {
 
     const hasMore = data.length > 4;
 
+    const esc = window.escapeHtml;
     const cards = data.map((a, i) => {
         const images = (a.images && a.images.length) ? a.images : (a.image ? [a.image] : []);
         const thumb  = images[0];
@@ -97,7 +98,7 @@ window.renderAchievements = function(data) {
 
         const imgBlock = thumb
             ? `<div class="ach-img">
-                   <img src="${thumb}" alt="${window.tData(a.title)}" loading="lazy">
+                   <img src="${esc(thumb)}" alt="${esc(window.tData(a.title))}" loading="lazy">
                    ${count > 1 ? `<span class="ach-img-count">📷 ${count}</span>` : ''}
                </div>`
             : `<div class="ach-img ach-img-placeholder">

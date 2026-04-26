@@ -33,6 +33,8 @@ async function loadSections() {
                 if (api === 'map' && window._mapAfterRender) window._mapAfterRender(data);
             } catch (err) {
                 console.error(`Ошибка загрузки секции "${api}":`, err);
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = `<div style="padding:40px;text-align:center;color:#999;font-size:14px;">Не удалось загрузить раздел. Попробуйте обновить страницу.</div>`;
             }
         })
     );

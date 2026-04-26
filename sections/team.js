@@ -109,27 +109,28 @@ window.openBioModal = function(idx) {
     if (!d || !d.bio) return;
     const bio = d.bio;
 
+    const esc = window.escapeHtml;
     const careerRows = (bio.career || []).map(c =>
         `<tr>
-            <td style="white-space:nowrap;padding:6px 12px 6px 0;color:#888;font-size:13px;vertical-align:top;">${c.years}</td>
-            <td style="padding:6px 0;font-size:14px;line-height:1.5;">${c.place}</td>
+            <td style="white-space:nowrap;padding:6px 12px 6px 0;color:#888;font-size:13px;vertical-align:top;">${esc(c.years)}</td>
+            <td style="padding:6px 0;font-size:14px;line-height:1.5;">${esc(c.place)}</td>
         </tr>`
     ).join('');
 
     document.getElementById('bio-modal-content').innerHTML = `
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
             ${d.photo
-                ? `<img src="${d.photo}" alt="" style="width:72px;height:72px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+                ? `<img src="${esc(d.photo)}" alt="" style="width:72px;height:72px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
                 : `<div style="width:72px;height:72px;border-radius:50%;background:#e8eef7;flex-shrink:0;"></div>`}
             <div>
-                <div style="font-size:18px;font-weight:700;color:#1A3C6E;">${d.name}</div>
-                <div style="font-size:14px;color:#555;margin-top:4px;">${window.tData(d.department)}</div>
+                <div style="font-size:18px;font-weight:700;color:#1A3C6E;">${esc(d.name)}</div>
+                <div style="font-size:14px;color:#555;margin-top:4px;">${esc(window.tData(d.department))}</div>
             </div>
         </div>
         <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
-            <tr><td style="padding:6px 12px 6px 0;color:#888;font-size:13px;width:130px;">${window.t('team.bio.born')}</td><td style="font-size:14px;">${bio.born || '—'}</td></tr>
-            <tr><td style="padding:6px 12px 6px 0;color:#888;font-size:13px;">${window.t('team.bio.education')}</td><td style="font-size:14px;">${bio.education || '—'}</td></tr>
-            <tr><td style="padding:6px 12px 6px 0;color:#888;font-size:13px;">${window.t('team.bio.specialization')}</td><td style="font-size:14px;">${bio.specialization || '—'}</td></tr>
+            <tr><td style="padding:6px 12px 6px 0;color:#888;font-size:13px;width:130px;">${window.t('team.bio.born')}</td><td style="font-size:14px;">${esc(bio.born || '—')}</td></tr>
+            <tr><td style="padding:6px 12px 6px 0;color:#888;font-size:13px;">${window.t('team.bio.education')}</td><td style="font-size:14px;">${esc(bio.education || '—')}</td></tr>
+            <tr><td style="padding:6px 12px 6px 0;color:#888;font-size:13px;">${window.t('team.bio.specialization')}</td><td style="font-size:14px;">${esc(bio.specialization || '—')}</td></tr>
         </table>
         <div style="font-size:14px;font-weight:700;color:#1A3C6E;margin-bottom:10px;border-bottom:2px solid #e8eef7;padding-bottom:8px;">${window.t('team.bio.career')}</div>
         <table style="width:100%;border-collapse:collapse;">${careerRows}</table>

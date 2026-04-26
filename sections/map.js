@@ -241,8 +241,8 @@
     const cards = sector.mahallas.map(m => leaderCard(m)).join('');
     panel.innerHTML = `
       <div class="map-panel-header">
-        <div class="map-panel-num">${id}</div>
-        <div class="map-panel-name">${sectorName}</div>
+        <div class="map-panel-num">${Number(id)}</div>
+        <div class="map-panel-name">${window.escapeHtml(sectorName)}</div>
       </div>
       <div class="map-panel-leaders">${cards}</div>`;
 
@@ -252,16 +252,17 @@
 
   /* ── Карточка МФЙ ── */
   function leaderCard(m) {
+    const esc = window.escapeHtml;
     const photo = m.leader.photo
-      ? `<img src="${m.leader.photo}" class="map-leader-photo" alt="${m.leader.name}">`
+      ? `<img src="${esc(m.leader.photo)}" class="map-leader-photo" alt="${esc(m.leader.name)}">`
       : `<div class="map-leader-photo map-leader-photo--empty">👤</div>`;
     return `
       <div class="map-leader-card">
         ${photo}
         <div class="map-leader-info">
-          <div class="map-leader-mahalla">${window.tData(m.name)}</div>
-          <div class="map-leader-name">${m.leader.name}</div>
-          <div class="map-leader-phone">📞 ${m.leader.phone}</div>
+          <div class="map-leader-mahalla">${esc(window.tData(m.name))}</div>
+          <div class="map-leader-name">${esc(m.leader.name)}</div>
+          <div class="map-leader-phone">📞 ${esc(m.leader.phone)}</div>
         </div>
       </div>`;
   }

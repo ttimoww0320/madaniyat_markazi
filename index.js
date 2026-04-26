@@ -20,8 +20,21 @@ const TG_TOKEN       = process.env.TG_TOKEN || '';
 const TG_CHAT_ID     = process.env.TG_CHAT_ID || '';
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || `http://localhost:${PORT}`;
 
-if (!ADMIN_PASSWORD) console.warn('[WARN] ADMIN_PASSWORD не задан — установите его в .env');
-if (!TG_TOKEN)       console.warn('[WARN] TG_TOKEN не задан — Telegram-функции не будут работать');
+// ===== КОНСТАНТЫ =====
+const RATE_LIMIT_REQUESTS  = 5;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const AUTH_BLOCK_ATTEMPTS  = 10;
+const AUTH_BLOCK_WINDOW_MS = 15 * 60 * 1000;
+const REQUEST_TIMEOUT_MS   = 30 * 1000;
+const TG_FETCH_TIMEOUT_MS  = 15 * 1000;
+const TG_SEND_TIMEOUT_MS   = 10 * 1000;
+const UPLOAD_MAX_BYTES     = 20 * 1024 * 1024;
+const BACKUP_KEEP_COUNT    = 5;
+const RETRY_ATTEMPTS       = 3;
+const RETRY_DELAY_MS       = 5 * 1000;
+const CLEANUP_INTERVAL_MS  = 5 * 60 * 1000;
+const SYNC_INTERVAL_MS     = 30 * 60 * 1000;
+const HISTORY_DAYS         = 90;
 
 // ===== БЕЗОПАСНАЯ ЗАПИСЬ JSON (бэкап + атомарная запись) =====
 const BACKUP_DIR = path.join(__dirname, 'data', 'backups');
@@ -41,18 +54,47 @@ function safeWriteJSON(filePath, data) {
                 .sort();
             for (const old of all.slice(0, -5)) fs.unlinkSync(path.join(BACKUP_DIR, old));
         }
-    } catch (e) { console.warn('[Backup] Не удалось создать бэкап:', e.message); }
+    } catch (e) { logger.warn('[Backup] Не удалось создать бэкап:', e.message); }
     // Атомарная запись через временный файл
     const tmp = filePath + '.tmp';
     fs.writeFileSync(tmp, json, 'utf8');
     fs.renameSync(tmp, filePath);
 }
 
+// ===== ЛОГИРОВАНИЕ В ФАЙЛ =====
+const LOG_FILE = path.join(__dirname, 'logs', 'server.log');
+try { fs.mkdirSync(path.join(__dirname, 'logs'), { recursive: true }); } catch {}
+
+function log(level, ...args) {
+    const line = `[${new Date().toISOString()}] [${level}] ${args.join(' ')}\n`;
+    process.stdout.write(line);
+    try { fs.appendFileSync(LOG_FILE, line); } catch {}
+}
+
+// Ротация лога — оставляем последние 5 МБ
+function rotateLogs() {
+    try {
+        const stat = fs.statSync(LOG_FILE);
+        if (stat.size > 5 * 1024 * 1024) {
+            fs.renameSync(LOG_FILE, LOG_FILE + '.old');
+        }
+    } catch {}
+}
+
+const logger = {
+    info:  (...a) => log('INFO',  ...a),
+    warn:  (...a) => log('WARN',  ...a),
+    error: (...a) => log('ERROR', ...a),
+};
+
+if (!ADMIN_PASSWORD) logger.warn('[WARN] ADMIN_PASSWORD не задан — установите его в .env');
+if (!TG_TOKEN)       logger.warn('[WARN] TG_TOKEN не задан — Telegram-функции не будут работать');
+
 // ===== ЛОКА ОТ RACE CONDITION =====
 const _syncLocks = new Set();
 async function withLock(key, fn) {
     if (_syncLocks.has(key)) {
-        console.log(`[Lock] Пропуск — ${key} уже выполняется`);
+        logger.warn(`[Lock] Пропуск — ${key} уже выполняется`);
         return null;
     }
     _syncLocks.add(key);
@@ -62,7 +104,7 @@ async function withLock(key, fn) {
 
 // ===== RATE LIMITING (в памяти) =====
 const _rateLimits = new Map();
-function checkRateLimit(ip, maxRequests = 5, windowMs = 60000) {
+function checkRateLimit(ip, maxRequests = RATE_LIMIT_REQUESTS, windowMs = RATE_LIMIT_WINDOW_MS) {
     const now  = Date.now();
     const hits = (_rateLimits.get(ip) || []).filter(t => now - t < windowMs);
     if (hits.length >= maxRequests) return false;
@@ -92,7 +134,7 @@ function sendTelegram(text) {
             res.on('end', () => {
                 try {
                     const parsed = JSON.parse(data);
-                    console.log('[Telegram ответ]:', JSON.stringify(parsed));
+                    logger.info('[Telegram ответ]:', JSON.stringify(parsed));
                     if (parsed.ok) {
                         resolve(parsed);
                     } else {
@@ -104,7 +146,7 @@ function sendTelegram(text) {
             });
         });
         req.on('error', err => {
-            console.error('[Telegram ошибка сети]:', err.message);
+            logger.error('[Telegram ошибка сети]:', err.message);
             reject(err);
         });
         req.setTimeout(10000, () => { req.destroy(); reject(new Error('Telegram timeout')); });
@@ -114,12 +156,12 @@ function sendTelegram(text) {
 }
 
 // ===== RETRY-ХЕЛПЕР =====
-async function withRetry(fn, attempts = 3, delayMs = 5000) {
+async function withRetry(fn, attempts = RETRY_ATTEMPTS, delayMs = RETRY_DELAY_MS) {
     for (let i = 0; i < attempts; i++) {
         try { return await fn(); }
         catch (e) {
             if (i === attempts - 1) throw e;
-            console.warn(`[Retry] Попытка ${i + 1} не удалась: ${e.message}. Повтор через ${delayMs / 1000}с...`);
+            logger.warn(`[Retry] Попытка ${i + 1} не удалась: ${e.message}. Повтор через ${delayMs / 1000}с...`);
             await new Promise(r => setTimeout(r, delayMs * (i + 1)));
         }
     }
@@ -169,15 +211,31 @@ function fetchTelegramPage(channelName, before) {
     });
 }
 
-function parseTelegramMessage(block) {
+// Общая функция — извлекает postId, date, text из блока Telegram
+function parseTgBlockBase(block) {
     const postIdMatch = block.match(/data-post="[^/]+\/(\d+)"/);
     if (!postIdMatch) return null;
-    const postId = postIdMatch[1];
-
     const dateMatch = block.match(/<time[^>]+datetime="(\d{4}-\d{2}-\d{2})/);
     if (!dateMatch) return null;
     const [y, m, d] = dateMatch[1].split('-');
     const date = `${d}.${m}.${y}`;
+    let text = '';
+    const textMatch = block.match(/class="tgme_widget_message_text[^"]*"[^>]*>([\s\S]*?)<\/div>/);
+    if (textMatch) {
+        text = textMatch[1]
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/<[^>]+>/g, '')
+            .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ')
+            .trim();
+    }
+    return { postId: postIdMatch[1], date, text };
+}
+
+function parseTelegramMessage(block) {
+    const base = parseTgBlockBase(block);
+    if (!base) return null;
+    const { postId, date } = base;
 
     let image = null;
     let isVideo = false;
@@ -202,18 +260,7 @@ function parseTelegramMessage(block) {
         if (mv) { image = mv[1]; isVideo = isVideo || block.includes('video'); }
     }
 
-    let text = '';
-    const textMatch = block.match(/class="tgme_widget_message_text[^"]*"[^>]*>([\s\S]*?)<\/div>/);
-    if (textMatch) {
-        text = textMatch[1]
-            .replace(/<br\s*\/?>/gi, '\n')
-            .replace(/<[^>]+>/g, '')
-            .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-            .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ')
-            .trim();
-    }
-
-    return { postId, date, image, isVideo, text };
+    return { postId, date, image, isVideo, text: base.text };
 }
 
 function parseTelegramPage(html) {
@@ -249,26 +296,10 @@ function parseTelegramGalleryPage(html) {
         }
         if (!photos.length) continue;
 
-        const postIdMatch = block.match(/data-post="[^/]+\/(\d+)"/);
-        if (!postIdMatch) continue;
-        const postId = postIdMatch[1];
-
-        const dateMatch = block.match(/<time[^>]+datetime="(\d{4}-\d{2}-\d{2})/);
-        if (!dateMatch) continue;
-        const [y, mo, d] = dateMatch[1].split('-');
-        const date = `${d}.${mo}.${y}`;
-
-        let alt = '';
-        const textMatch = block.match(/class="tgme_widget_message_text[^"]*"[^>]*>([\s\S]*?)<\/div>/);
-        if (textMatch) {
-            alt = textMatch[1]
-                .replace(/<br\s*\/?>/gi, '\n')
-                .replace(/<[^>]+>/g, '')
-                .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-                .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ')
-                .split('\n')[0].trim().slice(0, 120);
-        }
-        if (!alt) alt = `Фото ${date}`;
+        const base = parseTgBlockBase(block);
+        if (!base) continue;
+        const { postId, date } = base;
+        const alt = base.text.split('\n')[0].trim().slice(0, 120) || `Фото ${date}`;
 
         items.push({ postId, date, alt, photos });
     }
@@ -278,18 +309,18 @@ function parseTelegramGalleryPage(html) {
 
 async function syncTelegramNews() { return withLock('tg-news', _syncTelegramNews); }
 async function _syncTelegramNews() {
-    console.log(`[TG Sync] Синхронизация с каналом @${TG_CHANNEL_NAME}...`);
+    logger.info(`[TG Sync] Синхронизация с каналом @${TG_CHANNEL_NAME}...`);
 
     let html;
     try {
         html = await withRetry(() => fetchTelegramPage());
     } catch (e) {
-        console.error('[TG Sync] Ошибка запроса после 3 попыток:', e.message);
+        logger.error('[TG Sync] Ошибка запроса после 3 попыток:', e.message);
         return { added: 0, error: e.message };
     }
 
     const posts = parseTelegramPage(html);
-    console.log(`[TG Sync] Найдено постов: ${posts.length}`);
+    logger.info(`[TG Sync] Найдено постов: ${posts.length}`);
 
     const newsFile = path.join(ROOT, 'data', 'news.json');
     let existing = [];
@@ -314,9 +345,9 @@ async function _syncTelegramNews() {
             try {
                 const fname = tgImageFilename(imageUrl, 'news');
                 imageUrl = await downloadImage(imageUrl, fname);
-                console.log(`[TG Sync] Скачано фото: ${fname}`);
+                logger.info(`[TG Sync] Скачано фото: ${fname}`);
             } catch (e) {
-                console.warn(`[TG Sync] Не удалось скачать фото: ${e.message}`);
+                logger.warn(`[TG Sync] Не удалось скачать фото: ${e.message}`);
             }
         }
         existing.unshift({
@@ -332,9 +363,9 @@ async function _syncTelegramNews() {
 
     if (added > 0) {
         safeWriteJSON(newsFile, existing);
-        console.log(`[TG Sync] Добавлено новых постов: ${added}`);
+        logger.info(`[TG Sync] Добавлено новых постов: ${added}`);
     } else {
-        console.log('[TG Sync] Новых постов нет');
+        logger.info('[TG Sync] Новых постов нет');
     }
     return { added, total: posts.length };
 }
@@ -346,7 +377,7 @@ const TG_GALLERY_PAGE_DELAY = 500;
 
 async function syncTelegramGallery() { return withLock('tg-gallery', _syncTelegramGallery); }
 async function _syncTelegramGallery() {
-    console.log(`[TG Gallery] Синхронизация с каналом @${TG_GALLERY_CHANNEL}...`);
+    logger.info(`[TG Gallery] Синхронизация с каналом @${TG_GALLERY_CHANNEL}...`);
 
     let allItems = [];
     let before = null;
@@ -356,7 +387,7 @@ async function _syncTelegramGallery() {
         try {
             html = await withRetry(() => fetchTelegramPage(TG_GALLERY_CHANNEL, before));
         } catch (e) {
-            console.error('[TG Gallery] Ошибка запроса после 3 попыток:', e.message);
+            logger.error('[TG Gallery] Ошибка запроса после 3 попыток:', e.message);
             if (page === 0) return { added: 0, error: e.message };
             break;
         }
@@ -373,7 +404,7 @@ async function _syncTelegramGallery() {
         await new Promise(r => setTimeout(r, TG_GALLERY_PAGE_DELAY));
     }
 
-    console.log(`[TG Gallery] Найдено постов с фото: ${allItems.length}`);
+    logger.info(`[TG Gallery] Найдено постов с фото: ${allItems.length}`);
 
     const galleryFile = path.join(ROOT, 'data', 'gallery.json');
     let existing = [];
@@ -399,9 +430,9 @@ async function _syncTelegramGallery() {
                 const fname = tgImageFilename(photoUrl, 'gallery');
                 const local = await downloadImage(photoUrl, fname);
                 localPhotos.push(local);
-                console.log(`[TG Gallery] Скачано фото: ${fname}`);
+                logger.info(`[TG Gallery] Скачано фото: ${fname}`);
             } catch (e) {
-                console.warn(`[TG Gallery] Не удалось скачать фото: ${e.message}`);
+                logger.warn(`[TG Gallery] Не удалось скачать фото: ${e.message}`);
                 localPhotos.push(photoUrl);
             }
         }
@@ -416,9 +447,9 @@ async function _syncTelegramGallery() {
 
     if (added > 0) {
         safeWriteJSON(galleryFile, existing);
-        console.log(`[TG Gallery] Добавлено новых: ${added}`);
+        logger.info(`[TG Gallery] Добавлено новых: ${added}`);
     } else {
-        console.log('[TG Gallery] Новых элементов нет');
+        logger.info('[TG Gallery] Новых элементов нет');
     }
     return { added, total: allItems.length };
 }
@@ -430,9 +461,10 @@ function downloadImage(url, filename) {
         if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
         // Защита от path traversal в имени файла
-        const safeName = path.basename(filename).replace(/[^a-zA-Z0-9._-]/g, '_');
+        const safeName = path.basename(filename).replace(/[^a-zA-Z0-9._-]/g, '_').replace(/^\.+$/, '_');
+        if (!safeName || safeName.length < 2) { reject(new Error('Недопустимое имя файла')); return; }
         const filePath = path.join(uploadsDir, safeName);
-        if (!filePath.startsWith(uploadsDir + path.sep)) { reject(new Error('Недопустимый путь')); return; }
+        if (!filePath.startsWith(path.resolve(uploadsDir) + path.sep)) { reject(new Error('Недопустимый путь')); return; }
 
         if (fs.existsSync(filePath)) { resolve(`/uploads/${safeName}`); return; }
 
@@ -530,8 +562,8 @@ function checkAuth(req) {
     if (!ADMIN_PASSWORD) return false;
     const ip  = req.socket.remoteAddress || 'unknown';
     const now = Date.now();
-    const failures = (_authFailures.get(ip) || []).filter(t => now - t < 15 * 60 * 1000);
-    if (failures.length >= 10) return false; // блок на 15 минут после 10 неудач
+    const failures = (_authFailures.get(ip) || []).filter(t => now - t < AUTH_BLOCK_WINDOW_MS);
+    if (failures.length >= AUTH_BLOCK_ATTEMPTS) return false; // блок на 15 минут после 10 неудач
     const auth = req.headers['authorization'] || '';
     if (auth === `Bearer ${ADMIN_PASSWORD}`) { _authFailures.delete(ip); return true; }
     failures.push(now);
@@ -561,7 +593,7 @@ function readBody(req, maxBytes = 10 * 1024 * 1024) {
 }
 
 const PHONE_RE = /^[\+\d\s\-\(\)]{7,20}$/;
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_RE = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
 
 const server = http.createServer(async (req, res) => {
 
@@ -597,22 +629,26 @@ const server = http.createServer(async (req, res) => {
                 sendJSON(res, 400, { error: 'Недопустимый тип файла' }); return;
             }
 
-            const safeName   = `${Date.now()}_${path.basename(rawName).replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+            const baseName   = path.basename(rawName).replace(/[^a-zA-Z0-9._-]/g, '_').replace(/^\.+$/, '_');
+            const safeName   = `${Date.now()}_${baseName || 'file'}`;
             const uploadsDir = path.join(ROOT, 'uploads');
             if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+            const uploadPath = path.join(uploadsDir, safeName);
+            if (!uploadPath.startsWith(path.resolve(uploadsDir) + path.sep)) {
+                sendJSON(res, 400, { error: 'Недопустимое имя файла' }); return;
+            }
 
             let size = 0;
-            const MAX_UPLOAD = 20 * 1024 * 1024;
             const chunks = [];
             const timer = setTimeout(() => { req.destroy(); sendJSON(res, 408, { error: 'Timeout' }); }, 60000);
             req.on('data', c => {
                 size += c.length;
-                if (size > MAX_UPLOAD) { req.destroy(); clearTimeout(timer); sendJSON(res, 413, { error: 'Файл слишком большой' }); return; }
+                if (size > UPLOAD_MAX_BYTES) { req.destroy(); clearTimeout(timer); sendJSON(res, 413, { error: 'Файл слишком большой' }); return; }
                 chunks.push(c);
             });
             req.on('end', () => {
                 clearTimeout(timer);
-                fs.writeFile(path.join(uploadsDir, safeName), Buffer.concat(chunks), err => {
+                fs.writeFile(uploadPath, Buffer.concat(chunks), err => {
                     if (err) { sendJSON(res, 500, { error: 'Ошибка сохранения' }); return; }
                     sendJSON(res, 200, { url: `/uploads/${safeName}` });
                 });
@@ -631,7 +667,8 @@ const server = http.createServer(async (req, res) => {
         // GET /api/auth
         if (section === 'auth') {
             if (req.method === 'GET') {
-                sendJSON(res, checkAuth(req) ? 200 : 401, { ok: checkAuth(req) });
+                const ok = checkAuth(req);
+                sendJSON(res, ok ? 200 : 401, { ok });
             } else {
                 sendJSON(res, 405, { error: 'Метод не разрешён' });
             }
@@ -643,7 +680,7 @@ const server = http.createServer(async (req, res) => {
             if (req.method !== 'POST') { sendJSON(res, 405, { error: 'Метод не разрешён' }); return; }
 
             const ip = req.socket.remoteAddress || 'unknown';
-            if (!checkRateLimit(ip, 5, 60000)) {
+            if (!checkRateLimit(ip, RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW_MS)) {
                 sendJSON(res, 429, { error: 'Слишком много запросов. Попробуйте через минуту.' }); return;
             }
 
@@ -685,7 +722,7 @@ const server = http.createServer(async (req, res) => {
                 await sendTelegram(text);
                 sendJSON(res, 200, { ok: true });
             } catch (e) {
-                console.error('[send-message] Ошибка:', e.message);
+                logger.error('[send-message] Ошибка:', e.message);
                 sendJSON(res, 500, { error: 'Ошибка отправки в Telegram' });
             }
             return;
@@ -765,21 +802,6 @@ const server = http.createServer(async (req, res) => {
             return;
         }
 
-        // GET /api/debug-tg
-        if (section === 'debug-tg') {
-            if (!checkAuth(req)) { sendJSON(res, 401, { error: 'Неверный пароль' }); return; }
-            try {
-                const html = await fetchTelegramPage();
-                const blocks = html.split(/(?=<div class="tgme_widget_message\b)/);
-                const videoBlocks = blocks.filter(b => b.includes('video'));
-                const firstPost  = blocks[1] ? blocks[1].slice(0, 3000) : 'нет постов';
-                const firstVideo = videoBlocks[0] ? videoBlocks[0].slice(0, 3000) : 'нет видео-блоков';
-                sendJSON(res, 200, { total: blocks.length, videoBlocks: videoBlocks.length, firstPost, firstVideo });
-            } catch (e) {
-                sendJSON(res, 500, { error: e.message });
-            }
-            return;
-        }
 
         // GET /api/visitors — статистика посетителей (только для админа)
         if (section === 'visitors') {
@@ -944,27 +966,28 @@ function cleanOrphanedUploads() {
                 deleted++;
             }
         }
-        if (deleted > 0) console.log(`[Автоочистка] Удалено ${deleted} неиспользуемых файлов из uploads/`);
+        if (deleted > 0) logger.info(`[Автоочистка] Удалено ${deleted} неиспользуемых файлов из uploads/`);
     } catch (e) {
-        console.error('[Автоочистка] Ошибка:', e.message);
+        logger.error('[Автоочистка] Ошибка:', e.message);
     }
 }
 
 server.listen(PORT, () => {
-    console.log(`Сервер запущен:  http://localhost:${PORT}`);
-    console.log(`Админка:         http://localhost:${PORT}/admin.html`);
-    console.log('Нажми Ctrl+C чтобы остановить');
+    rotateLogs();
+    logger.info(`Сервер запущен:  http://localhost:${PORT}`);
+    logger.info(`Админка:         http://localhost:${PORT}/admin.html`);
+    logger.info('Нажми Ctrl+C чтобы остановить');
 
-    setTimeout(() => syncTelegramNews().catch(e => console.error('[TG Sync]', e.message)), 3000);
-    setTimeout(() => syncTelegramGallery().catch(e => console.error('[TG Gallery]', e.message)), 5000);
-    setInterval(() => syncTelegramNews().catch(e => console.error('[TG Sync]', e.message)), 30 * 60 * 1000);
-    setInterval(() => syncTelegramGallery().catch(e => console.error('[TG Gallery]', e.message)), 30 * 60 * 1000);
+    setTimeout(() => syncTelegramNews().catch(e => logger.error('[TG Sync]', e.message)), 3000);
+    setTimeout(() => syncTelegramGallery().catch(e => logger.error('[TG Gallery]', e.message)), 5000);
+    setInterval(() => syncTelegramNews().catch(e => logger.error('[TG Sync]', e.message)), SYNC_INTERVAL_MS);
+    setInterval(() => syncTelegramGallery().catch(e => logger.error('[TG Gallery]', e.message)), SYNC_INTERVAL_MS);
     setInterval(cleanOrphanedUploads, 7 * 24 * 60 * 60 * 1000);
     setInterval(() => {
         const now = Date.now();
         for (const [k, v] of _rateLimits) if (!v.some(t => now - t < 60000)) _rateLimits.delete(k);
-        for (const [k, v] of _authFailures) if (!v.some(t => now - t < 15 * 60 * 1000)) _authFailures.delete(k);
-    }, 5 * 60 * 1000);
+        for (const [k, v] of _authFailures) if (!v.some(t => now - t < AUTH_BLOCK_WINDOW_MS)) _authFailures.delete(k);
+    }, CLEANUP_INTERVAL_MS);
 
     if (process.platform === 'win32' || process.platform === 'darwin') {
         const { exec } = require('child_process');
@@ -974,12 +997,12 @@ server.listen(PORT, () => {
 
 // ===== GRACEFUL SHUTDOWN =====
 function shutdown() {
-    console.log('\n[Сервер] Завершение работы...');
+    logger.info('[Сервер] Завершение работы...');
     server.close(() => {
-        console.log('[Сервер] Остановлен.');
+        logger.info('[Сервер] Остановлен.');
         process.exit(0);
     });
-    setTimeout(() => { console.error('[Сервер] Принудительное завершение.'); process.exit(1); }, 10000);
+    setTimeout(() => { logger.error('[Сервер] Принудительное завершение.'); process.exit(1); }, 10000);
 }
 process.on('SIGTERM', shutdown);
 process.on('SIGINT',  shutdown);
