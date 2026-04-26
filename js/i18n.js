@@ -61,7 +61,17 @@
         document.documentElement.lang = _lang === 'oz' ? 'uz-Cyrl' : _lang;
     }
 
-    window.i18n  = { t, tData, getLang, setLang, init, LANGS, DEFAULT };
-    window.t     = t;
-    window.tData = tData;
+    function escapeHtml(s) {
+        return String(s ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    window.i18n      = { t, tData, getLang, setLang, init, LANGS, DEFAULT };
+    window.t         = t;
+    window.tData     = tData;
+    window.escapeHtml = escapeHtml;
 })();

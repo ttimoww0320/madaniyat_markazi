@@ -495,10 +495,18 @@ function sendJSON(res, status, data) {
     res.end(JSON.stringify(data));
 }
 
+const _authFailures = new Map();
 function checkAuth(req) {
     if (!ADMIN_PASSWORD) return false;
+    const ip  = req.socket.remoteAddress || 'unknown';
+    const now = Date.now();
+    const failures = (_authFailures.get(ip) || []).filter(t => now - t < 15 * 60 * 1000);
+    if (failures.length >= 10) return false; // блок на 15 минут после 10 неудач
     const auth = req.headers['authorization'] || '';
-    return auth === `Bearer ${ADMIN_PASSWORD}`;
+    if (auth === `Bearer ${ADMIN_PASSWORD}`) { _authFailures.delete(ip); return true; }
+    failures.push(now);
+    _authFailures.set(ip, failures);
+    return false;
 }
 
 // Собрать тело запроса с ограничением размера и таймаутом

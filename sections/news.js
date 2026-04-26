@@ -2,6 +2,7 @@ window.renderNews = function(data) {
     if (!data || !data.length) return '';
 
     const TG_CHANNEL = 'madaniyatvazirligi';
+    const esc = window.escapeHtml;
 
     const cards = data.map(n => {
         const img = n.image
@@ -18,8 +19,8 @@ window.renderNews = function(data) {
             ${img}
             <div class="news-body">
                 ${n.date ? `<span class="news-date">${n.date}</span>` : ''}
-                <h3 class="news-title">${window.tData(n.title)}</h3>
-                <p class="news-text">${window.tData(n.text)}</p>
+                <h3 class="news-title">${esc(window.tData(n.title))}</h3>
+                <p class="news-text">${esc(window.tData(n.text))}</p>
                 ${tgLink ? `<span class="news-tg-hint">Читать в Telegram →</span>` : ''}
             </div>
         </${closeTag}>`;

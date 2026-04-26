@@ -10,21 +10,22 @@ const EVENT_ICONS = {
 };
 
 function buildEventCard(ev) {
+    const esc = window.escapeHtml;
     const imageContent = ev.image
-        ? `<img src="${ev.image}" alt="${window.tData(ev.title)}" style="width:100%;height:100%;object-fit:cover;">`
+        ? `<img src="${esc(ev.image)}" alt="${esc(window.tData(ev.title))}" style="width:100%;height:100%;object-fit:cover;">`
         : `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                ${EVENT_ICONS[ev.color] || EVENT_ICONS.blue}
            </svg>`;
 
     return `
     <div class="card">
-        <div class="event-image ${ev.image ? '' : ev.color}" style="${ev.image ? 'padding:0' : ''}">
+        <div class="event-image ${esc(ev.image ? '' : ev.color)}" style="${ev.image ? 'padding:0' : ''}">
             ${imageContent}
         </div>
         <div class="event-content">
-            <span class="event-date ${ev.color !== 'blue' ? ev.color : ''}">${window.tData(ev.date)}</span>
-            <h3 class="event-title">${window.tData(ev.title)}</h3>
-            <p class="event-meta">${window.tData(ev.place)} • ${ev.time}</p>
+            <span class="event-date ${ev.color !== 'blue' ? esc(ev.color) : ''}">${esc(window.tData(ev.date))}</span>
+            <h3 class="event-title">${esc(window.tData(ev.title))}</h3>
+            <p class="event-meta">${esc(window.tData(ev.place))} • ${esc(ev.time)}</p>
         </div>
     </div>`;
 }

@@ -119,11 +119,12 @@ function applySiteData(data) {
 
         const req = document.getElementById('footer-requisites');
         if (req) {
+            const esc = window.escapeHtml;
             req.innerHTML = [
-                data.footer.logoText   ? `<p><strong>${window.tData(data.footer.logoText)}</strong></p>` : '',
-                data.footer.address    ? `<p>${window.tData(data.footer.address)}</p>` : '',
-                data.footer.inn        ? `<p>ИНН: ${data.footer.inn}</p>` : '',
-                data.footer.workHours  ? `<p>${window.tData(data.footer.workHours)}</p>` : '',
+                data.footer.logoText   ? `<p><strong>${esc(window.tData(data.footer.logoText))}</strong></p>` : '',
+                data.footer.address    ? `<p>${esc(window.tData(data.footer.address))}</p>` : '',
+                data.footer.inn        ? `<p>ИНН: ${esc(data.footer.inn)}</p>` : '',
+                data.footer.workHours  ? `<p>${esc(window.tData(data.footer.workHours))}</p>` : '',
             ].join('');
         }
     }
@@ -131,10 +132,11 @@ function applySiteData(data) {
     if (data.stats && data.stats.length) {
         const bar = document.getElementById('stats-bar');
         if (bar) {
+            const esc = window.escapeHtml;
             bar.innerHTML = data.stats.map(s =>
                 `<div class="stat-item">
-                    <span class="stat-num" data-target="${s.value}" data-suffix="${s.suffix || ''}">0</span>
-                    <span class="stat-label">${window.tData(s.label)}</span>
+                    <span class="stat-num" data-target="${esc(s.value)}" data-suffix="${esc(s.suffix || '')}">0</span>
+                    <span class="stat-label">${esc(window.tData(s.label))}</span>
                 </div>`
             ).join('');
             if (window.initStatsAnimation) window.initStatsAnimation();
