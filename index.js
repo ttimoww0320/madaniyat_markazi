@@ -2,6 +2,7 @@ const http  = require('http');
 const https = require('https');
 const fs    = require('fs');
 const path  = require('path');
+const zlib  = require('zlib');
 
 // ===== ЗАГРУЗКА .env =====
 try {
@@ -490,9 +491,26 @@ function trackVisit() {
 }
 const ALLOWED_UPLOAD_EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg', '.pdf', '.doc', '.docx']);
 
-function sendJSON(res, status, data) {
-    res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
-    res.end(JSON.stringify(data));
+function sendCompressed(req, res, status, headers, body) {
+    const accept = req.headers['accept-encoding'] || '';
+    if (accept.includes('gzip') && body.length > 512) {
+        zlib.gzip(body, (err, compressed) => {
+            if (err) { res.writeHead(status, headers); res.end(body); return; }
+            res.writeHead(status, { ...headers, 'Content-Encoding': 'gzip', 'Vary': 'Accept-Encoding' });
+            res.end(compressed);
+        });
+    } else {
+        res.writeHead(status, headers);
+        res.end(body);
+    }
+}
+
+function sendJSON(res, status, data, req) {
+    const body = Buffer.from(JSON.stringify(data), 'utf8');
+    const headers = { 'Content-Type': 'application/json; charset=utf-8' };
+    if (req) { sendCompressed(req, res, status, headers, body); return; }
+    res.writeHead(status, headers);
+    res.end(body);
 }
 
 const _authFailures = new Map();
@@ -861,8 +879,13 @@ const server = http.createServer(async (req, res) => {
             headers['Content-Security-Policy'] = 'upgrade-insecure-requests';
             headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains';
         }
-        res.writeHead(200, headers);
-        res.end(data);
+        const compressible = /^(text\/|application\/javascript|application\/json)/.test(mime);
+        if (compressible) {
+            sendCompressed(req, res, 200, headers, data);
+        } else {
+            res.writeHead(200, headers);
+            res.end(data);
+        }
     });
 });
 
