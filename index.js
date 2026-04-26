@@ -22,6 +22,43 @@ const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || `http://localhost:${PORT}`;
 if (!ADMIN_PASSWORD) console.warn('[WARN] ADMIN_PASSWORD не задан — установите его в .env');
 if (!TG_TOKEN)       console.warn('[WARN] TG_TOKEN не задан — Telegram-функции не будут работать');
 
+// ===== БЕЗОПАСНАЯ ЗАПИСЬ JSON (бэкап + атомарная запись) =====
+const BACKUP_DIR = path.join(__dirname, 'data', 'backups');
+try { fs.mkdirSync(BACKUP_DIR, { recursive: true }); } catch {}
+
+function safeWriteJSON(filePath, data) {
+    const json = JSON.stringify(data, null, 2);
+    // Бэкап текущего файла
+    try {
+        if (fs.existsSync(filePath)) {
+            const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const name  = path.basename(filePath, '.json');
+            fs.copyFileSync(filePath, path.join(BACKUP_DIR, `${name}.${stamp}.json`));
+            // Оставляем только 5 последних бэкапов для каждого файла
+            const all = fs.readdirSync(BACKUP_DIR)
+                .filter(f => f.startsWith(name + '.'))
+                .sort();
+            for (const old of all.slice(0, -5)) fs.unlinkSync(path.join(BACKUP_DIR, old));
+        }
+    } catch (e) { console.warn('[Backup] Не удалось создать бэкап:', e.message); }
+    // Атомарная запись через временный файл
+    const tmp = filePath + '.tmp';
+    fs.writeFileSync(tmp, json, 'utf8');
+    fs.renameSync(tmp, filePath);
+}
+
+// ===== ЛОКА ОТ RACE CONDITION =====
+const _syncLocks = new Set();
+async function withLock(key, fn) {
+    if (_syncLocks.has(key)) {
+        console.log(`[Lock] Пропуск — ${key} уже выполняется`);
+        return null;
+    }
+    _syncLocks.add(key);
+    try { return await fn(); }
+    finally { _syncLocks.delete(key); }
+}
+
 // ===== RATE LIMITING (в памяти) =====
 const _rateLimits = new Map();
 function checkRateLimit(ip, maxRequests = 5, windowMs = 60000) {
@@ -226,7 +263,8 @@ function parseTelegramGalleryPage(html) {
     return items;
 }
 
-async function syncTelegramNews() {
+async function syncTelegramNews() { return withLock('tg-news', _syncTelegramNews); }
+async function _syncTelegramNews() {
     console.log(`[TG Sync] Синхронизация с каналом @${TG_CHANNEL_NAME}...`);
 
     let html;
@@ -280,7 +318,7 @@ async function syncTelegramNews() {
     }
 
     if (added > 0) {
-        fs.writeFileSync(newsFile, JSON.stringify(existing, null, 2), 'utf8');
+        safeWriteJSON(newsFile, existing);
         console.log(`[TG Sync] Добавлено новых постов: ${added}`);
     } else {
         console.log('[TG Sync] Новых постов нет');
@@ -293,7 +331,8 @@ const TG_GALLERY_CHANNEL = 'madaniyatbolimi';
 const TG_GALLERY_MAX_PAGES = 5;
 const TG_GALLERY_PAGE_DELAY = 500;
 
-async function syncTelegramGallery() {
+async function syncTelegramGallery() { return withLock('tg-gallery', _syncTelegramGallery); }
+async function _syncTelegramGallery() {
     console.log(`[TG Gallery] Синхронизация с каналом @${TG_GALLERY_CHANNEL}...`);
 
     let allItems = [];
@@ -363,7 +402,7 @@ async function syncTelegramGallery() {
     }
 
     if (added > 0) {
-        fs.writeFileSync(galleryFile, JSON.stringify(existing, null, 2), 'utf8');
+        safeWriteJSON(galleryFile, existing);
         console.log(`[TG Gallery] Добавлено новых: ${added}`);
     } else {
         console.log('[TG Gallery] Новых элементов нет');
@@ -652,7 +691,7 @@ const server = http.createServer(async (req, res) => {
                         } catch { failed++; }
                     }
                 }
-                if (newsChanged) fs.writeFileSync(newsFile, JSON.stringify(news, null, 2), 'utf8');
+                if (newsChanged) safeWriteJSON(newsFile, news);
 
                 const galleryFile = path.join(ROOT, 'data', 'gallery.json');
                 let gallery = [];
@@ -671,7 +710,7 @@ const server = http.createServer(async (req, res) => {
                         }
                     }
                 }
-                if (galleryChanged) fs.writeFileSync(galleryFile, JSON.stringify(gallery, null, 2), 'utf8');
+                if (galleryChanged) safeWriteJSON(galleryFile, gallery);
 
                 sendJSON(res, 200, { ok: true, downloaded, failed });
             } catch (e) {
@@ -804,7 +843,12 @@ const server = http.createServer(async (req, res) => {
             });
             return;
         }
-        const headers = { 'Content-Type': mime, 'Cache-Control': cacheControl };
+        const headers = {
+            'Content-Type': mime,
+            'Cache-Control': cacheControl,
+            'X-Content-Type-Options': 'nosniff',
+            'X-Frame-Options': 'SAMEORIGIN',
+        };
         if (mime.startsWith('text/html')) {
             headers['Content-Security-Policy'] = 'upgrade-insecure-requests';
             headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains';
@@ -853,3 +897,15 @@ server.listen(PORT, () => {
         exec(process.platform === 'win32' ? `start http://localhost:${PORT}` : `open http://localhost:${PORT}`);
     }
 });
+
+// ===== GRACEFUL SHUTDOWN =====
+function shutdown() {
+    console.log('\n[Сервер] Завершение работы...');
+    server.close(() => {
+        console.log('[Сервер] Остановлен.');
+        process.exit(0);
+    });
+    setTimeout(() => { console.error('[Сервер] Принудительное завершение.'); process.exit(1); }, 10000);
+}
+process.on('SIGTERM', shutdown);
+process.on('SIGINT',  shutdown);
