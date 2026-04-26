@@ -113,6 +113,18 @@ function sendTelegram(text) {
     });
 }
 
+// ===== RETRY-ХЕЛПЕР =====
+async function withRetry(fn, attempts = 3, delayMs = 5000) {
+    for (let i = 0; i < attempts; i++) {
+        try { return await fn(); }
+        catch (e) {
+            if (i === attempts - 1) throw e;
+            console.warn(`[Retry] Попытка ${i + 1} не удалась: ${e.message}. Повтор через ${delayMs / 1000}с...`);
+            await new Promise(r => setTimeout(r, delayMs * (i + 1)));
+        }
+    }
+}
+
 // ===== СИНХРОНИЗАЦИЯ С TELEGRAM-КАНАЛОМ =====
 const TG_CHANNEL_NAME = 'madaniyatvazirligi';
 
@@ -270,9 +282,9 @@ async function _syncTelegramNews() {
 
     let html;
     try {
-        html = await fetchTelegramPage();
+        html = await withRetry(() => fetchTelegramPage());
     } catch (e) {
-        console.error('[TG Sync] Ошибка запроса:', e.message);
+        console.error('[TG Sync] Ошибка запроса после 3 попыток:', e.message);
         return { added: 0, error: e.message };
     }
 
@@ -342,9 +354,9 @@ async function _syncTelegramGallery() {
     for (let page = 0; page < TG_GALLERY_MAX_PAGES; page++) {
         let html;
         try {
-            html = await fetchTelegramPage(TG_GALLERY_CHANNEL, before);
+            html = await withRetry(() => fetchTelegramPage(TG_GALLERY_CHANNEL, before));
         } catch (e) {
-            console.error('[TG Gallery] Ошибка запроса:', e.message);
+            console.error('[TG Gallery] Ошибка запроса после 3 попыток:', e.message);
             if (page === 0) return { added: 0, error: e.message };
             break;
         }
@@ -574,6 +586,7 @@ const server = http.createServer(async (req, res) => {
         // POST /api/upload?name=file.jpg
         if (section === 'upload') {
             if (!checkAuth(req)) { sendJSON(res, 401, { error: 'Неверный пароль' }); return; }
+            if (!req.headers['x-requested-with']) { sendJSON(res, 403, { error: 'Запрещено' }); return; }
             if (req.method !== 'POST') { sendJSON(res, 405, { error: 'Метод не разрешён' }); return; }
 
             const urlObj = new URL(req.url, `http://localhost:${PORT}`);
@@ -810,20 +823,38 @@ const server = http.createServer(async (req, res) => {
         // POST /api/:section
         if (req.method === 'POST') {
             if (!checkAuth(req)) { sendJSON(res, 401, { error: 'Неверный пароль' }); return; }
+            if (!req.headers['x-requested-with']) { sendJSON(res, 403, { error: 'Запрещено' }); return; }
 
-            let body;
+            let body, parsed;
             try {
-                body = await readBody(req);
-                JSON.parse(body);
+                body   = await readBody(req);
+                parsed = JSON.parse(body);
             } catch (e) {
                 sendJSON(res, 400, { error: e.message.includes('large') ? 'Данные слишком большие' : 'Некорректный JSON' });
                 return;
             }
 
-            fs.writeFile(dataFile, body, 'utf8', err => {
-                if (err) { sendJSON(res, 500, { error: 'Ошибка сохранения' }); return; }
-                sendJSON(res, 200, { ok: true });
-            });
+            // Валидация структуры по секции
+            const arraySection  = ['news', 'events', 'circles', 'achievements'];
+            const objectSection = ['site', 'contact', 'map', 'visitors'];
+            if (arraySection.includes(section) && !Array.isArray(parsed)) {
+                sendJSON(res, 400, { error: `Секция "${section}" должна быть массивом` }); return;
+            }
+            if (objectSection.includes(section) && (typeof parsed !== 'object' || Array.isArray(parsed))) {
+                sendJSON(res, 400, { error: `Секция "${section}" должна быть объектом` }); return;
+            }
+            if (section === 'team' && (!parsed.director || !Array.isArray(parsed.deputies) || !Array.isArray(parsed.staff))) {
+                sendJSON(res, 400, { error: 'Секция "team" должна содержать director, deputies[], staff[]' }); return;
+            }
+            if (section === 'documents' && !Array.isArray(parsed.main)) {
+                sendJSON(res, 400, { error: 'Секция "documents" должна содержать main[]' }); return;
+            }
+            if (section === 'gallery' && !Array.isArray(parsed)) {
+                sendJSON(res, 400, { error: 'Секция "gallery" должна быть массивом' }); return;
+            }
+
+            safeWriteJSON(dataFile, parsed);
+            sendJSON(res, 200, { ok: true });
             return;
         }
 
