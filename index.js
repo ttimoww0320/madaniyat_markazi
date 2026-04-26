@@ -608,6 +608,13 @@ const server = http.createServer(async (req, res) => {
             return;
         }
 
+        // GET /api/health
+        if (section === 'health') {
+            const dataOk = fs.existsSync(path.join(ROOT, 'data', 'news.json'));
+            sendJSON(res, 200, { ok: true, uptime: Math.floor(process.uptime()), data: dataOk }, req);
+            return;
+        }
+
         // GET /api/auth
         if (section === 'auth') {
             if (req.method === 'GET') {
@@ -922,6 +929,11 @@ server.listen(PORT, () => {
     setInterval(() => syncTelegramNews().catch(e => console.error('[TG Sync]', e.message)), 30 * 60 * 1000);
     setInterval(() => syncTelegramGallery().catch(e => console.error('[TG Gallery]', e.message)), 30 * 60 * 1000);
     setInterval(cleanOrphanedUploads, 7 * 24 * 60 * 60 * 1000);
+    setInterval(() => {
+        const now = Date.now();
+        for (const [k, v] of _rateLimits) if (!v.some(t => now - t < 60000)) _rateLimits.delete(k);
+        for (const [k, v] of _authFailures) if (!v.some(t => now - t < 15 * 60 * 1000)) _authFailures.delete(k);
+    }, 5 * 60 * 1000);
 
     if (process.platform === 'win32' || process.platform === 'darwin') {
         const { exec } = require('child_process');

@@ -18,23 +18,24 @@ window.toggleDocuments = function() {
 window.renderDocuments = function(data) {
     const hasMore = data.main.length > 4;
 
+    const esc = window.escapeHtml;
     const mainCards = data.main.map((doc, i) => {
         const downloadBtn = doc.file
-            ? `<a class="doc-download" href="${doc.file}" download="${window.tData(doc.title)}">${window.t('btn.download')}</a>`
+            ? `<a class="doc-download" href="${esc(doc.file)}" download="${esc(window.tData(doc.title))}">${window.t('btn.download')}</a>`
             : `<span class="doc-download" style="opacity:.4;cursor:default">${window.t('btn.download')}</span>`;
         const extra = i >= 4;
         return `
         <div class="doc-card${extra ? ' doc-extra-item' : ''}"${extra ? ' style="display:none"' : ''}>
-            <div class="doc-icon ${doc.color}">
+            <div class="doc-icon ${esc(doc.color)}">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     ${(DOC_ICON_PATHS[doc.color] || DOC_ICON_PATHS.blue).path}
                 </svg>
             </div>
             <div class="doc-info">
-                <h3 class="doc-title">${window.tData(doc.title)}</h3>
-                <p class="doc-desc">${window.tData(doc.description)}</p>
+                <h3 class="doc-title">${esc(window.tData(doc.title))}</h3>
+                <p class="doc-desc">${esc(window.tData(doc.description))}</p>
                 <div class="doc-meta">
-                    <span class="doc-size">${doc.size}</span>
+                    <span class="doc-size">${esc(doc.size)}</span>
                     ${downloadBtn}
                 </div>
             </div>

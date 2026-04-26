@@ -14,6 +14,7 @@ window.renderGallery = function(data) {
 </div>`;
     }
 
+    const esc = window.escapeHtml;
     const makeCard = (item, idx) => {
         const photos = item.photos || [];
         const cover  = photos[0] || null;
@@ -21,7 +22,7 @@ window.renderGallery = function(data) {
 
         const imgEl = cover
             ? `<div class="news-img news-img-loading">
-                <img src="${cover}" alt="" loading="lazy"
+                <img src="${esc(cover)}" alt="" loading="lazy"
                     onload="this.parentElement.classList.remove('news-img-loading')"
                     onerror="this.parentElement.classList.add('news-img-error');this.remove()">
                 ${count > 1 ? `<span class="gallery-count">${count > 9 ? '9+' : count + '+'}</span>` : ''}
@@ -33,7 +34,7 @@ window.renderGallery = function(data) {
              ${count > 0 ? `onclick="window.openGalleryItem(${idx})"` : ''}>
             ${imgEl}
             <div class="news-body">
-                <h3 class="news-title">${window.tData(item.alt)}</h3>
+                <h3 class="news-title">${esc(window.tData(item.alt))}</h3>
             </div>
         </div>`;
     };

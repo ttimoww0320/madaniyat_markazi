@@ -15,16 +15,17 @@ window.renderCircles = function(data) {
     window._circlesData = data;
     const hasMore = data.length > 4;
 
+    const esc = window.escapeHtml;
     const cardsHTML = data.map((c, i) => {
         const card = `
         <div class="circle-card">
-            <div class="circle-icon ${c.color}">
+            <div class="circle-icon ${esc(c.color)}">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     ${CIRCLE_ICONS[c.color] || CIRCLE_ICONS.purple}
                 </svg>
             </div>
-            <h3 class="circle-title">${window.tData(c.title)}</h3>
-            <p class="circle-age">${window.tData(c.age)}</p>
+            <h3 class="circle-title">${esc(window.tData(c.title))}</h3>
+            <p class="circle-age">${esc(window.tData(c.age))}</p>
             <button class="circle-enroll-btn" onclick="window.openEnroll(${i})">
                 ${window.t('btn.enroll')}
             </button>

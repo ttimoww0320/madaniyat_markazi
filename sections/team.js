@@ -28,14 +28,15 @@ window.renderTeam = function(data) {
     // Сохраняем данные для модалки
     window._deputiesData = deputies;
 
+    const esc = window.escapeHtml;
     const deputyCards = deputies.map((d, i) => `
         <div class="deputy-card${i >= 4 ? ' deputy-extra-item' : ''}"${i >= 4 ? ' style="display:none"' : ''}>
-            ${photoAvatar(d.photo, `md ${d.color}`, personSVG(36, DEPUTY_COLORS[d.color] || '#888'))}
-            <span class="badge sm ${d.color}">${window.tData(d.role)}</span>
-            <h3 class="name-md">${d.name}</h3>
-            <p class="title-sm">${window.tData(d.department)}</p>
-            <p class="contact-text"><a href="tel:${d.phone}">${d.phone}</a></p>
-            <p class="contact-text"><a href="mailto:${d.email}" class="contact-email">${d.email}</a></p>
+            ${photoAvatar(d.photo, `md ${esc(d.color)}`, personSVG(36, DEPUTY_COLORS[d.color] || '#888'))}
+            <span class="badge sm ${esc(d.color)}">${esc(window.tData(d.role))}</span>
+            <h3 class="name-md">${esc(d.name)}</h3>
+            <p class="title-sm">${esc(window.tData(d.department))}</p>
+            <p class="contact-text"><a href="tel:${esc(d.phone)}">${esc(d.phone)}</a></p>
+            <p class="contact-text"><a href="mailto:${esc(d.email)}" class="contact-email">${esc(d.email)}</a></p>
             ${d.bio ? `<button onclick="window.openBioModal(${i})" style="margin-top:auto;padding:7px 18px;border-radius:8px;border:1.5px solid #1A3C6E;background:#fff;color:#1A3C6E;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;align-self:center;">${window.t('team.bioBtn')}</button>` : '<div style="margin-top:auto;"></div>'}
         </div>
     `).join('');
@@ -43,9 +44,9 @@ window.renderTeam = function(data) {
     const staffCards = staff.map(s => `
         <div class="staff-card">
             ${photoAvatar(s.photo, 'sm', personSVG(28, '#888'))}
-            <h4 class="name-sm">${s.name}</h4>
-            <p class="title-xs">${window.tData(s.role)}</p>
-            <a href="tel:${s.phone}" class="phone-sm">${s.phone}</a>
+            <h4 class="name-sm">${esc(s.name)}</h4>
+            <p class="title-xs">${esc(window.tData(s.role))}</p>
+            <a href="tel:${esc(s.phone)}" class="phone-sm">${esc(s.phone)}</a>
         </div>
     `).join('');
 
