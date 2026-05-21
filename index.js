@@ -364,6 +364,7 @@ async function _syncTelegramNews() {
     }
 
     // обрезаем до лимита, удаляя файлы старых записей
+    let newsTrimmed = false;
     if (existing.length > NEWS_MAX_COUNT) {
         const uploadsDir = path.join(ROOT, 'uploads');
         const removed = existing.splice(NEWS_MAX_COUNT);
@@ -371,10 +372,11 @@ async function _syncTelegramNews() {
             const fname = item.image && item.image.replace('/uploads/', '');
             if (fname) try { fs.unlinkSync(path.join(uploadsDir, fname)); } catch {}
         }
+        newsTrimmed = true;
         logger.info(`[TG Sync] Обрезано до ${NEWS_MAX_COUNT} новостей, удалено ${removed.length} старых`);
     }
 
-    if (added > 0 || existing.length > NEWS_MAX_COUNT) {
+    if (added > 0 || newsTrimmed) {
         safeWriteJSON(newsFile, existing);
         logger.info(`[TG Sync] Добавлено новых постов: ${added}`);
     } else {
@@ -459,6 +461,7 @@ async function _syncTelegramGallery() {
     }
 
     // обрезаем до лимита, удаляя файлы старых альбомов
+    let galleryTrimmed = false;
     if (existing.length > GALLERY_MAX_COUNT) {
         const uploadsDir = path.join(ROOT, 'uploads');
         const removed = existing.splice(GALLERY_MAX_COUNT);
@@ -468,10 +471,11 @@ async function _syncTelegramGallery() {
                 if (fname && fname.startsWith('tg_')) try { fs.unlinkSync(path.join(uploadsDir, fname)); } catch {}
             }
         }
+        galleryTrimmed = true;
         logger.info(`[TG Gallery] Обрезано до ${GALLERY_MAX_COUNT} альбомов, удалено ${removed.length} старых`);
     }
 
-    if (added > 0 || existing.length > GALLERY_MAX_COUNT) {
+    if (added > 0 || galleryTrimmed) {
         safeWriteJSON(galleryFile, existing);
         logger.info(`[TG Gallery] Добавлено новых: ${added}`);
     } else {
@@ -860,7 +864,10 @@ const server = http.createServer(async (req, res) => {
             fs.readFile(dataFile, 'utf8', (err, raw) => {
                 if (err) { sendJSON(res, 404, { error: 'Файл не найден' }); return; }
                 try {
-                    sendJSON(res, 200, JSON.parse(raw));
+                    let parsed = JSON.parse(raw);
+                    if (section === 'news'    && Array.isArray(parsed)) parsed = parsed.slice(0, NEWS_MAX_COUNT);
+                    if (section === 'gallery' && Array.isArray(parsed)) parsed = parsed.slice(0, GALLERY_MAX_COUNT);
+                    sendJSON(res, 200, parsed);
                 } catch {
                     sendJSON(res, 500, { error: 'Повреждённый JSON' });
                 }
