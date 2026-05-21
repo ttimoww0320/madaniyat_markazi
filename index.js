@@ -35,8 +35,8 @@ const RETRY_DELAY_MS       = 5 * 1000;
 const CLEANUP_INTERVAL_MS  = 5 * 60 * 1000;
 const SYNC_INTERVAL_MS     = 30 * 60 * 1000;
 const HISTORY_DAYS         = 90;
-const NEWS_MAX_COUNT       = 100;
-const GALLERY_MAX_COUNT    = 50;
+const NEWS_MAX_COUNT       = 10;
+const GALLERY_MAX_COUNT    = 10;
 
 // ===== БЕЗОПАСНАЯ ЗАПИСЬ JSON (бэкап + атомарная запись) =====
 const BACKUP_DIR = path.join(__dirname, 'data', 'backups');
@@ -975,7 +975,7 @@ const server = http.createServer(async (req, res) => {
     });
 });
 
-const UPLOADS_MAX_BYTES = 50 * 1024 * 1024; // лимит 50 МБ на папку uploads
+const UPLOADS_MAX_BYTES = 20 * 1024 * 1024; // лимит 20 МБ на папку uploads
 
 function cleanOrphanedUploads() {
     const uploadsDir = path.join(ROOT, 'uploads');
