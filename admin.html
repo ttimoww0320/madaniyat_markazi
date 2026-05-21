@@ -1739,76 +1739,7 @@ function renderDeputyItem(d) {
     row.appendChild(photoField.element);
     row.appendChild(delWrapper);
 
-    // ── Биография ──
-    const bio = d.bio || {};
-    const bornIn = input(bio.born || '', 'Дата рождения');
-    const eduIn  = input(bio.education || '', 'Образование (ВУЗ, специальность)');
-    const specIn = input(bio.specialization || '', 'Специализация');
-
-    const careerList = document.createElement('div');
-    careerList.style.cssText = 'display:flex;flex-direction:column;gap:6px;margin-top:6px;';
-
-    function addCareerEntry(entry) {
-        entry = entry || {};
-        const entryRow = document.createElement('div');
-        entryRow.style.cssText = 'display:flex;gap:8px;align-items:center;';
-        const yearsIn = document.createElement('input');
-        yearsIn.className = 'field-input'; yearsIn.placeholder = '2010–2015';
-        yearsIn.value = entry.years || ''; yearsIn.style.cssText = 'width:110px;flex-shrink:0;';
-        const placeIn = document.createElement('input');
-        placeIn.className = 'field-input'; placeIn.placeholder = 'Место работы / должность';
-        placeIn.value = entry.place || ''; placeIn.style.flex = '1';
-        const db = document.createElement('button');
-        db.type = 'button'; db.textContent = '×'; db.className = 'delete-btn';
-        db.onclick = () => entryRow.remove();
-        entryRow._getData = () => ({ years: yearsIn.value.trim(), place: placeIn.value.trim() });
-        entryRow.appendChild(yearsIn); entryRow.appendChild(placeIn); entryRow.appendChild(db);
-        careerList.appendChild(entryRow);
-    }
-    (bio.career || []).forEach(c => addCareerEntry(c));
-
-    const addCareerBtn = document.createElement('button');
-    addCareerBtn.type = 'button'; addCareerBtn.textContent = '+ Добавить запись карьеры';
-    addCareerBtn.className = 'add-btn';
-    addCareerBtn.style.cssText = 'margin-top:8px;font-size:13px;padding:5px 14px;';
-    addCareerBtn.onclick = () => addCareerEntry();
-
-    const bioGrid = document.createElement('div');
-    bioGrid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;';
-    bioGrid.appendChild(fieldGroup('Дата рождения', bornIn));
-    bioGrid.appendChild(fieldGroup('Образование', eduIn));
-    const specWrap = document.createElement('div');
-    specWrap.style.gridColumn = '1/-1';
-    specWrap.appendChild(fieldGroup('Специализация', specIn));
-    bioGrid.appendChild(specWrap);
-    const careerWrap = document.createElement('div');
-    careerWrap.style.gridColumn = '1/-1';
-    const careerLbl = document.createElement('label');
-    careerLbl.className = 'field-label'; careerLbl.textContent = 'Карьера';
-    careerWrap.appendChild(careerLbl); careerWrap.appendChild(careerList); careerWrap.appendChild(addCareerBtn);
-    bioGrid.appendChild(careerWrap);
-
-    const bioDetails = document.createElement('details');
-    bioDetails.style.gridColumn = '1/-1';
-    if (bio.born || bio.education || (bio.career && bio.career.length)) bioDetails.open = true;
-    const bioSummary = document.createElement('summary');
-    bioSummary.style.cssText = 'cursor:pointer;font-weight:600;color:#534AB7;font-size:14px;padding:8px 0 4px;border-top:1px solid #eee;margin-top:8px;list-style:none;';
-    bioSummary.textContent = '\u{1F4CB} Биография (необязательно)';
-    bioDetails.appendChild(bioSummary);
-    bioDetails.appendChild(bioGrid);
-    row.appendChild(bioDetails);
-
-    row._getData = () => {
-        const career = [...careerList.children].map(r => r._getData()).filter(c => c.years || c.place);
-        const hasBio = bornIn.value || eduIn.value || specIn.value || career.length;
-        return {
-            id: d.id || Date.now(),
-            name: nameIn.value, role: roleIn.getValue(), department: deptIn.getValue(),
-            color: colorSel.value, phone: phoneIn.value, email: emailIn.value,
-            photo: photoField.getUrl(),
-            ...(hasBio ? { bio: { born: bornIn.value, education: eduIn.value, specialization: specIn.value, career } } : {})
-        };
-    };
+    row._getData = () => ({ id: d.id || Date.now(), name: nameIn.value, role: roleIn.getValue(), department: deptIn.getValue(), color: colorSel.value, phone: phoneIn.value, email: emailIn.value, photo: photoField.getUrl() });
     return row;
 }
 
