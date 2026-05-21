@@ -35,6 +35,8 @@ const RETRY_DELAY_MS       = 5 * 1000;
 const CLEANUP_INTERVAL_MS  = 5 * 60 * 1000;
 const SYNC_INTERVAL_MS     = 30 * 60 * 1000;
 const HISTORY_DAYS         = 90;
+const NEWS_MAX_COUNT       = 100;
+const GALLERY_MAX_COUNT    = 50;
 
 // ===== БЕЗОПАСНАЯ ЗАПИСЬ JSON (бэкап + атомарная запись) =====
 const BACKUP_DIR = path.join(__dirname, 'data', 'backups');
@@ -361,7 +363,18 @@ async function _syncTelegramNews() {
         });
     }
 
-    if (added > 0) {
+    // обрезаем до лимита, удаляя файлы старых записей
+    if (existing.length > NEWS_MAX_COUNT) {
+        const uploadsDir = path.join(ROOT, 'uploads');
+        const removed = existing.splice(NEWS_MAX_COUNT);
+        for (const item of removed) {
+            const fname = item.image && item.image.replace('/uploads/', '');
+            if (fname) try { fs.unlinkSync(path.join(uploadsDir, fname)); } catch {}
+        }
+        logger.info(`[TG Sync] Обрезано до ${NEWS_MAX_COUNT} новостей, удалено ${removed.length} старых`);
+    }
+
+    if (added > 0 || existing.length > NEWS_MAX_COUNT) {
         safeWriteJSON(newsFile, existing);
         logger.info(`[TG Sync] Добавлено новых постов: ${added}`);
     } else {
@@ -445,7 +458,20 @@ async function _syncTelegramGallery() {
         });
     }
 
-    if (added > 0) {
+    // обрезаем до лимита, удаляя файлы старых альбомов
+    if (existing.length > GALLERY_MAX_COUNT) {
+        const uploadsDir = path.join(ROOT, 'uploads');
+        const removed = existing.splice(GALLERY_MAX_COUNT);
+        for (const album of removed) {
+            for (const photo of (album.photos || [])) {
+                const fname = photo && photo.replace('/uploads/', '');
+                if (fname && fname.startsWith('tg_')) try { fs.unlinkSync(path.join(uploadsDir, fname)); } catch {}
+            }
+        }
+        logger.info(`[TG Gallery] Обрезано до ${GALLERY_MAX_COUNT} альбомов, удалено ${removed.length} старых`);
+    }
+
+    if (added > 0 || existing.length > GALLERY_MAX_COUNT) {
         safeWriteJSON(galleryFile, existing);
         logger.info(`[TG Gallery] Добавлено новых: ${added}`);
     } else {
