@@ -952,19 +952,32 @@ const server = http.createServer(async (req, res) => {
 function cleanOrphanedUploads() {
     const uploadsDir = path.join(ROOT, 'uploads');
     const dataDir    = path.join(ROOT, 'data');
+    const MIN_AGE_MS = 2 * 24 * 60 * 60 * 1000; // удалять только файлы старше 2 суток
     try {
-        const used = new Set(['логотип.png']);
+        const used = new Set();
+        // собираем все ссылки на uploads из JSON-данных
         for (const f of fs.readdirSync(dataDir)) {
             if (!f.endsWith('.json')) continue;
             const raw = fs.readFileSync(path.join(dataDir, f), 'utf8');
-            for (const m of raw.matchAll(/uploads\/([^"'\s]+)/g)) used.add(m[1]);
+            for (const m of raw.matchAll(/uploads\/([^"'\s\\]+)/g)) used.add(m[1]);
         }
+        // собираем ссылки из HTML и JS файлов проекта (логотип и другие статичные файлы)
+        for (const f of fs.readdirSync(ROOT)) {
+            if (!f.endsWith('.html') && !f.endsWith('.js')) continue;
+            try {
+                const raw = fs.readFileSync(path.join(ROOT, f), 'utf8');
+                for (const m of raw.matchAll(/uploads\/([^"'\s\\)]+)/g)) used.add(m[1]);
+            } catch {}
+        }
+        const now = Date.now();
         let deleted = 0;
         for (const f of fs.readdirSync(uploadsDir)) {
-            if (!used.has(f)) {
-                fs.unlinkSync(path.join(uploadsDir, f));
-                deleted++;
-            }
+            if (used.has(f)) continue;
+            const p = path.join(uploadsDir, f);
+            try {
+                const age = now - fs.statSync(p).mtimeMs;
+                if (age > MIN_AGE_MS) { fs.unlinkSync(p); deleted++; }
+            } catch {}
         }
         if (deleted > 0) logger.info(`[Автоочистка] Удалено ${deleted} неиспользуемых файлов из uploads/`);
     } catch (e) {
