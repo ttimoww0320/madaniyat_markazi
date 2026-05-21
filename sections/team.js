@@ -29,17 +29,21 @@ window.renderTeam = function(data) {
     window._deputiesData = deputies;
 
     const esc = window.escapeHtml;
-    const deputyCards = deputies.map((d, i) => `
-        <div class="deputy-card${i >= 4 ? ' deputy-extra-item' : ''}"${i >= 4 ? ' style="display:none"' : ''}>
+    const deputyCards = deputies.map((d, i) => {
+        const hasBio = !!d.bio;
+        const clickAttr = hasBio ? `onclick="window.openBioModal(${i})" style="cursor:pointer;"` : '';
+        const extraStyle = i >= 4 ? 'display:none;' : '';
+        return `
+        <div class="deputy-card${i >= 4 ? ' deputy-extra-item' : ''}" ${clickAttr} style="${extraStyle}">
             ${photoAvatar(d.photo, `md ${esc(d.color)}`, personSVG(36, DEPUTY_COLORS[d.color] || '#888'))}
             <span class="badge sm ${esc(d.color)}">${esc(window.tData(d.role))}</span>
             <h3 class="name-md">${esc(d.name)}</h3>
             <p class="title-sm">${esc(window.tData(d.department))}</p>
-            <p class="contact-text"><a href="tel:${esc(d.phone)}">${esc(d.phone)}</a></p>
-            <p class="contact-text"><a href="mailto:${esc(d.email)}" class="contact-email">${esc(d.email)}</a></p>
-            ${d.bio ? `<button onclick="window.openBioModal(${i})" style="margin-top:auto;padding:7px 18px;border-radius:8px;border:1.5px solid #1A3C6E;background:#fff;color:#1A3C6E;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;align-self:center;">${window.t('team.bioBtn')}</button>` : '<div style="margin-top:auto;"></div>'}
-        </div>
-    `).join('');
+            <p class="contact-text"><a href="tel:${esc(d.phone)}" onclick="event.stopPropagation()">${esc(d.phone)}</a></p>
+            <p class="contact-text"><a href="mailto:${esc(d.email)}" class="contact-email" onclick="event.stopPropagation()">${esc(d.email)}</a></p>
+            ${hasBio ? `<div style="margin-top:auto;padding:7px 0;font-size:13px;font-weight:600;color:#1A3C6E;text-align:center;">${window.t('team.bioBtn')} →</div>` : '<div style="margin-top:auto;"></div>'}
+        </div>`;
+    }).join('');
 
     const staffCards = staff.map(s => `
         <div class="staff-card">
