@@ -975,7 +975,7 @@ const server = http.createServer(async (req, res) => {
     });
 });
 
-const UPLOADS_MAX_BYTES = 20 * 1024 * 1024; // лимит 20 МБ на папку uploads
+const UPLOADS_MAX_BYTES = 40 * 1024 * 1024; // лимит 40 МБ на папку uploads
 
 function cleanOrphanedUploads() {
     const uploadsDir = path.join(ROOT, 'uploads');
