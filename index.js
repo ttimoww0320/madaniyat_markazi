@@ -949,19 +949,19 @@ const server = http.createServer(async (req, res) => {
     });
 });
 
+const UPLOADS_MAX_BYTES = 50 * 1024 * 1024; // лимит 50 МБ на папку uploads
+
 function cleanOrphanedUploads() {
     const uploadsDir = path.join(ROOT, 'uploads');
     const dataDir    = path.join(ROOT, 'data');
-    const MIN_AGE_MS = 2 * 24 * 60 * 60 * 1000; // удалять только файлы старше 2 суток
+    const MIN_AGE_MS = 2 * 24 * 60 * 60 * 1000;
     try {
         const used = new Set();
-        // собираем все ссылки на uploads из JSON-данных
         for (const f of fs.readdirSync(dataDir)) {
             if (!f.endsWith('.json')) continue;
             const raw = fs.readFileSync(path.join(dataDir, f), 'utf8');
             for (const m of raw.matchAll(/uploads\/([^"'\s\\]+)/g)) used.add(m[1]);
         }
-        // собираем ссылки из HTML и JS файлов проекта (логотип и другие статичные файлы)
         for (const f of fs.readdirSync(ROOT)) {
             if (!f.endsWith('.html') && !f.endsWith('.js')) continue;
             try {
@@ -971,15 +971,26 @@ function cleanOrphanedUploads() {
         }
         const now = Date.now();
         let deleted = 0;
+        // удаляем явно неиспользуемые файлы старше 2 суток
         for (const f of fs.readdirSync(uploadsDir)) {
             if (used.has(f)) continue;
             const p = path.join(uploadsDir, f);
             try {
-                const age = now - fs.statSync(p).mtimeMs;
-                if (age > MIN_AGE_MS) { fs.unlinkSync(p); deleted++; }
+                if (now - fs.statSync(p).mtimeMs > MIN_AGE_MS) { fs.unlinkSync(p); deleted++; }
             } catch {}
         }
-        if (deleted > 0) logger.info(`[Автоочистка] Удалено ${deleted} неиспользуемых файлов из uploads/`);
+        // если uploads превышает лимит — удаляем самые старые tg_ файлы
+        const allFiles = fs.readdirSync(uploadsDir)
+            .filter(f => f.startsWith('tg_'))
+            .map(f => { try { const s = fs.statSync(path.join(uploadsDir, f)); return { f, mtime: s.mtimeMs, size: s.size }; } catch { return null; } })
+            .filter(Boolean)
+            .sort((a, b) => a.mtime - b.mtime);
+        let totalSize = allFiles.reduce((s, x) => s + x.size, 0);
+        for (const { f, size } of allFiles) {
+            if (totalSize <= UPLOADS_MAX_BYTES) break;
+            try { fs.unlinkSync(path.join(uploadsDir, f)); totalSize -= size; deleted++; } catch {}
+        }
+        if (deleted > 0) logger.info(`[Автоочистка] Удалено ${deleted} файлов из uploads/ (осталось ~${Math.round(totalSize / 1024 / 1024)} МБ)`);
     } catch (e) {
         logger.error('[Автоочистка] Ошибка:', e.message);
     }
