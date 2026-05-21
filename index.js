@@ -980,9 +980,10 @@ server.listen(PORT, () => {
 
     setTimeout(() => syncTelegramNews().catch(e => logger.error('[TG Sync]', e.message)), 3000);
     setTimeout(() => syncTelegramGallery().catch(e => logger.error('[TG Gallery]', e.message)), 5000);
+    setTimeout(cleanOrphanedUploads, 10000);
     setInterval(() => syncTelegramNews().catch(e => logger.error('[TG Sync]', e.message)), SYNC_INTERVAL_MS);
     setInterval(() => syncTelegramGallery().catch(e => logger.error('[TG Gallery]', e.message)), SYNC_INTERVAL_MS);
-    setInterval(cleanOrphanedUploads, 7 * 24 * 60 * 60 * 1000);
+    setInterval(cleanOrphanedUploads, 24 * 60 * 60 * 1000);
     setInterval(() => {
         const now = Date.now();
         for (const [k, v] of _rateLimits) if (!v.some(t => now - t < 60000)) _rateLimits.delete(k);
