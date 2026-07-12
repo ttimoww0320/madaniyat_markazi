@@ -25,6 +25,14 @@
     "documents":       "Hujjatlar",
     "documentsSub":    "Rasmiy hujjatlar va litsenziyalar"
   },
+  "circles": {
+    "schedule":    "Dars jadvali",
+    "teacher":     "O'qituvchi",
+    "spots":       "O'rinlar",
+    "spotsLeft":   "qoldi",
+    "spotsClosed": "to'ldirilgan",
+    "waitlist":    "Kutish ro'yxati"
+  },
   "btn": {
     "showAll":  "Barchasini ko'rish →",
     "hideAll":  "Yashirish ↑",

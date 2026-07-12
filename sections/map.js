@@ -147,24 +147,25 @@
     map.fitBounds(L.geoJSON(districtFeature).getBounds(), { padding: [24, 24] });
 
     _leafletMap = map;
+
+    /* По умолчанию сразу открываем сектор №1 — Культурный центр №23 */
+    selectSector(1, data);
   }
 
-  /* ── Нарезка на 5 секторов внутри границы ── */
+  /* ── Нарезка на 4 сектора внутри границы (по числу домов культуры) ── */
   function drawSectors(map, districtFeature, data) {
     const bbox = turf.bbox(districtFeature);  // [minLng, minLat, maxLng, maxLat]
     const [minLng, minLat, maxLng, maxLat] = bbox;
 
-    const midLng  = (minLng + maxLng) / 2;
-    const lat1    = minLat + (maxLat - minLat) * 0.36;  // нижняя треть
-    const lat2    = minLat + (maxLat - minLat) * 0.64;  // верхняя треть
+    const midLng = (minLng + maxLng) / 2;
+    const midLat = (minLat + maxLat) / 2;
 
-    /* 5 прямоугольников которые делят bounding box района */
+    /* 4 прямоугольника-квадранта, которые делят bounding box района */
     const boxes = [
-      turf.bboxPolygon([minLng, lat2,   midLng, maxLat]),  // 1 — северо-запад
-      turf.bboxPolygon([midLng, lat2,   maxLng, maxLat]),  // 2 — северо-восток
-      turf.bboxPolygon([minLng, lat1,   maxLng, lat2  ]),  // 3 — центр
-      turf.bboxPolygon([minLng, minLat, midLng, lat1  ]),  // 4 — юго-запад
-      turf.bboxPolygon([midLng, minLat, maxLng, lat1  ]),  // 5 — юго-восток
+      turf.bboxPolygon([minLng, midLat, midLng, maxLat]),  // 1 — северо-запад
+      turf.bboxPolygon([midLng, midLat, maxLng, maxLat]),  // 2 — северо-восток
+      turf.bboxPolygon([minLng, minLat, midLng, midLat]),  // 3 — юго-запад
+      turf.bboxPolygon([midLng, minLat, maxLng, midLat]),  // 4 — юго-восток
     ];
 
     boxes.forEach((box, i) => {

@@ -17,18 +17,62 @@ window.renderCircles = function(data) {
 
     const esc = window.escapeHtml;
     const cardsHTML = data.map((c, i) => {
+        const descHtml = c.description
+            ? `<p class="circle-desc">${esc(window.tData(c.description))}</p>`
+            : '';
+
+        const statCells = [];
+        if (c.schedule) {
+            statCells.push(`<div class="circle-stat-cell">
+                <span class="circle-stat-cap">${window.t('circles.schedule')}</span>
+                <span class="circle-stat-val">${esc(c.schedule)}</span>
+            </div>`);
+        }
+        if (c.teacher) {
+            statCells.push(`<div class="circle-stat-cell">
+                <span class="circle-stat-cap">${window.t('circles.teacher')}</span>
+                <span class="circle-stat-val">${esc(c.teacher)}</span>
+            </div>`);
+        }
+        const statHtml = statCells.length ? `<div class="circle-stat-row">${statCells.join('')}</div>` : '';
+
+        const spotsNum = parseInt(c.spots, 10);
+        const hasSpots = c.spots !== undefined && c.spots !== '';
+        const isClosed = hasSpots && !isNaN(spotsNum) && spotsNum === 0;
+        const isLow = hasSpots && !isNaN(spotsNum) && spotsNum > 0 && spotsNum <= 5;
+        const capacityHtml = hasSpots
+            ? `<div class="circle-capacity"><span class="${isClosed ? 'circle-spots-closed' : isLow ? 'circle-spots-low' : 'circle-spots-ok'}" style="width:${isClosed ? 100 : isLow ? 75 : 35}%"></span></div>`
+            : '';
+
+        const btnHtml = isClosed
+            ? `<button class="circle-waitlist-btn" onclick="window.openEnroll(${i})">${window.t('circles.waitlist')} <svg class="circle-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>`
+            : `<button class="circle-enroll-btn" onclick="window.openEnroll(${i})">${window.t('btn.enroll')} <svg class="circle-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>`;
+
+        const iconMarkup = CIRCLE_ICONS[c.color] || CIRCLE_ICONS.purple;
+        const iconMarkupWhite = iconMarkup.replace(/stroke="#[0-9A-Fa-f]+"/g, 'stroke="#fff"');
+
         const card = `
         <div class="circle-card">
-            <div class="circle-icon ${esc(c.color)}">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    ${CIRCLE_ICONS[c.color] || CIRCLE_ICONS.purple}
-                </svg>
+            <div class="circle-cover">
+                <div class="circle-cover-flag"><span style="background:#1DAEEF"></span><span style="background:#fff"></span><span style="background:#1EB57E"></span></div>
+                <div class="circle-cover-wm" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">${iconMarkupWhite}</svg>
+                </div>
+                <span class="circle-age-tag">${esc(window.tData(c.age))}</span>
             </div>
-            <h3 class="circle-title">${esc(window.tData(c.title))}</h3>
-            <p class="circle-age">${esc(window.tData(c.age))}</p>
-            <button class="circle-enroll-btn" onclick="window.openEnroll(${i})">
-                ${window.t('btn.enroll')}
-            </button>
+            <div class="circle-badge-wrap">
+                <div class="circle-badge">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">${iconMarkup}</svg>
+                </div>
+            </div>
+            <div class="circle-body">
+                <h3 class="circle-title">${esc(window.tData(c.title))}</h3>
+                <div class="circle-title-rule"></div>
+                ${descHtml}
+                ${statHtml}
+                ${capacityHtml}
+                ${btnHtml}
+            </div>
         </div>`;
         if (i >= 4) {
             return `<div class="circle-extra-item" style="display:none">${card}</div>`;

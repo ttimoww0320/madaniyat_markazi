@@ -73,15 +73,22 @@
     border-radius: 10px;
     padding: 10px 12px;
     border: 1px solid rgba(255,255,255,0.07);
-    transition: background 0.2s;
+    position: relative;
+    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
 }
-.map-leader-card:hover { background: rgba(255,255,255,0.09); }
+.map-leader-card:hover {
+    background: rgba(255,255,255,0.1);
+    transform: scale(1.08);
+    box-shadow: 0 10px 24px rgba(0,0,0,.4);
+    z-index: 2;
+}
 .map-leader-photo {
     width: 44px; height: 44px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #1A3C6E;
     flex-shrink: 0;
+    transition: transform .2s ease;
 }
 .map-leader-photo--empty {
     width: 44px; height: 44px;
@@ -90,6 +97,11 @@
     border: 2px solid #C8A84B;
     display: flex; align-items: center; justify-content: center;
     font-size: 20px; flex-shrink: 0;
+    transition: transform .2s ease;
+}
+.map-leader-card:hover .map-leader-photo,
+.map-leader-card:hover .map-leader-photo--empty {
+    transform: scale(1.25);
 }
 .map-leader-info { display: flex; flex-direction: column; gap: 2px; }
 .map-leader-mahalla {
@@ -677,46 +689,159 @@ span.section-link {
 }
 
 /* =============================================
-   CIRCLE CARDS
+   CIRCLE CARDS (гос-стиль: единая институциональная
+   шапка + герб-бейдж, вместо разноцветных карточек)
    ============================================= */
 .circle-card {
-    background: rgba(255,255,255,0.92);
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 16px;
-    padding: 28px;
-    text-align: center;
-    transition: transform .2s;
+    background: #fff;
+    border: 1px solid rgba(26,60,110,.12);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(13,26,58,.14);
+    transition: transform .2s ease, box-shadow .2s ease;
 }
 
 .circle-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(13,26,58,.2);
 }
 
-.circle-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    margin: 0 auto 16px;
+.circle-cover {
+    position: relative;
+    height: 68px;
+    background: linear-gradient(180deg, #14305A 0%, #1A3C6E 100%);
+    overflow: hidden;
+}
+
+.circle-cover-flag {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    display: flex;
+}
+.circle-cover-flag span { flex: 1; }
+
+.circle-cover-wm {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    opacity: .12;
+}
+.circle-cover-wm svg { width: 100%; height: 100%; }
+
+.circle-age-tag {
+    position: absolute;
+    top: 14px;
+    left: 20px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.9);
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 4px;
+    padding: 4px 9px;
+}
+
+.circle-badge-wrap {
+    margin: -28px 0 0 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.circle-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #C8A84B;
+    box-shadow: 0 3px 8px rgba(13,26,58,.22);
     display: flex;
     align-items: center;
     justify-content: center;
 }
+.circle-badge svg { width: 24px; height: 24px; }
 
-.circle-icon.purple { background: #E8EFF8; }
-.circle-icon.green  { background: #E1F5EE; }
-.circle-icon.yellow { background: #FAEEDA; }
-.circle-icon.pink   { background: #FBEAF0; }
+.circle-body {
+    padding: 14px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
 
 .circle-title {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 19px;
+    font-weight: 700;
+    color: #1A1A1A;
     margin-bottom: 4px;
+    line-height: 1.3;
 }
 
-.circle-age {
-    font-size: 14px;
-    color: #666;
+.circle-title-rule {
+    width: 32px;
+    height: 2px;
+    background: #C8A84B;
+    margin-bottom: 12px;
 }
+
+.circle-desc {
+    font-size: 13px;
+    color: #767b85;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    flex: 1;
+}
+
+.circle-stat-row {
+    display: flex;
+    border: 1px solid #e4e7ee;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.circle-stat-cell {
+    flex: 1;
+    padding: 9px 10px;
+    text-align: center;
+    border-right: 1px solid #e4e7ee;
+}
+.circle-stat-cell:last-child { border-right: none; }
+
+.circle-stat-cap {
+    display: block;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: #9aa1ad;
+    margin-bottom: 3px;
+}
+
+.circle-stat-val {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1A3C6E;
+}
+
+.circle-capacity {
+    height: 4px;
+    border-radius: 2px;
+    background: #eef0f3;
+    margin-bottom: 18px;
+    overflow: hidden;
+}
+.circle-capacity span { display: block; height: 100%; }
+
+.circle-spots-ok   { background: #1a7a4a; }
+.circle-spots-low  { background: #d97706; }
+.circle-spots-closed { background: #aaa; }
 
 /* =============================================
    НОВОСТИ
@@ -2027,6 +2152,7 @@ body.high-contrast .section-gray .section { background: #111 !important; }
 body.high-contrast a { color: #FFD700 !important; }
 body.high-contrast .btn-primary,
 body.high-contrast .circle-enroll-btn,
+body.high-contrast .circle-waitlist-btn,
 body.high-contrast .enroll-submit { background: #fff !important; color: #000 !important; }
 body.high-contrast .btn-secondary { border-color: #fff !important; color: #fff !important; }
 body.high-contrast p, body.high-contrast h1, body.high-contrast h2,
@@ -2157,20 +2283,37 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
 /* =============================================
    КНОПКА ЗАПИСИ НА КРУЖОК
    ============================================= */
-.circle-enroll-btn {
-    display: inline-block;
-    margin-top: 14px;
-    padding: 8px 20px;
-    background: #1A3C6E;
-    color: #fff;
+.circle-enroll-btn,
+.circle-waitlist-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 13px 20px;
     border: none;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
     transition: background .2s;
+    font-family: inherit;
+    margin-top: auto;
+}
+
+.circle-enroll-btn {
+    background: #1A3C6E;
+    color: #fff;
 }
 .circle-enroll-btn:hover { background: #14305A; }
+
+.circle-waitlist-btn {
+    background: #f0f0f0;
+    color: #999;
+    cursor: default;
+}
+
+.circle-btn-arrow { transition: transform .2s ease; }
+.circle-enroll-btn:hover .circle-btn-arrow { transform: translateX(3px); }
 
 /* =============================================
    МОДАЛЬНОЕ ОКНО ЗАПИСИ

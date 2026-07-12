@@ -25,6 +25,14 @@
     "documents":       "Документы",
     "documentsSub":    "Официальные документы и лицензии"
   },
+  "circles": {
+    "schedule":    "Расписание",
+    "teacher":     "Преподаватель",
+    "spots":       "Места",
+    "spotsLeft":   "осталось",
+    "spotsClosed": "набор закрыт",
+    "waitlist":    "В лист ожидания"
+  },
   "btn": {
     "showAll":  "Смотреть все →",
     "hideAll":  "Скрыть ↑",

@@ -25,6 +25,14 @@
     "documents":       "Ҳужжатлар",
     "documentsSub":    "Расмий ҳужжатлар ва лицензиялар"
   },
+  "circles": {
+    "schedule":    "Дарс жадвали",
+    "teacher":     "Ўқитувчи",
+    "spots":       "Ўринлар",
+    "spotsLeft":   "қолди",
+    "spotsClosed": "тўлдирилган",
+    "waitlist":    "Кутиш рўйхати"
+  },
   "btn": {
     "showAll":  "Барчасини кўриш →",
     "hideAll":  "Яшириш ↑",
