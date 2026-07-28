@@ -444,30 +444,6 @@ body.has-global-bg .hero {
     color: #fff;
 }
 
-.section-link {
-    color: rgba(255,255,255,0.75);
-    font-size: 15px;
-}
-
-span.section-link {
-    cursor: default;
-    opacity: 0.5;
-}
-
-/* Кнопка «Все события →» — выглядит как ссылка */
-.section-link-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 15px;
-    cursor: pointer;
-    padding: 0;
-    font-family: inherit;
-    transition: opacity .2s;
-}
-.section-link-btn:hover { opacity: .7; }
-
-
 .section-center {
     text-align: center;
     margin-bottom: 40px;
