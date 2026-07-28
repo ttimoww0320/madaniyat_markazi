@@ -63,14 +63,7 @@ window.renderDocuments = function(data) {
             <p class="section-subtitle">${window.t('sections.documentsSub')}</p>
         </div>
         <div class="docs-main">${mainCards}</div>
-        ${hasMore ? `
-        <div style="text-align:center;margin-top:32px;margin-bottom:40px;">
-            <button id="docs-toggle-btn" onclick="window.toggleDocuments()" style="
-                display:inline-flex;align-items:center;gap:8px;
-                padding:11px 32px;border-radius:10px;border:2px solid #1A3C6E;
-                background:#fff;color:#1A3C6E;font-size:15px;font-weight:600;
-                cursor:pointer;font-family:inherit;transition:background .2s,color .2s;">${window.t('btn.showAll')}</button>
-        </div>` : ''}
+        ${hasMore ? window.renderToggleBtn('docs-toggle-btn', 'window.toggleDocuments()') : ''}
         <div class="docs-small">${smallCards}</div>
     </section>
 </div>`;

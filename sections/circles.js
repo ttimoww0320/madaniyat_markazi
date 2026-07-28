@@ -87,14 +87,7 @@ window.renderCircles = function(data) {
             <h2 class="section-title">${window.t('sections.circles')}</h2>
         </div>
         <div class="grid-4" id="circles-grid">${cardsHTML}</div>
-        ${hasMore ? `
-        <div style="text-align:center;margin-top:32px;margin-bottom:40px;">
-            <button id="circles-toggle-btn" onclick="window.toggleCircles()" style="
-                display:inline-flex;align-items:center;gap:8px;
-                padding:11px 32px;border-radius:10px;border:2px solid #1A3C6E;
-                background:#fff;color:#1A3C6E;font-size:15px;font-weight:600;
-                cursor:pointer;font-family:inherit;transition:background .2s,color .2s;">${window.t('btn.showAll')}</button>
-        </div>` : ''}
+        ${hasMore ? window.renderToggleBtn('circles-toggle-btn', 'window.toggleCircles()') : ''}
     </section>
 </div>`;
 };

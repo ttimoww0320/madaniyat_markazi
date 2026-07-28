@@ -46,11 +46,16 @@ window.renderGallery = function(data) {
     // Скорость: ~8 секунд на карточку, минимум 40 сек
     const duration = Math.max(40, data.length * 8);
 
+    const freshness = window._galleryUpdatedAt
+        ? `<span class="freshness-badge">${window.t('freshness.updated')} ${window.formatRelativeTime(window._galleryUpdatedAt)}</span>`
+        : '';
+
     return `
 <div class="section-gray">
     <section class="section" id="gallery">
         <div class="section-header">
             <h2 class="section-title">${window.t('sections.gallery')}</h2>
+            ${freshness}
         </div>
         <div class="gallery-marquee-outer">
             <div class="gallery-marquee-track" style="animation-duration:${duration}s">

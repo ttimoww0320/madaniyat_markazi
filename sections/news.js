@@ -26,10 +26,17 @@ window.renderNews = function(data) {
         </${closeTag}>`;
     }).join('');
 
+    const freshness = window._newsUpdatedAt
+        ? `<span class="freshness-badge">${window.t('freshness.updated')} ${window.formatRelativeTime(window._newsUpdatedAt)}</span>`
+        : '';
+
     return `
 <section class="section" id="news">
     <div class="news-section-header">
-        <h2 class="section-title">${window.t('sections.news')}</h2>
+        <div class="news-header-titlewrap">
+            <h2 class="section-title">${window.t('sections.news')}</h2>
+            ${freshness}
+        </div>
         <div class="news-nav-btns">
             <button class="news-nav-btn" id="news-prev" onclick="window.scrollNews(-1)" aria-label="Назад">&#8592;</button>
             <button class="news-nav-btn" id="news-next" onclick="window.scrollNews(1)" aria-label="Вперёд">&#8594;</button>

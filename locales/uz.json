@@ -97,5 +97,15 @@
   "footer": {
     "official": "Rasmiy sayt",
     "sections": "Sayt bo'limlari"
+  },
+  "stats": {
+    "visitorsToday": "Bugun tashrif buyurganlar"
+  },
+  "freshness": {
+    "updated":    "Yangilandi",
+    "justNow":    "hozirgina",
+    "minutesAgo": "{n} daqiqa oldin",
+    "hoursAgo":   "{n} soat oldin",
+    "daysAgo":    "{n} kun oldin"
   }
 }

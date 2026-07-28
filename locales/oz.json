@@ -97,5 +97,15 @@
   "footer": {
     "official": "Расмий сайт",
     "sections": "Сайт бўлимлари"
+  },
+  "stats": {
+    "visitorsToday": "Бугун ташриф буюрганлар"
+  },
+  "freshness": {
+    "updated":    "Янгиланди",
+    "justNow":    "ҳозиргина",
+    "minutesAgo": "{n} дақиқа олдин",
+    "hoursAgo":   "{n} соат олдин",
+    "daysAgo":    "{n} кун олдин"
   }
 }

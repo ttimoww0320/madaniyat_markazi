@@ -97,5 +97,15 @@
   "footer": {
     "official": "Официальный сайт",
     "sections": "Разделы сайта"
+  },
+  "stats": {
+    "visitorsToday": "Посетителей сегодня"
+  },
+  "freshness": {
+    "updated":    "Обновлено",
+    "justNow":    "только что",
+    "minutesAgo": "{n} мин. назад",
+    "hoursAgo":   "{n} ч. назад",
+    "daysAgo":    "{n} дн. назад"
   }
 }

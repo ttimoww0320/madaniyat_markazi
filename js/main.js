@@ -131,16 +131,25 @@ function applySiteData(data) {
         }
     }
 
-    if (data.stats && data.stats.length) {
-        const bar = document.getElementById('stats-bar');
-        if (bar) {
-            const esc = window.escapeHtml;
-            bar.innerHTML = data.stats.map(s =>
+    const bar = document.getElementById('stats-bar');
+    if (bar) {
+        const esc = window.escapeHtml;
+        let tiles = (data.stats && data.stats.length)
+            ? data.stats.map(s =>
                 `<div class="stat-item">
                     <span class="stat-num" data-target="${esc(s.value)}" data-suffix="${esc(s.suffix || '')}">0</span>
                     <span class="stat-label">${esc(window.tData(s.label))}</span>
                 </div>`
-            ).join('');
+              ).join('')
+            : '';
+        if (typeof data._visitorsToday === 'number') {
+            tiles += `<div class="stat-item">
+                <span class="stat-num" data-target="${data._visitorsToday}" data-suffix="">0</span>
+                <span class="stat-label">${esc(window.t('stats.visitorsToday'))}</span>
+            </div>`;
+        }
+        if (tiles) {
+            bar.innerHTML = tiles;
             if (window.initStatsAnimation) window.initStatsAnimation();
         }
     }
@@ -150,9 +159,36 @@ async function loadSite() {
     const res = await fetch('/api/site');
     if (!res.ok) return null;
     const data = await res.json();
+    try {
+        const visRes = await fetch('/api/visitors-public');
+        if (visRes.ok) data._visitorsToday = (await visRes.json()).today;
+    } catch {}
     _cachedSiteData = data;
     applySiteData(data);
     return data;
+}
+
+// Человекочитаемое "N минут назад" по ISO-дате
+window.formatRelativeTime = function(iso) {
+    if (!iso) return '';
+    const diffMs = Date.now() - new Date(iso).getTime();
+    const min = Math.floor(diffMs / 60000);
+    if (min < 1)  return window.t('freshness.justNow');
+    if (min < 60) return window.t('freshness.minutesAgo').replace('{n}', min);
+    const hours = Math.floor(min / 60);
+    if (hours < 24) return window.t('freshness.hoursAgo').replace('{n}', hours);
+    const days = Math.floor(hours / 24);
+    return window.t('freshness.daysAgo').replace('{n}', days);
+};
+
+async function loadFreshness() {
+    try {
+        const res = await fetch('/api/health');
+        if (!res.ok) return;
+        const data = await res.json();
+        window._newsUpdatedAt    = data.newsUpdatedAt    || null;
+        window._galleryUpdatedAt = data.galleryUpdatedAt || null;
+    } catch {}
 }
 
 // Обновить статические строки навигации
@@ -384,6 +420,18 @@ function applyScrollAnimation(containerEl) {
     });
 }
 
+// Общая разметка для кнопки «показать ещё» (используется в circles/achievements/events/documents/team)
+window.renderToggleBtn = function(btnId, onclickCall) {
+    return `
+    <div style="text-align:center;margin-top:32px;margin-bottom:40px;">
+        <button id="${btnId}" onclick="${onclickCall}" style="
+            display:inline-flex;align-items:center;gap:8px;
+            padding:11px 32px;border-radius:10px;border:2px solid #1A3C6E;
+            background:#fff;color:#1A3C6E;font-size:15px;font-weight:600;
+            cursor:pointer;font-family:inherit;transition:background .2s,color .2s;">${window.t('btn.showAll')}</button>
+    </div>`;
+};
+
 // Общая утилита для кнопок «показать ещё / скрыть»
 window._toggleSection = function(itemSelector, btnId) {
     const items = document.querySelectorAll(itemSelector);
@@ -398,6 +446,9 @@ window._toggleSection = function(itemSelector, btnId) {
 document.addEventListener('DOMContentLoaded', async () => {
     // Сначала инициализируем i18n
     await window.i18n.init();
+
+    // Даты обновления новостей/галереи нужны ДО рендера секций (используются в бейджах)
+    await loadFreshness();
 
     // Потом грузим всё параллельно
     const [siteData] = await Promise.all([loadSite(), loadSections(), loadContactFooter()]);

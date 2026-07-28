@@ -855,6 +855,18 @@ span.section-link {
 .news-section-header .section-title {
     margin-bottom: 0;
 }
+.news-header-titlewrap {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.freshness-badge {
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.55);
+    white-space: nowrap;
+}
 .news-nav-btns {
     display: flex;
     gap: 10px;

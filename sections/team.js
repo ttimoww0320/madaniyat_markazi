@@ -96,14 +96,7 @@ window.renderTeam = function(data) {
     </div>
 
     <div class="deputies-grid">${deputyCards}</div>
-    ${deputies.length > 4 ? `
-    <div style="text-align:center;margin-top:32px;margin-bottom:40px;">
-        <button id="deputy-toggle-btn" onclick="window.toggleDeputies()" style="
-            display:inline-flex;align-items:center;gap:8px;
-            padding:11px 32px;border-radius:10px;border:2px solid #1A3C6E;
-            background:#fff;color:#1A3C6E;font-size:15px;font-weight:600;
-            cursor:pointer;font-family:inherit;transition:background .2s,color .2s;">${window.t('btn.showAll')}</button>
-    </div>` : ''}
+    ${deputies.length > 4 ? window.renderToggleBtn('deputy-toggle-btn', 'window.toggleDeputies()') : ''}
     <div class="staff-grid">${staffCards}</div>
 </section>`;
 };
