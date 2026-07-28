@@ -1437,7 +1437,7 @@ a.phone-sm { color: #1A3C6E; }
 .doc-icon.blue   { background: #E6F1FB; }
 .doc-icon.yellow { background: #FAEEDA; }
 
-.doc-info { flex: 1; }
+.doc-info { flex: 1; display: flex; flex-direction: column; }
 
 .doc-title {
     font-size: 14px;
@@ -1458,6 +1458,7 @@ a.phone-sm { color: #1A3C6E; }
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
+    margin-top: auto;
 }
 
 .doc-size {
