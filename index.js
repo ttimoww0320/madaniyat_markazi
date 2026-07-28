@@ -1,8 +1,9 @@
-const http  = require('http');
-const https = require('https');
-const fs    = require('fs');
-const path  = require('path');
-const zlib  = require('zlib');
+const http   = require('http');
+const https  = require('https');
+const fs     = require('fs');
+const path   = require('path');
+const zlib   = require('zlib');
+const crypto = require('crypto');
 
 // ===== ЗАГРУЗКА .env =====
 try {
@@ -587,6 +588,13 @@ function sendJSON(res, status, data, req) {
     res.end(body);
 }
 
+function timingSafeEqualStr(a, b) {
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    if (bufA.length !== bufB.length) return false;
+    return crypto.timingSafeEqual(bufA, bufB);
+}
+
 const _authFailures = new Map();
 function checkAuth(req) {
     if (!ADMIN_PASSWORD) return false;
@@ -595,7 +603,7 @@ function checkAuth(req) {
     const failures = (_authFailures.get(ip) || []).filter(t => now - t < AUTH_BLOCK_WINDOW_MS);
     if (failures.length >= AUTH_BLOCK_ATTEMPTS) return false; // блок на 15 минут после 10 неудач
     const auth = req.headers['authorization'] || '';
-    if (auth === `Bearer ${ADMIN_PASSWORD}`) { _authFailures.delete(ip); return true; }
+    if (timingSafeEqualStr(auth, `Bearer ${ADMIN_PASSWORD}`)) { _authFailures.delete(ip); return true; }
     failures.push(now);
     _authFailures.set(ip, failures);
     return false;
@@ -690,7 +698,19 @@ const server = http.createServer(async (req, res) => {
         // GET /api/health
         if (section === 'health') {
             const dataOk = fs.existsSync(path.join(ROOT, 'data', 'news.json'));
-            sendJSON(res, 200, { ok: true, uptime: Math.floor(process.uptime()), data: dataOk }, req);
+            let newsUpdatedAt = null, galleryUpdatedAt = null;
+            try { newsUpdatedAt    = fs.statSync(path.join(ROOT, 'data', 'news.json')).mtime.toISOString(); } catch {}
+            try { galleryUpdatedAt = fs.statSync(path.join(ROOT, 'data', 'gallery.json')).mtime.toISOString(); } catch {}
+            sendJSON(res, 200, { ok: true, uptime: Math.floor(process.uptime()), data: dataOk, newsUpdatedAt, galleryUpdatedAt }, req);
+            return;
+        }
+
+        // GET /api/visitors-public — публичная сводка без авторизации (для счётчика на главной)
+        if (section === 'visitors-public') {
+            if (req.method !== 'GET') { sendJSON(res, 405, { error: 'Метод не разрешён' }); return; }
+            const data  = readVisitors();
+            const today = new Date().toISOString().slice(0, 10);
+            sendJSON(res, 200, { total: data.total || 0, today: (data.days && data.days[today]) || 0 }, req);
             return;
         }
 
