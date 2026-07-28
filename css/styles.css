@@ -365,6 +365,19 @@ body {
     line-height: 1.6;
 }
 
+/* Скролл-реveal для карточек. Объявлено рано в файле: специфичность совпадает
+   с card:hover-правилами, а при равной специфичности побеждает более позднее
+   правило — если .in-view объявить ниже card:hover, оно перебивает подъём при наведении. */
+.anim-card {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .45s ease, transform .45s ease;
+}
+.anim-card.in-view {
+    opacity: 1;
+    transform: none;
+}
+
 /* ── Глобальное видео-фон ── */
 #site-bg-video {
     position: fixed;
@@ -1413,6 +1426,11 @@ a.news-card--link {
     border-radius: 14px;
     padding: 20px;
     text-align: center;
+    transition: transform .2s, box-shadow .2s;
+}
+.staff-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
 }
 
 .phone-sm { font-size: 12px; color: #888; }
@@ -1442,6 +1460,11 @@ a.phone-sm { color: #1A3C6E; }
     display: flex;
     flex-direction: column;
     gap: 14px;
+    transition: transform .2s, box-shadow .2s;
+}
+.doc-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
 }
 
 .doc-icon {
@@ -2531,19 +2554,6 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
 }
 .skl-grid-card { height: 200px; border-radius: 12px; }
 .skl-map-box { height: 420px; border-radius: 12px; }
-
-/* =============================================
-   SCROLL ANIMATIONS
-   ============================================= */
-.anim-card {
-    opacity: 0;
-    transform: translateY(28px);
-    transition: opacity .45s ease, transform .45s ease;
-}
-.anim-card.in-view {
-    opacity: 1;
-    transform: none;
-}
 
 /* =============================================
    DRAG & DROP (admin)
