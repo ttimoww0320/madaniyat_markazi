@@ -2507,6 +2507,7 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
     gap: 20px;
 }
 .skl-grid-card { height: 200px; border-radius: 12px; }
+.skl-map-box { height: 420px; border-radius: 12px; }
 
 /* =============================================
    SCROLL ANIMATIONS
