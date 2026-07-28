@@ -1795,9 +1795,19 @@ a.doc-small:hover {
     width: 280px;
     flex-shrink: 0;
     cursor: default;
+    display: flex;
+    flex-direction: column;
 }
 .gallery-card.clickable {
     cursor: pointer;
+}
+.gallery-card .news-img {
+    flex-shrink: 0;
+}
+.gallery-card .news-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
 }
 
 .gallery-count {
