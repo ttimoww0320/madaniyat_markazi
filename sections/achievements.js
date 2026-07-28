@@ -115,6 +115,10 @@ window.renderAchievements = function(data) {
              onclick="window.openAchModal(${i})" role="button" tabindex="0"
              onkeydown="if(event.key==='Enter')window.openAchModal(${i})">
             ${imgBlock}
+            <div class="ach-body">
+                ${a.year ? `<span class="ach-year">${esc(a.year)}</span>` : ''}
+                <h3 class="ach-title">${esc(window.tData(a.title))}</h3>
+            </div>
         </div>`;
     }).join('');
 
