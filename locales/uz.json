@@ -92,7 +92,8 @@
     "successTitle":  "Ariza qabul qilindi!",
     "successText":   "Tez orada siz bilan bog'lanamiz.",
     "circleLabel":   "To'garak",
-    "childLabel":    "Bola"
+    "childLabel":    "Bola",
+    "noConn":        "Ulanish yo'q. Internetni tekshiring."
   },
   "footer": {
     "official": "Rasmiy sayt",
@@ -107,5 +108,21 @@
     "minutesAgo": "{n} daqiqa oldin",
     "hoursAgo":   "{n} soat oldin",
     "daysAgo":    "{n} kun oldin"
+  },
+  "a11y": {
+    "mainNav":       "Asosiy navigatsiya",
+    "accessibility": "Qulaylik",
+    "increaseFont":  "Shriftni kattalashtirish",
+    "decreaseFont":  "Shriftni kichiklashtirish",
+    "contrastTitle": "Ko'zi ojizlar uchun rejim",
+    "contrastLabel": "Yuqori kontrast",
+    "menu":          "Menyu",
+    "close":         "Yopish",
+    "back":          "Orqaga",
+    "next":          "Oldinga",
+    "backToTop":     "Yuqoriga"
+  },
+  "errors": {
+    "sectionLoad": "Bo'limni yuklab bo'lmadi. Sahifani yangilab ko'ring."
   }
 }

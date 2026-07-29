@@ -39,7 +39,6 @@
     <script src="sections/circles.js" defer></script>
     <script src="sections/team.js" defer></script>
     <script src="sections/documents.js" defer></script>
-    <script src="sections/contact.js" defer></script>
     <script src="sections/gallery.js" defer></script>
     <script src="sections/news.js" defer></script>
     <script src="sections/achievements.js" defer></script>
@@ -139,9 +138,9 @@
             <button class="lang-btn"        data-lang="uz" onclick="window.i18n.setLang('uz')">UZ</button>
             <button class="lang-btn"        data-lang="oz" onclick="window.i18n.setLang('oz')">ЎЗ</button>
         </div>
-        <div class="access-btns" aria-label="Доступность">
-            <button class="access-btn" onclick="changeFontSize(1)" title="Увеличить шрифт" aria-label="Увеличить шрифт">A+</button>
-            <button class="access-btn" onclick="changeFontSize(-1)" title="Уменьшить шрифт" aria-label="Уменьшить шрифт">A-</button>
+        <div class="access-btns" id="access-btns" aria-label="Доступность">
+            <button class="access-btn" id="font-inc-btn" onclick="changeFontSize(1)" title="Увеличить шрифт" aria-label="Увеличить шрифт">A+</button>
+            <button class="access-btn" id="font-dec-btn" onclick="changeFontSize(-1)" title="Уменьшить шрифт" aria-label="Уменьшить шрифт">A-</button>
             <button class="access-btn" id="contrast-btn" onclick="toggleContrast()" title="Режим для слабовидящих" aria-label="Высокий контраст">👁</button>
         </div>
         <button class="burger-btn" id="burger-btn" onclick="toggleMenu()" aria-label="Меню" aria-expanded="false">
@@ -484,13 +483,13 @@
                 err.textContent = window.t('enroll.errorSend');
                 err.style.display = 'block';
                 btn.disabled = false;
-                btn.textContent = 'Отправить заявку';
+                btn.textContent = window.t('enroll.submit');
             }
         } catch {
-            err.textContent = 'Нет соединения. Проверьте интернет.';
+            err.textContent = window.t('enroll.noConn');
             err.style.display = 'block';
             btn.disabled = false;
-            btn.textContent = 'Отправить заявку';
+            btn.textContent = window.t('enroll.submit');
         }
     };
 
@@ -603,7 +602,7 @@
     <!-- ===== МОДАЛ: ЗАПИСЬ НА КРУЖОК ===== -->
     <div id="enroll-modal" onclick="if(event.target===this)window.closeEnroll()">
         <div class="enroll-box">
-            <button class="enroll-close" onclick="window.closeEnroll()" aria-label="Закрыть">✕</button>
+            <button class="enroll-close" id="enroll-close-btn" onclick="window.closeEnroll()" aria-label="Закрыть">✕</button>
             <h3 id="enroll-title"></h3>
             <p class="enroll-circle-name" id="enroll-circle-label"></p>
             <div id="enroll-form-body">
@@ -633,14 +632,14 @@
     <!-- ===== МОДАЛКА БИОГРАФИИ ===== -->
     <div id="bio-modal" onclick="if(event.target===this)window.closeBioModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1100;align-items:center;justify-content:center;padding:20px;">
         <div id="bio-modal-inner" style="background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
-            <button onclick="window.closeBioModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1;">✕</button>
+            <button id="bio-close-btn" onclick="window.closeBioModal()" aria-label="Закрыть" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1;">✕</button>
             <div id="bio-modal-content"></div>
         </div>
     </div>
 
     <!-- ===== ЛАЙТБОКС ===== -->
     <div id="lightbox" onclick="if(event.target===this)window.closeLightbox()">
-        <button class="lb-close" onclick="window.closeLightbox()" aria-label="Закрыть">✕</button>
+        <button class="lb-close" id="lb-close-btn" onclick="window.closeLightbox()" aria-label="Закрыть">✕</button>
         <button class="lb-arrow lb-prev" id="lb-prev" onclick="window.lbPrev()" aria-label="Назад">&#8592;</button>
         <div class="lb-img-wrap">
             <img id="lb-img" src="" alt="">

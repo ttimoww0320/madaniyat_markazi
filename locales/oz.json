@@ -92,7 +92,8 @@
     "successTitle":  "Ариза қабул қилинди!",
     "successText":   "Тез орада сиз билан боғланамиз.",
     "circleLabel":   "Тўгарак",
-    "childLabel":    "Бола"
+    "childLabel":    "Бола",
+    "noConn":        "Уланиш йўқ. Интернетни текширинг."
   },
   "footer": {
     "official": "Расмий сайт",
@@ -107,5 +108,21 @@
     "minutesAgo": "{n} дақиқа олдин",
     "hoursAgo":   "{n} соат олдин",
     "daysAgo":    "{n} кун олдин"
+  },
+  "a11y": {
+    "mainNav":       "Асосий навигация",
+    "accessibility": "Қулайлик",
+    "increaseFont":  "Шрифтни каттaлаштириш",
+    "decreaseFont":  "Шрифтни кичиклаштириш",
+    "contrastTitle": "Кўзи ожизлар учун режим",
+    "contrastLabel": "Юқори контраст",
+    "menu":          "Меню",
+    "close":         "Ёпиш",
+    "back":          "Орқага",
+    "next":          "Олдинга",
+    "backToTop":     "Юқорига"
+  },
+  "errors": {
+    "sectionLoad": "Бўлимни юклаб бўлмади. Саҳифани янгилаб кўринг."
   }
 }

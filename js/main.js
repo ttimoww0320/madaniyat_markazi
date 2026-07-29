@@ -34,7 +34,7 @@ async function loadSections() {
             } catch (err) {
                 console.error(`Ошибка загрузки секции "${api}":`, err);
                 const el = document.getElementById(id);
-                if (el) el.innerHTML = `<div style="padding:40px;text-align:center;color:#999;font-size:14px;">Не удалось загрузить раздел. Попробуйте обновить страницу.</div>`;
+                if (el) el.innerHTML = `<div style="padding:40px;text-align:center;color:#999;font-size:14px;">${window.t('errors.sectionLoad')}</div>`;
             }
         })
     );
@@ -272,6 +272,29 @@ function applyContactStrings() {
     if (contactsTitle) contactsTitle.textContent = window.t('nav.contact');
 }
 
+// aria-label/title у статичных элементов шапки и модалок (не перерисовываются — переводим отдельно)
+function applyA11yStrings() {
+    const attrMap = {
+        'main-nav':          { 'aria-label': 'a11y.mainNav' },
+        'access-btns':       { 'aria-label': 'a11y.accessibility' },
+        'font-inc-btn':      { title: 'a11y.increaseFont', 'aria-label': 'a11y.increaseFont' },
+        'font-dec-btn':      { title: 'a11y.decreaseFont', 'aria-label': 'a11y.decreaseFont' },
+        'contrast-btn':      { title: 'a11y.contrastTitle', 'aria-label': 'a11y.contrastLabel' },
+        'burger-btn':        { 'aria-label': 'a11y.menu' },
+        'enroll-close-btn':  { 'aria-label': 'a11y.close' },
+        'bio-close-btn':     { 'aria-label': 'a11y.close' },
+        'lb-close-btn':      { 'aria-label': 'a11y.close' },
+        'lb-prev':           { 'aria-label': 'a11y.back' },
+        'lb-next':           { 'aria-label': 'a11y.next' },
+        'back-to-top':       { 'aria-label': 'a11y.backToTop' },
+    };
+    Object.entries(attrMap).forEach(([id, attrs]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        Object.entries(attrs).forEach(([attr, key]) => el.setAttribute(attr, window.t(key)));
+    });
+}
+
 async function loadContactFooter() {
     try {
         const res = await fetch('/api/contact');
@@ -391,6 +414,7 @@ function initContactForm() {
 document.addEventListener('langchange', () => {
     applyNavStrings();
     applyContactStrings();
+    applyA11yStrings();
     rerenderSections();
     if (_cachedSiteData) {
         applySiteData(_cachedSiteData);
@@ -459,6 +483,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Статические строки
     applyNavStrings();
     applyContactStrings();
+    applyA11yStrings();
 
     // Инициализируем форму
     initContactForm();

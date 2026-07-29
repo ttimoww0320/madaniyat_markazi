@@ -42,13 +42,13 @@ window.openAchModal = function(idx) {
             const prev = document.createElement('button');
             prev.className = 'ach-modal-arrow ach-modal-prev';
             prev.innerHTML = '&#8592;';
-            prev.setAttribute('aria-label', 'Назад');
+            prev.setAttribute('aria-label', window.t('a11y.back'));
             prev.onclick = () => goTo(current - 1);
 
             const next = document.createElement('button');
             next.className = 'ach-modal-arrow ach-modal-next';
             next.innerHTML = '&#8594;';
-            next.setAttribute('aria-label', 'Вперёд');
+            next.setAttribute('aria-label', window.t('a11y.next'));
             next.onclick = () => goTo(current + 1);
 
             images.forEach((_, i) => {
@@ -125,7 +125,7 @@ window.renderAchievements = function(data) {
     const modal = `
 <div id="ach-modal" class="ach-modal" onclick="if(event.target===this)window.closeAchModal()" role="dialog" aria-modal="true">
     <div class="ach-modal-inner">
-        <button class="ach-modal-close" onclick="window.closeAchModal()" aria-label="Закрыть">&times;</button>
+        <button class="ach-modal-close" onclick="window.closeAchModal()" aria-label="${window.t('a11y.close')}">&times;</button>
         <div class="ach-modal-gallery"></div>
         <div class="ach-modal-body">
             <span class="ach-modal-year"></span>

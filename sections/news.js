@@ -38,8 +38,8 @@ window.renderNews = function(data) {
             ${freshness}
         </div>
         <div class="news-nav-btns">
-            <button class="news-nav-btn" id="news-prev" onclick="window.scrollNews(-1)" aria-label="Назад">&#8592;</button>
-            <button class="news-nav-btn" id="news-next" onclick="window.scrollNews(1)" aria-label="Вперёд">&#8594;</button>
+            <button class="news-nav-btn" id="news-prev" onclick="window.scrollNews(-1)" aria-label="${window.t('a11y.back')}">&#8592;</button>
+            <button class="news-nav-btn" id="news-next" onclick="window.scrollNews(1)" aria-label="${window.t('a11y.next')}">&#8594;</button>
         </div>
     </div>
     <div class="news-track-wrap">
