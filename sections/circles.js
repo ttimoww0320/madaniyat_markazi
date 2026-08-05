@@ -39,10 +39,6 @@ window.renderCircles = function(data) {
         const spotsNum = parseInt(c.spots, 10);
         const hasSpots = c.spots !== undefined && c.spots !== '';
         const isClosed = hasSpots && !isNaN(spotsNum) && spotsNum === 0;
-        const isLow = hasSpots && !isNaN(spotsNum) && spotsNum > 0 && spotsNum <= 5;
-        const capacityHtml = hasSpots
-            ? `<div class="circle-capacity"><span class="${isClosed ? 'circle-spots-closed' : isLow ? 'circle-spots-low' : 'circle-spots-ok'}" style="width:${isClosed ? 100 : isLow ? 75 : 35}%"></span></div>`
-            : '';
 
         const btnHtml = isClosed
             ? `<button class="circle-waitlist-btn" onclick="window.openEnroll(${i})">${window.t('circles.waitlist')} <svg class="circle-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>`
@@ -70,7 +66,6 @@ window.renderCircles = function(data) {
                 <div class="circle-title-rule"></div>
                 ${descHtml}
                 ${statHtml}
-                ${capacityHtml}
                 ${btnHtml}
             </div>
         </div>`;

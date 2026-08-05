@@ -1352,18 +1352,6 @@ body.has-global-bg .hero {
     color: var(--color-primary);
 }
 
-.circle-capacity {
-    height: 4px;
-    border-radius: 2px;
-    background: var(--color-bg-alt);
-    margin-bottom: 18px;
-    overflow: hidden;
-}
-.circle-capacity span { display: block; height: 100%; }
-
-.circle-spots-ok   { background: var(--color-success); }
-.circle-spots-low  { background: #d97706; }
-.circle-spots-closed { background: #aaa; }
 
 /* =============================================
    НОВОСТИ
@@ -1863,10 +1851,10 @@ a.news-card--link {
     margin-bottom: 12px;
 }
 
-.badge.purple { background: var(--color-primary-light); color: var(--color-primary); }
-.badge.green  { background: var(--color-bg-alt); color: var(--color-text-secondary); }
-.badge.blue   { background: var(--color-primary-light); color: var(--color-primary); }
-.badge.yellow { background: #F6EFDC; color: #8A6A1F; }
+.badge.purple,
+.badge.green,
+.badge.blue,
+.badge.yellow { background: var(--color-primary-light); color: var(--color-primary); }
 .badge.sm     { font-size: 11px; padding: 4px 12px; margin-bottom: 10px; }
 
 .name-lg { font-size: 22px; font-weight: 600; margin-bottom: 4px; color: var(--color-text); }
@@ -2478,14 +2466,6 @@ a.doc-download:hover { color: var(--color-primary-hover); }
     border-top: none;
 }
 
-/* Флаг-полоска сверху */
-.footer-flag {
-    display: flex;
-    height: 5px;
-}
-.footer-flag-blue  { flex: 1; background: #1DAEEF; }
-.footer-flag-white { flex: 1; background: #fff; }
-.footer-flag-green { flex: 1; background: #1EB57E; }
 
 /* Основная часть */
 .footer-body {
