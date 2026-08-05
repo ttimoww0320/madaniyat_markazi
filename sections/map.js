@@ -4,9 +4,9 @@
    ============================================= */
 (function () {
 
-  const CLR_DEFAULT = '#2563a8';
-  const CLR_HOVER   = '#1d4f8a';
-  const CLR_ACTIVE  = '#1A3C6E';
+  const CLR_DEFAULT = '#0E67B3';
+  const CLR_HOVER   = '#0A5292';
+  const CLR_ACTIVE  = '#0B2E4F';
 
   let _leafletMap  = null;
   let _layers      = {};   // sectorId → L.geoJSON layer
@@ -32,7 +32,7 @@
       style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:999;overflow:visible;">
       <defs>
         <marker id="map-arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="#C8A84B"/>
+          <polygon points="0 0, 10 3.5, 0 7" fill="#0E67B3"/>
         </marker>
       </defs>
     </svg>
@@ -88,7 +88,7 @@
       el.setAttribute('class', 'connector-line');
       el.setAttribute('d', path);
       el.setAttribute('fill', 'none');
-      el.setAttribute('stroke', '#C8A84B');
+      el.setAttribute('stroke', '#0E67B3');
       el.setAttribute('stroke-width', '2');
       el.setAttribute('stroke-dasharray', '7,4');
       el.setAttribute('marker-end', 'url(#map-arrow)');
@@ -124,9 +124,9 @@
 
     if (!districtFeature) return;
 
-    /* Золотой контур района */
+    /* Контур района */
     L.geoJSON(districtFeature, {
-      style: { color: '#C8A84B', weight: 3, fillOpacity: 0, interactive: false }
+      style: { color: '#0E67B3', weight: 3, fillOpacity: 0, interactive: false }
     }).addTo(map);
 
     /* Затемнение всего снаружи района */
@@ -135,7 +135,7 @@
       if (rings) {
         L.polygon([[90,-180],[90,180],[-90,180],[-90,-180]], {
           holes: rings,
-          color: 'none', fillColor: '#05102a', fillOpacity: 0.65, interactive: false,
+          color: 'none', fillColor: '#0B2E4F', fillOpacity: 0.55, interactive: false,
         }).addTo(map);
       }
     } catch (e) {}
@@ -196,11 +196,11 @@
         icon: L.divIcon({
           className: '',
           html: `<div style="
-            background:rgba(26,60,110,0.92);color:#fff;
+            background:rgba(14,103,179,0.92);color:#fff;
             font-size:14px;font-weight:700;
             width:30px;height:30px;border-radius:50%;
             display:flex;align-items:center;justify-content:center;
-            border:2px solid #C8A84B;pointer-events:none;">${sectorId}</div>`,
+            border:2px solid #0A5292;pointer-events:none;">${sectorId}</div>`,
           iconSize: [30, 30], iconAnchor: [15, 15],
         }),
         interactive: false,

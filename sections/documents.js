@@ -1,59 +1,41 @@
-// SVG иконки по цвету документа
-const DOC_ICON_PATHS = {
-    red:    { stroke: '#A32D2D', path: `<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#A32D2D" stroke-width="1.5"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="#A32D2D" stroke-width="1.5"/>` },
-    green:  { stroke: '#0F6E56', path: `<path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="#0F6E56" stroke-width="1.5"/><path d="M22 4L12 14.01l-3-3" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round"/>` },
-    blue:   { stroke: '#185FA5', path: `<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#185FA5" stroke-width="1.5"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="#185FA5" stroke-width="1.5"/>` },
-    yellow: { stroke: '#854F0B', path: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#854F0B" stroke-width="1.5"/>` },
-};
+// Иконка документа — единый стиль, цвет через currentColor (см. .doc-icon)
+const DOC_ICON_SVG = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="1.5"/>
+</svg>`;
 
-const SMALL_DOC_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#888" stroke-width="1.5"/>
-    <path d="M14 2v6h6" stroke="#888" stroke-width="1.5"/>
+const DOWNLOAD_ICON_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 20h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
 window.toggleDocuments = function() {
     window._toggleSection('.doc-extra-item', 'docs-toggle-btn');
 };
 
+function buildDocRow(doc, esc, extraClass, hidden) {
+    const downloadBtn = doc.file
+        ? `<a class="doc-download" href="${esc(doc.file)}" download="${esc(window.tData(doc.title))}" aria-label="${window.t('btn.download')}">${DOWNLOAD_ICON_SVG}</a>`
+        : `<span class="doc-download" style="opacity:.4;cursor:default">${DOWNLOAD_ICON_SVG}</span>`;
+    return `
+    <div class="doc-row${extraClass ? ' doc-extra-item' : ''}"${hidden ? ' style="display:none"' : ''}>
+        <div class="doc-icon">${DOC_ICON_SVG}</div>
+        <div class="doc-info">
+            <h3 class="doc-title">${esc(window.tData(doc.title))}</h3>
+            ${doc.description ? `<p class="doc-desc">${esc(window.tData(doc.description))}</p>` : ''}
+        </div>
+        <div class="doc-meta">
+            <span class="doc-size">${esc(doc.size)}</span>
+            ${downloadBtn}
+        </div>
+    </div>`;
+}
+
 window.renderDocuments = function(data) {
     const hasMore = data.main.length > 4;
 
     const esc = window.escapeHtml;
-    const mainCards = data.main.map((doc, i) => {
-        const downloadBtn = doc.file
-            ? `<a class="doc-download" href="${esc(doc.file)}" download="${esc(window.tData(doc.title))}">${window.t('btn.download')}</a>`
-            : `<span class="doc-download" style="opacity:.4;cursor:default">${window.t('btn.download')}</span>`;
-        const extra = i >= 4;
-        return `
-        <div class="doc-card${extra ? ' doc-extra-item' : ''}"${extra ? ' style="display:none"' : ''}>
-            <div class="doc-icon ${esc(doc.color)}">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    ${(DOC_ICON_PATHS[doc.color] || DOC_ICON_PATHS.blue).path}
-                </svg>
-            </div>
-            <div class="doc-info">
-                <h3 class="doc-title">${esc(window.tData(doc.title))}</h3>
-                <p class="doc-desc">${esc(window.tData(doc.description))}</p>
-                <div class="doc-meta">
-                    <span class="doc-size">${esc(doc.size)}</span>
-                    ${downloadBtn}
-                </div>
-            </div>
-        </div>`;
-    }).join('');
-
-    const smallCards = data.small.map(doc => {
-        const tag   = doc.file ? 'a' : 'div';
-        const attrs = doc.file ? `href="${doc.file}" download="${window.tData(doc.title)}"` : '';
-        return `
-        <${tag} class="doc-small" ${attrs}>
-            <div class="doc-small-icon">${SMALL_DOC_SVG}</div>
-            <div>
-                <h4 class="doc-small-title">${window.tData(doc.title)}</h4>
-                <p class="doc-small-size">${doc.size}</p>
-            </div>
-        </${tag}>`;
-    }).join('');
+    const mainRows = data.main.map((doc, i) => buildDocRow(doc, esc, i >= 4, i >= 4)).join('');
+    const smallRows = data.small.map(doc => buildDocRow(doc, esc, false, false)).join('');
 
     return `
 <div class="section-gray">
@@ -62,9 +44,9 @@ window.renderDocuments = function(data) {
             <h2 class="section-title">${window.t('sections.documents')}</h2>
             <p class="section-subtitle">${window.t('sections.documentsSub')}</p>
         </div>
-        <div class="docs-main">${mainCards}</div>
+        <div class="docs-main docs-list">${mainRows}</div>
         ${hasMore ? window.renderToggleBtn('docs-toggle-btn', 'window.toggleDocuments()') : ''}
-        <div class="docs-small">${smallCards}</div>
+        <div class="docs-small docs-list">${smallRows}</div>
     </section>
 </div>`;
 };
