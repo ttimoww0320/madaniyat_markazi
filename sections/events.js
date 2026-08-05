@@ -1,12 +1,12 @@
-// Иконки по цвету события
+// Иконки по цвету события — цвет наследуется от .event-image (см. CSS)
 const EVENT_ICONS = {
-    blue: `<circle cx="12" cy="12" r="10" stroke="#185FA5" stroke-width="1.5"/>
-           <path d="M12 6v6l4 2" stroke="#185FA5" stroke-width="1.5" stroke-linecap="round"/>`,
-    yellow: `<rect x="3" y="3" width="18" height="18" rx="2" stroke="#854F0B" stroke-width="1.5"/>
-             <path d="M3 9h18M9 21V9" stroke="#854F0B" stroke-width="1.5"/>`,
-    green: `<path d="M9 18V5l12-2v13" stroke="#0F6E56" stroke-width="1.5"/>
-            <circle cx="6" cy="18" r="3" stroke="#0F6E56" stroke-width="1.5"/>
-            <circle cx="18" cy="16" r="3" stroke="#0F6E56" stroke-width="1.5"/>`,
+    blue: `<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+           <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>`,
+    yellow: `<rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
+             <path d="M3 9h18M9 21V9" stroke="currentColor" stroke-width="1.5"/>`,
+    green: `<path d="M9 18V5l12-2v13" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="1.5"/>`,
 };
 
 function buildEventCard(ev) {

@@ -443,6 +443,10 @@ a {
     padding: var(--section-pad-y) var(--container-pad);
     max-width: var(--container-max);
     margin: 0 auto;
+    scroll-margin-top: 270px;
+}
+@media (max-width: 768px) {
+    .section { scroll-margin-top: 140px; }
 }
 
 .section-gray {
@@ -1128,9 +1132,9 @@ body.has-global-bg .hero {
     position: relative;
 }
 
-.event-image.blue   { background: linear-gradient(135deg, var(--color-primary-light), #B7C4DD); }
-.event-image.yellow { background: linear-gradient(135deg, #F6EFDC, #E3CE8E); }
-.event-image.green  { background: linear-gradient(135deg, var(--color-bg-alt), #C7CDD4); }
+.event-image.blue   { background: linear-gradient(135deg, var(--color-primary-light), #B7C4DD); color: var(--color-primary); }
+.event-image.yellow { background: linear-gradient(135deg, #F6EFDC, #E3CE8E); color: #8A6A1F; }
+.event-image.green  { background: linear-gradient(135deg, var(--color-bg-alt), #C7CDD4); color: #4A5568; }
 
 /* Цветной индикатор категории поверх изображения */
 .event-image::before {
