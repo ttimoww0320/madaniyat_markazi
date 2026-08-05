@@ -1000,8 +1000,24 @@ body.has-global-bg .hero {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(6,30,54,0.55) 0%, rgba(6,30,54,0.75) 100%);
+    background: linear-gradient(180deg, rgba(6,30,54,0.15) 0%, rgba(6,30,54,0.35) 100%);
     z-index: 1;
+}
+.hero.has-hero-photo::before {
+    background: linear-gradient(180deg, rgba(6,30,54,0.55) 0%, rgba(6,30,54,0.75) 100%);
+}
+/* Едва заметная точечная текстура — чтобы фон без фото не читался плоской заливкой */
+.hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+    z-index: 1;
+    pointer-events: none;
+}
+.hero.has-hero-photo::after {
+    display: none;
 }
 
 .hero-content {

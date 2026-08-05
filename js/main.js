@@ -57,6 +57,7 @@ function rerenderSections() {
 function applyBackgrounds(siteData) {
     const globalBg = siteData.globalBg || '';
     const bgs      = siteData.backgrounds || {};
+    const hero     = document.querySelector('.hero');
 
     if (globalBg) {
         document.body.style.backgroundImage      = `url('${globalBg}')`;
@@ -65,18 +66,20 @@ function applyBackgrounds(siteData) {
         document.body.style.backgroundRepeat     = 'no-repeat';
         document.body.style.backgroundAttachment = 'fixed';
         document.body.classList.add('has-global-bg');
+        if (hero) hero.classList.add('has-hero-photo');
         return;
     }
 
     document.body.style.backgroundImage = '';
     document.body.classList.remove('has-global-bg');
+    if (hero && !bgs.hero) hero.classList.remove('has-hero-photo');
 
     Object.entries(bgs).forEach(([key, url]) => {
         if (!url) return;
 
         let el = null;
         if (key === 'hero') {
-            el = document.querySelector('.hero');
+            el = hero;
         } else {
             const container = document.getElementById(`section-${key}`);
             if (container) {
@@ -91,6 +94,7 @@ function applyBackgrounds(siteData) {
             el.style.backgroundSize     = 'cover';
             el.style.backgroundPosition = 'center';
             el.style.backgroundRepeat   = 'no-repeat';
+            if (key === 'hero') el.classList.add('has-hero-photo');
         }
     });
 }
