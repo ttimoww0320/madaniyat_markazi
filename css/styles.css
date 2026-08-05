@@ -873,7 +873,7 @@ body.has-global-bg .hero {
 /* ===== Уровень 3: разделы ===== */
 .nav {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
     width: 100%;
@@ -884,7 +884,10 @@ body.has-global-bg .hero {
 
 .nav-links {
     display: flex;
-    gap: 0;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
@@ -894,10 +897,16 @@ body.has-global-bg .hero {
     letter-spacing: normal;
     text-transform: uppercase;
     color: var(--color-text);
-    padding: 16px 14px;
+    padding: 8px 14px;
     border-radius: var(--radius-btn);
     transition: var(--transition);
     white-space: nowrap;
+}
+
+/* На 1024-1280px 8 пунктов тесно помещаются — сужаем паддинг, чтобы не переносились */
+@media (min-width: 1025px) and (max-width: 1280px) {
+    .nav-links { gap: 2px; }
+    .nav-links a { padding: 8px 10px; }
 }
 
 .nav-links a:hover {
