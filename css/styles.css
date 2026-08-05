@@ -744,17 +744,6 @@ body.has-global-bg .hero {
 }
 .a11y-row + .a11y-row { margin-top: 12px; }
 
-.gov-sitemap-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    flex-shrink: 0;
-    margin-left: 88px; /* + 40px из gap родителя = 128px, как отступ навбара gov.uz */
-    padding-left: 20px;
-    padding-right: 20px;
-    border-left: 1px solid rgba(0,0,0,.1);
-}
 .sitemap-btn {
     display: flex;
     flex-direction: column;
@@ -2723,7 +2712,6 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
     .gov-flag-divider { display: none; }
     .gov-clock { display: none; }
     .gov-building-banner { display: none; }
-    .gov-sitemap-wrap { display: none; }
     .gov-nav-sitemap-wrap { display: none; }
     .header-search-btn { display: none; }
     .gov-mainbar-inner { padding: 0.8rem 1rem; }
