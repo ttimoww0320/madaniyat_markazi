@@ -103,9 +103,9 @@ window.renderAchievements = function(data) {
                </div>`
             : `<div class="ach-img ach-img-placeholder">
                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                       <circle cx="12" cy="8" r="4" stroke="#C8A84B" stroke-width="1.5"/>
-                       <path d="M8 14l-2 7h12l-2-7" stroke="#C8A84B" stroke-width="1.5" stroke-linejoin="round"/>
-                       <path d="M10 14l2 3 2-3" stroke="#C8A84B" stroke-width="1.5" stroke-linejoin="round"/>
+                       <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/>
+                       <path d="M8 14l-2 7h12l-2-7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                       <path d="M10 14l2 3 2-3" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                    </svg>
                </div>`;
 
