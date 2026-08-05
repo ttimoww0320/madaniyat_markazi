@@ -440,18 +440,23 @@ a {
    LAYOUT
    ============================================= */
 .section {
-    padding: 60px 2rem;
-    max-width: 1200px;
+    padding: var(--section-pad-y) var(--container-pad);
+    max-width: var(--container-max);
     margin: 0 auto;
 }
 
 .section-gray {
-    background: rgba(240, 244, 255, 0.10);
+    background: var(--color-bg-alt);
 }
 
-/* Когда на body есть общий фон */
+/* Когда на body есть общий фон — секции становятся непрозрачными карточками,
+   иначе тёмный текст нового дизайна нечитаем поверх случайного фото. */
+body.has-global-bg .section {
+    background: rgba(255,255,255,.92);
+    border-radius: var(--radius-card);
+}
 body.has-global-bg .section-gray {
-    background: rgba(249, 249, 249, 0.10);
+    background: rgba(245,247,250,.92);
 }
 
 body.has-global-bg .hero {
@@ -475,9 +480,21 @@ body.has-global-bg .hero {
 }
 
 .section-title {
-    font-size: 28px;
-    font-weight: 600;
-    color: #fff;
+    display: block;
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    font-weight: var(--fw-h2);
+    color: var(--color-text);
+}
+
+.section-title::after {
+    content: '';
+    display: block;
+    width: 48px;
+    height: 3px;
+    background: var(--color-primary);
+    margin: 12px auto 0;
+    border-radius: 2px;
 }
 
 .section-center {
@@ -486,7 +503,7 @@ body.has-global-bg .hero {
 }
 
 .section-subtitle {
-    color: rgba(255,255,255,0.65);
+    color: var(--color-text-secondary);
     font-size: 16px;
     margin-top: 8px;
 }
@@ -2647,7 +2664,7 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
     .hero p   { font-size: 15px; }
 
     .stats-bar { flex-direction: column; }
-    .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,.15); }
+    .stat-item { border-right: none; border-bottom: 1px solid var(--color-border); }
     .stat-item:last-child { border-bottom: none; }
 
     .gallery-card {
@@ -2667,7 +2684,8 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
     display: flex;
     justify-content: center;
     gap: 0;
-    background: #1A3C6E;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
     flex-wrap: wrap;
 }
 .stat-item {
@@ -2675,20 +2693,20 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
     min-width: 160px;
     text-align: center;
     padding: 28px 20px;
-    border-right: 1px solid rgba(255,255,255,.15);
+    border-right: 1px solid var(--color-border);
 }
 .stat-item:last-child { border-right: none; }
 .stat-num {
     display: block;
     font-size: 40px;
-    font-weight: 800;
-    color: #fff;
+    font-weight: 700;
+    color: var(--color-primary);
     line-height: 1;
     margin-bottom: 6px;
 }
 .stat-label {
-    font-size: 13px;
-    color: rgba(255,255,255,.75);
+    font-size: 15px;
+    color: var(--color-text-secondary);
     font-weight: 500;
 }
 
