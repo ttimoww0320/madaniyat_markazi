@@ -787,8 +787,10 @@
     <script>
     (function() {
         const btn = document.getElementById('back-to-top');
+        const header = document.querySelector('.header');
         window.addEventListener('scroll', function() {
             btn.classList.toggle('visible', window.scrollY > 400);
+            header.classList.toggle('header--scrolled', window.scrollY > 10);
         }, { passive: true });
     })();
     </script>

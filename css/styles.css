@@ -525,15 +525,19 @@ body.has-global-bg .hero {
 .header {
     position: sticky;
     top: 0;
-    background: #fff;
+    background: var(--color-bg);
     box-shadow: 0 1px 1px rgba(0,0,0,.1);
     z-index: 100;
+    transition: box-shadow .2s ease;
+}
+.header--scrolled {
+    box-shadow: 0 2px 8px rgba(16,42,67,0.08);
 }
 
 /* ===== Уровень 1: герб/местность, время, язык, спец.возможности, карта сайта =====
    Значения ниже сняты через getComputedStyle() с живой шапки gov.uz/ru/digital. */
 .gov-topbar {
-    background: #fff;
+    background: var(--color-bg);
 }
 .gov-topbar-inner {
     width: 100%;
@@ -555,7 +559,7 @@ body.has-global-bg .hero {
     align-items: center;
     gap: 16px;
     height: 100%;
-    background: #013D8C;
+    background: var(--color-primary);
     color: #fff;
     font-size: 16px;
     font-weight: 400;
@@ -574,7 +578,7 @@ body.has-global-bg .hero {
     width: 1px;
     height: 40px;
     align-self: center;
-    background: #e2e6ee;
+    background: var(--color-border);
     flex-shrink: 0;
 }
 /* Полоска флага Узбекистана — аналог navbar_img__flagline на gov.uz */
@@ -595,7 +599,7 @@ body.has-global-bg .hero {
     font-weight: 400;
     letter-spacing: normal;
     text-transform: none;
-    color: #000;
+    color: var(--color-text);
     white-space: nowrap;
 }
 .gov-topbar-right {
@@ -622,7 +626,7 @@ body.has-global-bg .hero {
     font-size: 14px;
     font-weight: 400;
     line-height: 21.7px;
-    color: #707070;
+    color: var(--color-text-secondary);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
@@ -634,19 +638,19 @@ body.has-global-bg .hero {
     align-items: center;
     gap: 5px;
     height: 36px;
-    background: #fff;
-    border: 1px solid #707070;
-    color: #707070;
-    border-radius: 4px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-text-secondary);
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-badge);
     padding: 0 18px;
     font-size: 14px;
     font-weight: 600;
     line-height: 14px;
     cursor: pointer;
     font-family: inherit;
-    transition: background .2s;
+    transition: var(--transition);
 }
-.lang-pill-btn:hover { background: rgba(0,0,0,.04); }
+.lang-pill-btn:hover { background: var(--color-primary-light); }
 .a11y-caret { font-size: 10px; }
 .lang-panel {
     display: none;
@@ -654,10 +658,10 @@ body.has-global-bg .hero {
     top: calc(100% + 8px);
     right: 0;
     min-width: 140px;
-    background: #fff;
-    border: 1px solid #e2e6ee;
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-btn);
+    box-shadow: var(--shadow-card-hover);
     padding: 6px;
     z-index: 110;
 }
@@ -679,26 +683,26 @@ body.has-global-bg .hero {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     background: transparent;
-    border: none;
-    color: #1a1a1a;
-    border-radius: 0;
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    border-radius: var(--radius-badge);
     cursor: pointer;
-    transition: opacity .2s;
+    transition: var(--transition);
 }
-.a11y-icon-btn:hover { opacity: .6; }
+.a11y-icon-btn:hover { background: var(--color-primary-light); }
 .a11y-panel {
     display: none;
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
     min-width: 240px;
-    background: #fff;
-    border: 1px solid #e2e6ee;
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-btn);
+    box-shadow: var(--shadow-card-hover);
     padding: 14px;
     z-index: 110;
 }
@@ -706,7 +710,7 @@ body.has-global-bg .hero {
 .a11y-panel-title {
     font-size: 13px;
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--color-text);
     margin-bottom: 12px;
 }
 .a11y-row {
@@ -715,7 +719,7 @@ body.has-global-bg .hero {
     justify-content: space-between;
     gap: 12px;
     font-size: 13px;
-    color: #1a1a1a;
+    color: var(--color-text);
 }
 .a11y-row + .a11y-row { margin-top: 12px; }
 
@@ -749,7 +753,7 @@ body.has-global-bg .hero {
     display: block;
     width: 100%;
     height: 2px;
-    background: #1a1a1a;
+    background: var(--color-text);
     border-radius: 2px;
 }
 
@@ -777,7 +781,7 @@ body.has-global-bg .hero {
     flex-shrink: 0;
     background: transparent;
     border: none;
-    color: #000;
+    color: var(--color-text);
     cursor: pointer;
     transition: opacity .2s;
 }
@@ -787,7 +791,7 @@ body.has-global-bg .hero {
     align-items: center;
     gap: 20px;
 }
-.gov-phone-icon { display: flex; align-items: center; flex-shrink: 0; color: #000; }
+.gov-phone-icon { display: flex; align-items: center; flex-shrink: 0; color: var(--color-text); }
 .gov-phone-text {
     display: flex;
     flex-direction: column;
@@ -797,7 +801,7 @@ body.has-global-bg .hero {
     font-size: 16px;
     font-weight: 600;
     line-height: 24.8px;
-    color: #000;
+    color: var(--color-text);
     text-transform: uppercase;
     letter-spacing: normal;
 }
@@ -805,7 +809,7 @@ body.has-global-bg .hero {
     font-size: 24px;
     font-weight: 500;
     line-height: 37.2px;
-    color: #000;
+    color: var(--color-primary);
 }
 .gov-phone-number:hover { text-decoration: underline; }
 .gov-phone-all {
@@ -813,7 +817,7 @@ body.has-global-bg .hero {
     font-weight: 500;
     line-height: 27.9px;
     text-transform: uppercase;
-    color: #000;
+    color: var(--color-text);
     text-decoration: none;
 }
 .gov-phone-all:hover { text-decoration: underline; }
@@ -841,7 +845,7 @@ body.has-global-bg .hero {
     font-weight: 500;
     font-size: 20px;
     line-height: 26px;
-    color: #000;
+    color: var(--color-text);
     max-width: 320px;
 }
 
@@ -854,7 +858,7 @@ body.has-global-bg .hero {
     width: 100%;
     padding: 0 16px;
     min-height: 57px;
-    background: #F0F0F0;
+    background: var(--color-bg-alt);
 }
 
 .nav-links {
@@ -864,20 +868,20 @@ body.has-global-bg .hero {
 }
 
 .nav-links a {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: var(--fs-nav);
+    font-weight: 700;
     letter-spacing: normal;
     text-transform: uppercase;
-    color: #000;
-    padding: 16px 8px;
-    border-radius: 0;
-    transition: color .2s;
+    color: var(--color-text);
+    padding: 16px 14px;
+    border-radius: var(--radius-btn);
+    transition: var(--transition);
     white-space: nowrap;
 }
 
 .nav-links a:hover {
-    background: transparent;
-    color: #013D8C;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
 }
 
 .gov-nav-sitemap-wrap {
@@ -887,10 +891,10 @@ body.has-global-bg .hero {
     height: 57px;
     width: 60px;
     flex-shrink: 0;
-    border-left: 1px solid #d9d9d9;
+    border-left: 1px solid var(--color-border);
 }
 .gov-nav-sitemap-wrap .sitemap-btn { width: 24px; }
-.gov-nav-sitemap-wrap .sitemap-btn span { background: #1a1a1a; }
+.gov-nav-sitemap-wrap .sitemap-btn span { background: var(--color-text); }
 
 /* ===== Панель "Карта сайта" ===== */
 .sitemap-overlay {
@@ -910,7 +914,7 @@ body.has-global-bg .hero {
     bottom: 0;
     width: 320px;
     max-width: 85vw;
-    background: #fff;
+    background: var(--color-bg);
     box-shadow: -8px 0 24px rgba(0,0,0,.15);
     z-index: 200;
     padding: 20px;
@@ -924,16 +928,16 @@ body.has-global-bg .hero {
     justify-content: space-between;
     padding-bottom: 14px;
     margin-bottom: 14px;
-    border-bottom: 1px solid #e2e6ee;
+    border-bottom: 1px solid var(--color-border);
     font-size: 16px;
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--color-text);
 }
 .sitemap-close {
     background: none;
     border: none;
     font-size: 16px;
-    color: #4A5568;
+    color: var(--color-text-secondary);
     cursor: pointer;
     padding: 4px;
 }
@@ -946,12 +950,12 @@ body.has-global-bg .hero {
 .sitemap-list a {
     display: block;
     padding: 10px 12px;
-    border-radius: 6px;
-    color: #1a1a1a;
+    border-radius: var(--radius-btn);
+    color: var(--color-text);
     font-size: 14px;
-    transition: background .2s;
+    transition: var(--transition);
 }
-.sitemap-list a:hover { background: rgba(26,60,110,.08); }
+.sitemap-list a:hover { background: var(--color-primary-light); color: var(--color-primary); }
 
 /* =============================================
    HERO
@@ -2275,11 +2279,11 @@ a.doc-small:hover {
     flex-direction: column;
     justify-content: center;
     gap: 5px;
-    width: 36px;
-    height: 36px;
-    background: rgba(26,60,110,.06);
-    border: 1px solid rgba(26,60,110,.2);
-    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-btn);
     cursor: pointer;
     padding: 8px;
     position: relative;
@@ -2288,7 +2292,7 @@ a.doc-small:hover {
 .burger-btn span {
     display: block;
     height: 2px;
-    background: #1A3C6E;
+    background: var(--color-text);
     border-radius: 2px;
     transition: transform .25s, opacity .25s;
 }
@@ -2303,18 +2307,18 @@ a.doc-small:hover {
 .lang-btn {
     background: transparent;
     border: none;
-    color: rgba(26,60,110,.7);
-    border-radius: 6px;
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-badge);
     padding: 4px 9px;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
-    transition: background .2s, color .2s;
+    transition: var(--transition);
     font-family: inherit;
     letter-spacing: .3px;
 }
-.lang-btn:hover  { background: rgba(26,60,110,.1); color: #1A3C6E; }
-.lang-btn.active { background: #1A3C6E; color: #fff; }
+.lang-btn:hover  { background: var(--color-primary-light); color: var(--color-primary); }
+.lang-btn.active { background: transparent; color: var(--color-primary); font-weight: 700; }
 
 .access-btns {
     display: flex;
@@ -2322,19 +2326,19 @@ a.doc-small:hover {
     flex-shrink: 0;
 }
 .access-btn {
-    background: rgba(26,60,110,.06);
-    border: 1px solid rgba(26,60,110,.2);
-    color: #1A3C6E;
-    border-radius: 6px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    border-radius: var(--radius-badge);
     padding: 5px 10px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: background .2s;
+    transition: var(--transition);
     font-family: inherit;
 }
 .access-btn:hover,
-.access-btn.active { background: rgba(26,60,110,.14); }
+.access-btn.active { background: var(--color-primary-light); color: var(--color-primary); }
 
 /* =============================================
    FOOTER
@@ -2585,7 +2589,7 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
         left: 0;
         right: 0;
         bottom: 0;
-        background: #fff;
+        background: var(--color-bg);
         z-index: 99;
     }
     .nav.open { display: flex; }
@@ -2598,7 +2602,7 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
     }
     .nav-links a {
         font-size: 20px;
-        color: #013D8C;
+        color: var(--color-primary);
         font-weight: 600;
     }
     .gov-topbar-inner { height: auto; padding: 6px 1rem; }
