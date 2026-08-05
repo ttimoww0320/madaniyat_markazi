@@ -39,7 +39,10 @@ window.renderTeam = function(data) {
             <p class="title-sm">${esc(window.tData(d.department))}</p>
             <p class="contact-text"><a href="tel:${esc(d.phone)}" onclick="event.stopPropagation()">${esc(d.phone)}</a></p>
             <p class="contact-text"><a href="mailto:${esc(d.email)}" class="contact-email" onclick="event.stopPropagation()">${esc(d.email)}</a></p>
-            ${hasBio ? `<div style="margin-top:auto;padding:7px 0;font-size:13px;font-weight:600;color:var(--color-primary);text-align:center;">${window.t('team.bioBtn')} →</div>` : '<div style="margin-top:auto;"></div>'}
+            ${hasBio ? `<div style="margin-top:auto;padding:7px 0;font-size:13px;font-weight:600;color:var(--color-primary);display:flex;align-items:center;justify-content:center;gap:6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+                ${window.t('team.bioBtn')} →
+            </div>` : '<div style="margin-top:auto;"></div>'}
         </div>`;
     }).join('');
 

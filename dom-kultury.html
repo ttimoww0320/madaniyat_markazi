@@ -161,7 +161,7 @@
                                     </div>
                                     <div class="a11y-row">
                                         <span id="a11y-contrast-label">Высокий контраст</span>
-                                        <button class="access-btn" id="contrast-btn" onclick="toggleContrast()" title="Режим для слабовидящих" aria-label="Высокий контраст">👁</button>
+                                        <button class="access-btn" id="contrast-btn" onclick="toggleContrast()" title="Режим для слабовидящих" aria-label="Высокий контраст"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
                                     </div>
                                 </div>
                             </div>
@@ -225,14 +225,14 @@
             <button class="sitemap-close" onclick="window.toggleSitemap(false)" aria-label="Закрыть">✕</button>
         </div>
         <ul class="sitemap-list">
-            <li><a href="#news"         id="sitemap-news"         onclick="window.toggleSitemap(false)">📰 Новости</a></li>
-            <li><a href="#events"       id="sitemap-events"       onclick="window.toggleSitemap(false)">📅 Афиша</a></li>
-            <li><a href="#circles"      id="sitemap-circles"      onclick="window.toggleSitemap(false)">🎨 Кружки</a></li>
-            <li><a href="#map"          id="sitemap-map"          onclick="window.toggleSitemap(false)">🗺 Карта</a></li>
-            <li><a href="#achievements" id="sitemap-achievements" onclick="window.toggleSitemap(false)">🏆 Достижения</a></li>
-            <li><a href="#team"         id="sitemap-team"         onclick="window.toggleSitemap(false)">👥 Команда</a></li>
-            <li><a href="#gallery"      id="sitemap-gallery"      onclick="window.toggleSitemap(false)">🖼 Галерея</a></li>
-            <li><a href="#documents"    id="sitemap-documents"    onclick="window.toggleSitemap(false)">📄 Документы</a></li>
+            <li><a href="#news"         id="sitemap-news"         onclick="window.toggleSitemap(false)">Новости</a></li>
+            <li><a href="#events"       id="sitemap-events"       onclick="window.toggleSitemap(false)">Афиша</a></li>
+            <li><a href="#circles"      id="sitemap-circles"      onclick="window.toggleSitemap(false)">Кружки</a></li>
+            <li><a href="#map"          id="sitemap-map"          onclick="window.toggleSitemap(false)">Карта</a></li>
+            <li><a href="#achievements" id="sitemap-achievements" onclick="window.toggleSitemap(false)">Достижения</a></li>
+            <li><a href="#team"         id="sitemap-team"         onclick="window.toggleSitemap(false)">Команда</a></li>
+            <li><a href="#gallery"      id="sitemap-gallery"      onclick="window.toggleSitemap(false)">Галерея</a></li>
+            <li><a href="#documents"    id="sitemap-documents"    onclick="window.toggleSitemap(false)">Документы</a></li>
         </ul>
     </div>
 
@@ -508,7 +508,9 @@
         const circleName = circle ? window.tData(circle.title) : '';
         _enrollCircle = circleName;
         document.getElementById('enroll-title').textContent        = window.t('enroll.title');
-        document.getElementById('enroll-circle-label').textContent = '📌 ' + circleName;
+        document.getElementById('enroll-circle-label').innerHTML =
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
+            window.escapeHtml(circleName);
         document.getElementById('enroll-label-name').textContent   = window.t('enroll.name');
         document.getElementById('enroll-label-phone').textContent  = window.t('enroll.phone');
         document.getElementById('enroll-label-child').textContent  = window.t('enroll.child');
@@ -747,7 +749,7 @@
                 <button class="enroll-submit" id="enroll-submit-btn" onclick="window.submitEnroll()"></button>
             </div>
             <div class="enroll-success" id="enroll-success" style="display:none">
-                <div class="enroll-check">✅</div>
+                <div class="enroll-check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg></div>
                 <h4 id="enroll-success-title"></h4>
                 <p id="enroll-success-text"></p>
             </div>

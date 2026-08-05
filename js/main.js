@@ -227,19 +227,31 @@ function applyNavStrings() {
         if (el) el.textContent = window.t(key);
     });
 
-    const sitemapNavMap = {
-        'sitemap-news':         ['📰', 'nav.news'],
-        'sitemap-events':       ['📅', 'nav.events'],
-        'sitemap-circles':      ['🎨', 'nav.circles'],
-        'sitemap-map':          ['🗺', 'nav.map'],
-        'sitemap-achievements': ['🏆', 'nav.achievements'],
-        'sitemap-team':         ['👥', 'nav.team'],
-        'sitemap-gallery':      ['🖼', 'nav.gallery'],
-        'sitemap-documents':    ['📄', 'nav.documents'],
+    const SITEMAP_ICON_PATHS = {
+        news:         '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 4v16"/>',
+        events:       '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+        circles:      '<circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4m10-10h-4M6 12H2"/>',
+        map:          '<path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/>',
+        achievements: '<circle cx="12" cy="8" r="4"/><path d="M8 14l-2 7h12l-2-7"/>',
+        team:         '<circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.5 3-5 7-5s7 1.5 7 5"/><circle cx="17.5" cy="9" r="2.3"/><path d="M23 20c0-2.7-2-4.3-4.5-4.7"/>',
+        gallery:      '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+        documents:    '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>',
     };
-    Object.entries(sitemapNavMap).forEach(([id, [emoji, key]]) => {
+    const sitemapNavMap = {
+        'sitemap-news':         ['news', 'nav.news'],
+        'sitemap-events':       ['events', 'nav.events'],
+        'sitemap-circles':      ['circles', 'nav.circles'],
+        'sitemap-map':          ['map', 'nav.map'],
+        'sitemap-achievements': ['achievements', 'nav.achievements'],
+        'sitemap-team':         ['team', 'nav.team'],
+        'sitemap-gallery':      ['gallery', 'nav.gallery'],
+        'sitemap-documents':    ['documents', 'nav.documents'],
+    };
+    Object.entries(sitemapNavMap).forEach(([id, [iconKey, key]]) => {
         const el = document.getElementById(id);
-        if (el) el.textContent = emoji + ' ' + window.t(key);
+        if (!el) return;
+        const icon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SITEMAP_ICON_PATHS[iconKey]}</svg>`;
+        el.innerHTML = icon + window.escapeHtml(window.t(key));
     });
 }
 
@@ -334,14 +346,21 @@ async function loadContactFooter() {
         const d = await res.json();
         const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
+        const FCI_ICONS = {
+            pin:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+            phone:  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>',
+            mail:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>',
+            clock:  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+        };
+
         const el = document.getElementById('footer-contact-list');
         if (el) {
             el.innerHTML = [
-                d.address ? `<div class="footer-contact-item"><span class="fci-icon">📍</span><span>${esc(window.tData(d.address))}</span></div>` : '',
+                d.address ? `<div class="footer-contact-item"><span class="fci-icon">${FCI_ICONS.pin}</span><span>${esc(window.tData(d.address))}</span></div>` : '',
                 ...(d.phones || []).map(p =>
-                    `<div class="footer-contact-item"><span class="fci-icon">📞</span><a href="tel:${p.number}">${esc(p.number)}</a></div>`),
-                d.email ? `<div class="footer-contact-item"><span class="fci-icon">✉️</span><a href="mailto:${esc(d.email)}">${esc(d.email)}</a></div>` : '',
-                d.hours?.weekdays ? `<div class="footer-contact-item"><span class="fci-icon">🕐</span><span>${esc(window.tData(d.hours.weekdays))}</span></div>` : '',
+                    `<div class="footer-contact-item"><span class="fci-icon">${FCI_ICONS.phone}</span><a href="tel:${p.number}">${esc(p.number)}</a></div>`),
+                d.email ? `<div class="footer-contact-item"><span class="fci-icon">${FCI_ICONS.mail}</span><a href="mailto:${esc(d.email)}">${esc(d.email)}</a></div>` : '',
+                d.hours?.weekdays ? `<div class="footer-contact-item"><span class="fci-icon">${FCI_ICONS.clock}</span><span>${esc(window.tData(d.hours.weekdays))}</span></div>` : '',
             ].join('');
         }
 
@@ -368,9 +387,10 @@ async function loadContactFooter() {
                 YouTube:   `<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M10 9l5 3-5 3V9z" fill="currentColor"/></svg>`,
             };
             const safeUrl = u => { try { const p = new URL(u); return (p.protocol === 'https:' || p.protocol === 'http:') ? p.href : '#'; } catch { return '#'; } };
+            const linkIcon = `<svg viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M14 11a5 5 0 00-7.07 0l-2.83 2.83a5 5 0 007.07 7.07L12.5 19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
             socEl.innerHTML = d.socials.map(s => `
                 <a href="${safeUrl(s.url)}" target="_blank" rel="noopener" class="footer-soc-btn" title="${esc(s.name)}">
-                    ${icons[s.name] || '🔗'}
+                    ${icons[s.name] || linkIcon}
                 </a>`).join('');
         }
     } catch (e) {

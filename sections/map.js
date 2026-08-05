@@ -39,7 +39,7 @@
 
     <div id="map-panel" class="map-panel">
       <div class="map-panel-placeholder">
-        <div class="map-panel-icon">🗺</div>
+        <div class="map-panel-icon"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg></div>
         <p>${window.t('sections.mapPlaceholder')}</p>
       </div>
     </div>
@@ -254,16 +254,18 @@
   /* ── Карточка МФЙ ── */
   function leaderCard(m) {
     const esc = window.escapeHtml;
+    const personIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>`;
     const photo = m.leader.photo
-      ? `<img src="${esc(m.leader.photo)}" class="map-leader-photo" alt="${esc(m.leader.name)}">`
-      : `<div class="map-leader-photo map-leader-photo--empty">👤</div>`;
+      ? `<img src="${esc(m.leader.photo)}" class="map-leader-photo" alt="${esc(m.leader.name)}" onerror="window.imgFallback(this,'person')">`
+      : `<div class="map-leader-photo map-leader-photo--empty">${personIcon}</div>`;
+    const phoneIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>`;
     return `
       <div class="map-leader-card">
         ${photo}
         <div class="map-leader-info">
           <div class="map-leader-mahalla">${esc(window.tData(m.name))}</div>
           <div class="map-leader-name">${esc(m.leader.name)}</div>
-          <div class="map-leader-phone">📞 ${esc(m.leader.phone)}</div>
+          <div class="map-leader-phone">${phoneIcon} ${esc(m.leader.phone)}</div>
         </div>
       </div>`;
   }
