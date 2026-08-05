@@ -222,6 +222,21 @@ function applyNavStrings() {
         const el = document.getElementById(id);
         if (el) el.textContent = emoji + ' ' + window.t(key);
     });
+
+    const sitemapNavMap = {
+        'sitemap-news':         ['📰', 'nav.news'],
+        'sitemap-events':       ['📅', 'nav.events'],
+        'sitemap-circles':      ['🎨', 'nav.circles'],
+        'sitemap-map':          ['🗺', 'nav.map'],
+        'sitemap-achievements': ['🏆', 'nav.achievements'],
+        'sitemap-team':         ['👥', 'nav.team'],
+        'sitemap-gallery':      ['🖼', 'nav.gallery'],
+        'sitemap-documents':    ['📄', 'nav.documents'],
+    };
+    Object.entries(sitemapNavMap).forEach(([id, [emoji, key]]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = emoji + ' ' + window.t(key);
+    });
 }
 
 // Обновить форму контакта при смене языка
@@ -280,6 +295,8 @@ function applyA11yStrings() {
         'font-inc-btn':      { title: 'a11y.increaseFont', 'aria-label': 'a11y.increaseFont' },
         'font-dec-btn':      { title: 'a11y.decreaseFont', 'aria-label': 'a11y.decreaseFont' },
         'contrast-btn':      { title: 'a11y.contrastTitle', 'aria-label': 'a11y.contrastLabel' },
+        'a11y-toggle-btn':   { title: 'a11y.specialFeatures', 'aria-label': 'a11y.specialFeatures' },
+        'sitemap-btn':       { title: 'a11y.sitemap', 'aria-label': 'a11y.sitemap' },
         'burger-btn':        { 'aria-label': 'a11y.menu' },
         'enroll-close-btn':  { 'aria-label': 'a11y.close' },
         'bio-close-btn':     { 'aria-label': 'a11y.close' },
@@ -292,6 +309,17 @@ function applyA11yStrings() {
         const el = document.getElementById(id);
         if (!el) return;
         Object.entries(attrs).forEach(([attr, key]) => el.setAttribute(attr, window.t(key)));
+    });
+
+    const textMap = {
+        'a11y-panel-title':    'a11y.specialFeatures',
+        'sitemap-panel-title': 'a11y.sitemap',
+        'a11y-font-label':     'a11y.fontSize',
+        'a11y-contrast-label': 'a11y.contrastLabel',
+    };
+    Object.entries(textMap).forEach(([id, key]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = window.t(key);
     });
 }
 
@@ -311,6 +339,20 @@ async function loadContactFooter() {
                 d.email ? `<div class="footer-contact-item"><span class="fci-icon">✉️</span><a href="mailto:${esc(d.email)}">${esc(d.email)}</a></div>` : '',
                 d.hours?.weekdays ? `<div class="footer-contact-item"><span class="fci-icon">🕐</span><span>${esc(window.tData(d.hours.weekdays))}</span></div>` : '',
             ].join('');
+        }
+
+        const headerPhone = document.getElementById('gov-header-phone');
+        if (headerPhone) {
+            const phones = d.phones || [];
+            const first  = phones[0];
+            headerPhone.innerHTML = first ? `
+                <span class="gov-phone-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span>
+                <span class="gov-phone-text">
+                    <span class="gov-phone-label">${esc(window.t('contact.phone').replace(' *', ''))}</span>
+                    <a class="gov-phone-number" href="tel:${first.number}">${esc(first.number)}</a>
+                    ${phones.length > 1 ? `<a class="gov-phone-all" href="#contact">${esc(window.t('nav.contact'))} →</a>` : ''}
+                </span>
+            ` : '';
         }
 
         const socEl = document.getElementById('footer-socials-row');

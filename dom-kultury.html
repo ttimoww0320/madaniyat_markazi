@@ -24,6 +24,9 @@
     <meta name="twitter:image" content="https://yunusobod-madaniyat.uz/uploads/логотип.png">
     <!-- Favicon — герб в SVG -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%231A3C6E'/><path d='M16 4a10.5 10.5 0 100 22 8 8 0 110-16 10.5 10.5 0 010-6z' fill='%23C8A84B'/><polygon points='20,6 21.5,10.5 26,10.5 22.5,13.5 24,18 20,15.5 16,18 17.5,13.5 14,10.5 18.5,10.5' fill='%23C8A84B'/></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -94,12 +97,6 @@
         </div>
     </div>
 
-    <!-- ===== ФОНОВОЕ ВИДЕО (весь сайт) ===== -->
-    <video id="site-bg-video" autoplay loop muted playsinline>
-        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260403_050628_c4e32401-fab4-4a27-b7a8-6e9291cd5959.mp4" type="video/mp4">
-    </video>
-    <div id="site-bg-overlay"></div>
-
     <!-- ===== ФЛАГ УЗБЕКИСТАНА ===== -->
     <div class="flag-stripe" aria-hidden="true">
         <div class="fs-blue"></div>
@@ -107,47 +104,137 @@
         <div class="fs-green"></div>
     </div>
 
-    <!-- ===== БАННЕР ОБЪЯВЛЕНИЙ ===== -->
-    <div class="announce-bar" id="announce-bar">
-        <div class="announce-track" id="announce-track"></div>
-    </div>
-
     <!-- ===== ШАПКА ===== -->
     <header class="header">
-        <div class="logo">
-            <div class="logo-emblem" aria-hidden="true">
-                <img src="uploads/логотип.png" alt="Логотип" width="44" height="44" style="object-fit:contain;">
+
+        <!-- Уровень 1: гос.плашка, герб, время, язык, спец.возможности, карта сайта -->
+        <div class="gov-topbar">
+            <div class="gov-topbar-inner">
+                <div class="gov-topbar-left">
+                    <span class="gov-orgs-pill">
+                        <span>Ҳокимият Юнусобод тумани</span>
+                        <span class="gov-orgs-pill-arrow" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="24" height="24" fill="currentColor">
+                                <path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.164 16-16S24.836 0 16 0m0 30C8.28 30 2 23.72 2 16S8.28 1.969 16 1.969 30 8.28 30 16s-6.28 14-14 14"></path>
+                                <path d="M13.808 8.271a.994.994 0 0 0-1.414 0 1.017 1.017 0 0 0 0 1.429l6.195 6.285-6.196 6.285a1.017 1.017 0 0 0 0 1.429.994.994 0 0 0 1.414 0l6.9-6.999a1.037 1.037 0 0 0 0-1.429z"></path>
+                            </svg>
+                        </span>
+                    </span>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Emblem_of_Uzbekistan.svg" alt="Герб Республики Узбекистан" class="gov-emblem-mini" width="56" height="58">
+                    <span class="gov-topbar-divider gov-flag-divider" aria-hidden="true"></span>
+                    <div class="gov-locality">
+                        <span>ОФИЦИАЛЬНЫЙ САЙТ</span>
+                        <span id="gov-locality-text">ЮНУСОБОД ТУМАНИ</span>
+                    </div>
+                </div>
+                <div class="gov-topbar-right">
+                    <div class="gov-building-banner">
+                        <img src="uploads/building.webp" alt="35 лет Независимости Узбекистана" width="420" height="82">
+                    </div>
+                    <div class="gov-widgets">
+                        <span class="gov-clock" id="gov-clock" aria-hidden="true"></span>
+
+                        <div class="gov-lang-a11y">
+                            <div class="lang-switcher">
+                                <button class="lang-pill-btn" id="lang-pill-btn" onclick="window.toggleLangPanel()" aria-haspopup="true" aria-expanded="false" aria-controls="lang-panel">
+                                    <span id="lang-pill-label">RU</span> <span class="a11y-caret" aria-hidden="true">▾</span>
+                                </button>
+                                <div class="lang-panel" id="lang-panel">
+                                    <button class="lang-btn active" data-lang="ru" onclick="window.i18n.setLang('ru')">Русский</button>
+                                    <button class="lang-btn"        data-lang="uz" onclick="window.i18n.setLang('uz')">O'zbek</button>
+                                    <button class="lang-btn"        data-lang="oz" onclick="window.i18n.setLang('oz')">Ўзбек</button>
+                                </div>
+                            </div>
+
+                            <div class="a11y-dropdown">
+                                <button class="a11y-icon-btn" id="a11y-toggle-btn" onclick="window.toggleA11yPanel()" aria-haspopup="true" aria-expanded="false" aria-controls="a11y-panel" title="Специальные возможности" aria-label="Специальные возможности">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                                <div class="a11y-panel" id="a11y-panel">
+                                    <div class="a11y-panel-title" id="a11y-panel-title">Специальные возможности</div>
+                                    <div class="a11y-row">
+                                        <span id="a11y-font-label">Размер шрифта</span>
+                                        <div class="access-btns" id="access-btns" aria-label="Доступность">
+                                            <button class="access-btn" id="font-inc-btn" onclick="changeFontSize(1)" title="Увеличить шрифт" aria-label="Увеличить шрифт">A+</button>
+                                            <button class="access-btn" id="font-dec-btn" onclick="changeFontSize(-1)" title="Уменьшить шрифт" aria-label="Уменьшить шрифт">A-</button>
+                                        </div>
+                                    </div>
+                                    <div class="a11y-row">
+                                        <span id="a11y-contrast-label">Высокий контраст</span>
+                                        <button class="access-btn" id="contrast-btn" onclick="toggleContrast()" title="Режим для слабовидящих" aria-label="Высокий контраст">👁</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gov-sitemap-wrap">
+                        <button class="sitemap-btn" id="sitemap-btn" onclick="window.toggleSitemap()" aria-haspopup="true" aria-expanded="false" aria-controls="sitemap-panel" title="Карта сайта" aria-label="Карта сайта">
+                            <span></span><span></span><span></span>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <span class="logo-text" id="logo-text">Дом культуры</span>
         </div>
+
+        <!-- Уровень 2: полное название организации, телефон -->
+        <div class="gov-mainbar">
+            <div class="gov-mainbar-inner">
+                <div class="logo">
+                    <div class="logo-emblem" aria-hidden="true">
+                        <img src="uploads/логотип.png" alt="Логотип" width="100" height="100" style="object-fit:contain;">
+                    </div>
+                    <span class="logo-text" id="logo-text">Дом культуры</span>
+                </div>
+                <div class="gov-mainbar-right">
+                    <button class="header-search-btn" type="button" aria-label="Поиск" title="Поиск">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                    <div class="gov-header-phone" id="gov-header-phone"></div>
+                </div>
+                <button class="burger-btn" id="burger-btn" onclick="toggleMenu()" aria-label="Меню" aria-expanded="false">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Уровень 3: разделы -->
         <nav class="nav" id="main-nav" aria-label="Основная навигация">
-            <a id="nav-news"         href="#news"         onclick="closeMenu()">Новости</a>
-            <a id="nav-events"       href="#events"       onclick="closeMenu()">Афиша</a>
-            <a id="nav-circles"      href="#circles"      onclick="closeMenu()">Кружки</a>
-            <a id="nav-map"          href="#map"          onclick="closeMenu()">Карта</a>
-            <a id="nav-achievements" href="#achievements" onclick="closeMenu()">Достижения</a>
-            <a id="nav-team"         href="#team"         onclick="closeMenu()">Команда</a>
-            <a id="nav-gallery"      href="#gallery"      onclick="closeMenu()">Галерея</a>
-            <a id="nav-documents"    href="#documents"    onclick="closeMenu()">Документы</a>
+            <div class="nav-links">
+                <a id="nav-news"         href="#news"         onclick="closeMenu()">Новости</a>
+                <a id="nav-events"       href="#events"       onclick="closeMenu()">Афиша</a>
+                <a id="nav-circles"      href="#circles"      onclick="closeMenu()">Кружки</a>
+                <a id="nav-map"          href="#map"          onclick="closeMenu()">Карта</a>
+                <a id="nav-achievements" href="#achievements" onclick="closeMenu()">Достижения</a>
+                <a id="nav-team"         href="#team"         onclick="closeMenu()">Команда</a>
+                <a id="nav-gallery"      href="#gallery"      onclick="closeMenu()">Галерея</a>
+                <a id="nav-documents"    href="#documents"    onclick="closeMenu()">Документы</a>
+            </div>
+            <div class="gov-nav-sitemap-wrap">
+                <button class="sitemap-btn" id="sitemap-btn-nav" onclick="window.toggleSitemap()" aria-haspopup="true" aria-expanded="false" aria-controls="sitemap-panel" title="Карта сайта" aria-label="Карта сайта">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
         </nav>
-        <!-- Кнопки доступности + бургер -->
-        <div class="header-right">
-        <!-- Переключатель языка -->
-        <div class="lang-switcher">
-            <button class="lang-btn active" data-lang="ru" onclick="window.i18n.setLang('ru')">RU</button>
-            <button class="lang-btn"        data-lang="uz" onclick="window.i18n.setLang('uz')">UZ</button>
-            <button class="lang-btn"        data-lang="oz" onclick="window.i18n.setLang('oz')">ЎЗ</button>
-        </div>
-        <div class="access-btns" id="access-btns" aria-label="Доступность">
-            <button class="access-btn" id="font-inc-btn" onclick="changeFontSize(1)" title="Увеличить шрифт" aria-label="Увеличить шрифт">A+</button>
-            <button class="access-btn" id="font-dec-btn" onclick="changeFontSize(-1)" title="Уменьшить шрифт" aria-label="Уменьшить шрифт">A-</button>
-            <button class="access-btn" id="contrast-btn" onclick="toggleContrast()" title="Режим для слабовидящих" aria-label="Высокий контраст">👁</button>
-        </div>
-        <button class="burger-btn" id="burger-btn" onclick="toggleMenu()" aria-label="Меню" aria-expanded="false">
-            <span></span><span></span><span></span>
-        </button>
-        </div>
     </header>
+
+    <!-- ===== ПАНЕЛЬ "КАРТА САЙТА" ===== -->
+    <div class="sitemap-overlay" id="sitemap-overlay" onclick="window.toggleSitemap(false)"></div>
+    <div class="sitemap-panel" id="sitemap-panel" role="dialog" aria-label="Карта сайта" aria-modal="true">
+        <div class="sitemap-panel-header">
+            <span id="sitemap-panel-title">Карта сайта</span>
+            <button class="sitemap-close" onclick="window.toggleSitemap(false)" aria-label="Закрыть">✕</button>
+        </div>
+        <ul class="sitemap-list">
+            <li><a href="#news"         id="sitemap-news"         onclick="window.toggleSitemap(false)">📰 Новости</a></li>
+            <li><a href="#events"       id="sitemap-events"       onclick="window.toggleSitemap(false)">📅 Афиша</a></li>
+            <li><a href="#circles"      id="sitemap-circles"      onclick="window.toggleSitemap(false)">🎨 Кружки</a></li>
+            <li><a href="#map"          id="sitemap-map"          onclick="window.toggleSitemap(false)">🗺 Карта</a></li>
+            <li><a href="#achievements" id="sitemap-achievements" onclick="window.toggleSitemap(false)">🏆 Достижения</a></li>
+            <li><a href="#team"         id="sitemap-team"         onclick="window.toggleSitemap(false)">👥 Команда</a></li>
+            <li><a href="#gallery"      id="sitemap-gallery"      onclick="window.toggleSitemap(false)">🖼 Галерея</a></li>
+            <li><a href="#documents"    id="sitemap-documents"    onclick="window.toggleSitemap(false)">📄 Документы</a></li>
+        </ul>
+    </div>
 
     <main>
 
@@ -548,24 +635,69 @@
         if (btn) btn.classList.add('active');
     }
 
-    // ===== БАННЕР ОБЪЯВЛЕНИЙ =====
-    (function() {
-        fetch('/api/events').then(r => r.json()).then(events => {
-            const bar = document.getElementById('announce-bar');
-            const track = document.getElementById('announce-track');
-            if (!events || !events.length) { bar.dataset.empty = 'true'; return; }
+    // ===== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА (плашка) =====
+    window.toggleLangPanel = function(force) {
+        const panel = document.getElementById('lang-panel');
+        const btn   = document.getElementById('lang-pill-btn');
+        const open  = typeof force === 'boolean' ? force : !panel.classList.contains('open');
+        panel.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', open);
+        if (open) { window.toggleA11yPanel(false); window.toggleSitemap(false); }
+    };
+    const LANG_PILL_LABELS = { ru: 'RU', uz: 'UZ', oz: 'ЎЗ' };
+    document.addEventListener('langchange', e => {
+        const label = document.getElementById('lang-pill-label');
+        if (label) label.textContent = LANG_PILL_LABELS[e.detail.lang] || e.detail.lang.toUpperCase();
+        window.toggleLangPanel(false);
+    });
 
-            const items = events.map(e => {
-                const td = window.tData || (v => v?.ru || v?.uz || v || '');
-                const date = e.date ? td(e.date) + ' — ' : '';
-                const title = td(e.title);
-                return `<span class="announce-item"><span class="announce-dot"></span>${date}${title}</span>`;
-            }).join('');
-            // Дублируем для бесшовной анимации
-            track.innerHTML = items + items;
-        }).catch(() => {
-            document.getElementById('announce-bar').dataset.empty = 'true';
-        });
+    // ===== ПАНЕЛЬ "СПЕЦ. ВОЗМОЖНОСТИ" =====
+    window.toggleA11yPanel = function(force) {
+        const panel = document.getElementById('a11y-panel');
+        const btn   = document.getElementById('a11y-toggle-btn');
+        const open  = typeof force === 'boolean' ? force : !panel.classList.contains('open');
+        panel.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', open);
+        if (open) { window.toggleSitemap(false); window.toggleLangPanel(false); }
+    };
+
+    // ===== ПАНЕЛЬ "КАРТА САЙТА" =====
+    window.toggleSitemap = function(force) {
+        const panel   = document.getElementById('sitemap-panel');
+        const overlay = document.getElementById('sitemap-overlay');
+        const btn     = document.getElementById('sitemap-btn');
+        const open    = typeof force === 'boolean' ? force : !panel.classList.contains('open');
+        panel.classList.toggle('open', open);
+        overlay.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', open);
+        document.body.style.overflow = open ? 'hidden' : '';
+        if (open) { window.toggleA11yPanel(false); window.toggleLangPanel(false); }
+    };
+
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.a11y-dropdown')) window.toggleA11yPanel(false);
+        if (!e.target.closest('.lang-switcher'))  window.toggleLangPanel(false);
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            window.toggleA11yPanel(false);
+            window.toggleSitemap(false);
+            window.toggleLangPanel(false);
+        }
+    });
+
+    // ===== ЧАСЫ В ШАПКЕ =====
+    (function() {
+        const el = document.getElementById('gov-clock');
+        if (!el) return;
+        const tick = () => {
+            const now = new Date();
+            const time = now.toLocaleTimeString('ru-RU');
+            const date = now.toLocaleDateString('ru-RU');
+            el.textContent = `${time} (GMT+5) ${date}`;
+        };
+        tick();
+        setInterval(tick, 1000);
     })();
 
     // ===== АНИМАЦИЯ СЧЁТЧИКОВ =====
