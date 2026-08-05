@@ -963,37 +963,56 @@ body.has-global-bg .hero {
 .hero {
     position: relative;
     padding: 0;
-    text-align: center;
-    min-height: 520px;
+    text-align: left;
+    min-height: 480px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: transparent;
+    background: linear-gradient(135deg, var(--color-footer-bg) 0%, var(--color-primary) 100%);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+/* Тёмный оверлей поверх фото/видео фона, чтобы текст оставался читаемым */
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(6,30,54,0.55) 0%, rgba(6,30,54,0.75) 100%);
+    z-index: 1;
 }
 
 .hero-content {
-    padding: 80px 2rem;
+    position: relative;
+    z-index: 2;
     width: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 80px var(--container-pad);
 }
 
 .hero h1 {
-    font-size: 48px;
-    font-weight: 600;
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+    font-weight: var(--fw-h1);
     margin-bottom: 16px;
     color: #fff;
+    max-width: 640px;
 }
 
 .hero p {
     font-size: 18px;
-    color: rgba(255,255,255,0.82);
-    max-width: 500px;
-    margin: 0 auto 32px;
+    line-height: 28px;
+    color: rgba(255,255,255,0.85);
+    max-width: 560px;
+    margin: 0 0 32px;
 }
 
 .hero-buttons {
     display: flex;
     gap: 16px;
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
 }
 
@@ -1003,42 +1022,47 @@ body.has-global-bg .hero {
 /* Shared base for primary button and form submit */
 .btn-primary,
 .form-submit {
-    background: #1A3C6E;
+    background: var(--color-primary);
     color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-btn);
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: background .2s;
+    transition: var(--transition);
 }
 
 .btn-primary:hover,
 .form-submit:not(:disabled):hover {
-    background: #14305A;
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
 }
 
 .btn-primary {
-    padding: 14px 32px;
-    display: inline-block;
+    height: 48px;
+    padding: 0 28px;
+    display: inline-flex;
+    align-items: center;
 }
 
 .btn-secondary {
-    background: #fff;
-    color: #1a1a1a;
-    border: 1px solid #ddd;
-    padding: 14px 32px;
-    border-radius: 6px;
+    background: transparent;
+    color: #fff;
+    border: 1.5px solid #fff;
+    height: 48px;
+    padding: 0 28px;
+    border-radius: var(--radius-btn);
     font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
-    transition: border-color .2s, color .2s;
+    transition: var(--transition);
     text-decoration: none;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
 }
 
 .btn-secondary:hover {
-    border-color: #1A3C6E;
-    color: #1A3C6E;
+    background: rgba(255,255,255,0.12);
 }
 
 /* =============================================
@@ -2618,7 +2642,8 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
     .gov-header-phone { display: none; }
     .logo-emblem { width: 44px; height: 44px; }
 
-    .hero h1 { font-size: 28px; }
+    .hero { min-height: 400px; }
+    .hero h1 { font-size: 32px; line-height: 40px; }
     .hero p   { font-size: 15px; }
 
     .stats-bar { flex-direction: column; }
