@@ -98,8 +98,8 @@ window.renderAchievements = function(data) {
 
         const imgBlock = thumb
             ? `<div class="ach-img">
-                   <img src="${esc(thumb)}" alt="${esc(window.tData(a.title))}" loading="lazy">
-                   ${count > 1 ? `<span class="ach-img-count">📷 ${count}</span>` : ''}
+                   <img src="${esc(thumb)}" alt="${esc(window.tData(a.title))}" loading="lazy" onerror="window.imgFallback(this,'trophy')">
+                   ${count > 1 ? `<span class="ach-img-count"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg> ${count}</span>` : ''}
                </div>`
             : `<div class="ach-img ach-img-placeholder">
                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">

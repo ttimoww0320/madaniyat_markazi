@@ -12,7 +12,7 @@ const EVENT_ICONS = {
 function buildEventCard(ev) {
     const esc = window.escapeHtml;
     const imageContent = ev.image
-        ? `<img src="${esc(ev.image)}" alt="${esc(window.tData(ev.title))}" style="width:100%;height:100%;object-fit:cover;">`
+        ? `<img src="${esc(ev.image)}" alt="${esc(window.tData(ev.title))}" style="width:100%;height:100%;object-fit:cover;" onerror="window.imgFallback(this,'calendar')">`
         : `<svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                ${EVENT_ICONS[ev.color] || EVENT_ICONS.blue}
            </svg>`;

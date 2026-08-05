@@ -8,7 +8,7 @@ function personSVG(size) {
 
 function photoAvatar(photo, cssClass, fallbackSvg) {
     if (photo) {
-        return `<div class="avatar ${cssClass}" style="padding:0;overflow:hidden;"><img src="${photo}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"></div>`;
+        return `<div class="avatar ${cssClass}" style="padding:0;overflow:hidden;"><img src="${photo}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" onerror="window.imgFallback(this,'person')"></div>`;
     }
     return `<div class="avatar ${cssClass}">${fallbackSvg}</div>`;
 }
@@ -115,7 +115,7 @@ window.openBioModal = function(idx) {
     document.getElementById('bio-modal-content').innerHTML = `
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
             ${d.photo
-                ? `<img src="${esc(d.photo)}" alt="" style="width:72px;height:72px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+                ? `<div style="width:72px;height:72px;border-radius:50%;flex-shrink:0;overflow:hidden;"><img src="${esc(d.photo)}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="window.imgFallback(this,'person')"></div>`
                 : `<div style="width:72px;height:72px;border-radius:50%;background:var(--color-border);flex-shrink:0;"></div>`}
             <div>
                 <div style="font-size:18px;font-weight:700;color:var(--color-primary);">${esc(d.name)}</div>

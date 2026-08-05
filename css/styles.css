@@ -1469,6 +1469,20 @@ a.news-card--link {
 .news-img-error {
     background: linear-gradient(135deg, var(--color-primary-light), var(--color-border));
 }
+
+/* Единый фолбэк для сломанных изображений (карточки событий/достижений, аватары) */
+.img-fallback-tile {
+    background: var(--color-bg-alt) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.img-fallback-tile svg {
+    width: 48px;
+    height: 48px;
+    color: var(--color-border) !important;
+    flex-shrink: 0;
+}
 .news-img-video { position: relative; }
 .news-play-btn {
     position: absolute;
@@ -1730,6 +1744,9 @@ a.news-card--link {
     position: absolute;
     bottom: 8px;
     right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
     background: rgba(0,0,0,.55);
     color: #fff;
     font-size: 12px;
