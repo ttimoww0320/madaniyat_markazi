@@ -61,7 +61,7 @@ window.renderTeam = function(data) {
 
     return `
 <section class="section" id="team">
-    <div class="section-center">
+    <div class="section-block">
         <h2 class="section-title">${window.t('sections.team')}</h2>
         <p class="section-subtitle">${window.t('sections.teamSub')}</p>
     </div>

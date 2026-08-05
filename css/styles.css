@@ -498,12 +498,11 @@ body.has-global-bg .hero {
     width: 48px;
     height: 3px;
     background: var(--color-primary);
-    margin: 12px auto 0;
+    margin: 12px 0 0;
     border-radius: 2px;
 }
 
-.section-center {
-    text-align: center;
+.section-block {
     margin-bottom: 40px;
 }
 

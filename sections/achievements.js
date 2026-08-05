@@ -137,7 +137,7 @@ window.renderAchievements = function(data) {
 
     return `
 <section class="section" id="achievements">
-    <div class="section-center">
+    <div class="section-block">
         <h2 class="section-title">${window.t('sections.achievements')}</h2>
         <p class="section-subtitle">${window.t('sections.achievementsSub')}</p>
     </div>

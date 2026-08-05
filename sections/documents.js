@@ -40,7 +40,7 @@ window.renderDocuments = function(data) {
     return `
 <div class="section-gray">
     <section class="section" id="documents">
-        <div class="section-center">
+        <div class="section-block">
             <h2 class="section-title">${window.t('sections.documents')}</h2>
             <p class="section-subtitle">${window.t('sections.documentsSub')}</p>
         </div>
