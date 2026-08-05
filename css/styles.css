@@ -1,4 +1,47 @@
 /* =============================================
+   ДИЗАЙН-ТОКЕНЫ (gov.uz стиль)
+   ============================================= */
+:root {
+    /* Цвета */
+    --color-bg: #FFFFFF;
+    --color-bg-alt: #F5F7FA;
+    --color-text: #1A1A1A;
+    --color-text-secondary: #5A6472;
+    --color-primary: #0E67B3;
+    --color-primary-hover: #0A5292;
+    --color-primary-light: #E8F1F9;
+    --color-border: #E2E6EB;
+    --color-footer-bg: #0B2E4F;
+    --color-footer-text: #C7D3DF;
+    --color-success: #1E8E3E;
+    --color-error: #D93025;
+
+    /* Типографика */
+    --font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    --fs-h1: 44px;   --lh-h1: 52px;  --fw-h1: 700;
+    --fs-h2: 28px;   --lh-h2: 36px;  --fw-h2: 700;
+    --fs-h3: 18px;   --lh-h3: 26px;  --fw-h3: 600;
+    --fs-body: 16px; --lh-body: 24px; --fw-body: 400;
+    --fs-small: 14px; --lh-small: 20px;
+    --fs-nav: 15px;  --fw-nav: 500;
+
+    /* Сетка и отступы */
+    --container-max: 1200px;
+    --container-pad: 24px;
+    --section-pad-y: 64px;
+    --gap-cards: 24px;
+    --card-pad: 24px;
+
+    /* Скругления и тени */
+    --radius-card: 12px;
+    --radius-btn: 8px;
+    --radius-badge: 6px;
+    --shadow-card: 0 1px 3px rgba(16, 42, 67, 0.08);
+    --shadow-card-hover: 0 8px 24px rgba(16, 42, 67, 0.12);
+    --transition: all 0.2s ease;
+}
+
+/* =============================================
    ИНТЕРАКТИВНАЯ КАРТА
    ============================================= */
 .map-layout {
@@ -359,10 +402,20 @@
 }
 
 body {
-    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #0d1a3a;
-    color: #1a1a1a;
-    line-height: 1.6;
+    font-family: var(--font-family);
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: var(--lh-body);
+    font-size: var(--fs-body);
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 /* Скролл-реveal для карточек. Объявлено рано в файле: специфичность совпадает
@@ -775,13 +828,13 @@ body.has-global-bg .hero {
 .logo-emblem {
     width: 100px;
     height: 100px;
-    background: #fff;
-    border-radius: 50%;
+    background: transparent;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 0 0 2px #C8A84B;
+    box-shadow: none;
 }
 
 .logo-text {
@@ -801,6 +854,7 @@ body.has-global-bg .hero {
     width: 100%;
     padding: 0 16px;
     min-height: 57px;
+    background: #F0F0F0;
 }
 
 .nav-links {
