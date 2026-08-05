@@ -2426,8 +2426,8 @@ a.doc-download:hover { color: var(--color-primary-hover); }
    FOOTER
    ============================================= */
 .footer {
-    background: linear-gradient(180deg, #0f2a52 0%, #1A3C6E 100%);
-    color: rgba(255,255,255,.85);
+    background: var(--color-footer-bg);
+    color: var(--color-footer-text);
     padding: 0;
     border-top: none;
 }
@@ -2470,13 +2470,14 @@ a.doc-download:hover { color: var(--color-primary-hover); }
 .footer-col--brand { flex: 1.4; }
 
 .footer-col-title {
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: .12em;
-    color: #C8A84B;
+    letter-spacing: .06em;
+    color: #fff;
     padding-bottom: 10px;
-    border-bottom: 1px solid rgba(200,168,75,.3);
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(255,255,255,.15);
 }
 
 /* Бренд-колонка */
@@ -2494,7 +2495,7 @@ a.doc-download:hover { color: var(--color-primary-hover); }
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 0 0 3px #C8A84B, 0 2px 8px rgba(0,0,0,.15);
+    box-shadow: 0 0 0 3px var(--color-primary), 0 2px 8px rgba(0,0,0,.15);
 }
 .footer-logo-text {
     font-weight: 700;
@@ -2505,7 +2506,7 @@ a.doc-download:hover { color: var(--color-primary-hover); }
 .footer-brand-desc {
     font-size: 13px;
     line-height: 1.8;
-    color: rgba(255,255,255,.6);
+    color: var(--color-footer-text);
 }
 
 /* Соцсети — иконки кнопки */
@@ -2518,19 +2519,19 @@ a.doc-download:hover { color: var(--color-primary-hover); }
 .footer-soc-btn {
     width: 38px;
     height: 38px;
-    border-radius: 6px;
+    border-radius: var(--radius-btn);
     background: rgba(255,255,255,.1);
     border: 1px solid rgba(255,255,255,.15);
-    color: rgba(255,255,255,.8);
+    color: var(--color-footer-text);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background .2s, border-color .2s, color .2s, transform .2s;
+    transition: var(--transition);
 }
 .footer-soc-btn svg { width: 18px; height: 18px; }
 .footer-soc-btn:hover {
-    background: #C8A84B;
-    border-color: #C8A84B;
+    background: var(--color-primary);
+    border-color: var(--color-primary);
     color: #fff;
     transform: translateY(-2px);
 }
@@ -2542,8 +2543,8 @@ a.doc-download:hover { color: var(--color-primary-hover); }
     gap: 10px 20px;
 }
 .footer-nav-grid a {
-    font-size: 13px;
-    color: rgba(255,255,255,.7);
+    font-size: 15px;
+    color: var(--color-footer-text);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -2563,15 +2564,15 @@ a.doc-download:hover { color: var(--color-primary-hover); }
     align-items: flex-start;
     gap: 10px;
     font-size: 13px;
-    color: rgba(255,255,255,.75);
+    color: var(--color-footer-text);
     line-height: 1.5;
 }
 .fci-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
 .footer-contact-item a {
-    color: rgba(255,255,255,.75);
+    color: var(--color-footer-text);
     transition: color .2s;
 }
-.footer-contact-item a:hover { color: #C8A84B; }
+.footer-contact-item a:hover { color: #fff; }
 
 /* Нижняя строка */
 .footer-bottom {
@@ -2898,17 +2899,17 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
    ============================================= */
 #back-to-top {
     position: fixed;
-    bottom: 32px;
-    right: 32px;
-    width: 46px;
-    height: 46px;
+    bottom: 24px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     border: none;
-    background: #1A3C6E;
+    background: var(--color-primary);
     color: #fff;
     font-size: 20px;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,.14);
+    box-shadow: var(--shadow-card-hover);
     opacity: 0;
     visibility: hidden;
     transform: translateY(12px);
@@ -2921,7 +2922,7 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
     transform: translateY(0);
 }
 #back-to-top:hover {
-    background: #14305a;
+    background: var(--color-primary-hover);
 }
 
 /* =============================================
