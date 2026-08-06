@@ -840,15 +840,16 @@ body.has-global-bg .hero {
 
 /* Герб — круглый значок с официальным стилем */
 .logo-emblem {
-    width: 100px;
-    height: 100px;
+    width: 44px;
+    height: 44px;
     background: transparent;
-    border-radius: 0;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     box-shadow: none;
+    color: var(--color-primary);
 }
 
 .logo-text {

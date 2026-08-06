@@ -510,17 +510,8 @@ function applyScrollAnimation(containerEl) {
     });
 }
 
-// Единый фолбэк для сломанных изображений: onerror="window.imgFallback(this,'calendar')"
-const IMG_FALLBACK_ICONS = {
-    calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
-    trophy:   '<path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M7 5H4a1 1 0 00-1 1v1a4 4 0 004 4M17 5h3a1 1 0 011 1v1a4 4 0 01-4 4"/>',
-    person:   '<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>',
-};
-window.imgFallback = function(img, icon) {
-    const wrap = img.parentElement;
-    if (wrap) wrap.classList.add('img-fallback-tile');
-    img.outerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IMG_FALLBACK_ICONS[icon] || IMG_FALLBACK_ICONS.person}</svg>`;
-};
+// window.imgFallback определён инлайн-скриптом в начале <body> в dom-kultury.html
+// (должен быть готов до первого onerror ещё до загрузки этого файла)
 
 // Общая разметка для кнопки «показать ещё» (используется в circles/achievements/events/documents/team)
 window.renderToggleBtn = function(btnId, onclickCall) {
