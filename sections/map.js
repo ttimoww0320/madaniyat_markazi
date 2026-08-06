@@ -16,7 +16,7 @@
   /* ── HTML секции ── */
   window.renderMap = function (data) {
     return `
-<section class="section section-gray map-section" id="map">
+<section class="section map-section" id="map">
   <div class="section-header">
     <h2 class="section-title">${window.t('sections.map')}</h2>
     <p class="section-subtitle">${window.t('sections.mapSubtitle')}</p>

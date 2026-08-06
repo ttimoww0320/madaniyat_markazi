@@ -38,15 +38,13 @@ window.renderDocuments = function(data) {
     const smallRows = data.small.map(doc => buildDocRow(doc, esc, false, false)).join('');
 
     return `
-<div class="section-gray">
-    <section class="section" id="documents">
-        <div class="section-block">
-            <h2 class="section-title">${window.t('sections.documents')}</h2>
-            <p class="section-subtitle">${window.t('sections.documentsSub')}</p>
-        </div>
-        <div class="docs-main docs-list">${mainRows}</div>
-        ${hasMore ? window.renderToggleBtn('docs-toggle-btn', 'window.toggleDocuments()') : ''}
-        <div class="docs-small docs-list">${smallRows}</div>
-    </section>
-</div>`;
+<section class="section" id="documents">
+    <div class="section-block">
+        <h2 class="section-title">${window.t('sections.documents')}</h2>
+        <p class="section-subtitle">${window.t('sections.documentsSub')}</p>
+    </div>
+    <div class="docs-main docs-list">${mainRows}</div>
+    ${hasMore ? window.renderToggleBtn('docs-toggle-btn', 'window.toggleDocuments()') : ''}
+    <div class="docs-small docs-list">${smallRows}</div>
+</section>`;
 };
