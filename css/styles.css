@@ -39,11 +39,25 @@
     --shadow-card: 0 1px 3px rgba(16, 42, 67, 0.08);
     --shadow-card-hover: 0 8px 24px rgba(16, 42, 67, 0.12);
     --transition: all 0.2s ease;
+
+    /* Шкала наложения (z-index) — единый источник истины для всех перекрывающих слоёв */
+    --z-content: 1;        /* обычный контент секций (в т.ч. изолированный контекст карты Leaflet) */
+    --z-back-to-top: 900;  /* кнопка "наверх" */
+    --z-header: 1000;      /* sticky-шапка (topbar + основная навигация) */
+    --z-mobile-menu: 1100; /* мобильное меню, панель "Карта сайта" и их оверлеи */
+    --z-modal: 1200;       /* модалки: лайтбокс галереи, запись, достижения */
 }
 
 /* =============================================
    ИНТЕРАКТИВНАЯ КАРТА
    ============================================= */
+/* Leaflet использует внутренние z-index до 700 (panes/popup) — изолируем их
+   в собственном контексте наложения, чтобы они не пробивали sticky-шапку */
+.map-section {
+    position: relative;
+    z-index: var(--z-content);
+    isolation: isolate;
+}
 .map-layout {
     display: flex;
     gap: 0;
@@ -538,7 +552,7 @@ body.has-global-bg .hero {
     top: 0;
     background: var(--color-bg);
     box-shadow: 0 1px 1px rgba(0,0,0,.1);
-    z-index: 100;
+    z-index: var(--z-header);
     transition: box-shadow .2s ease;
 }
 .header--scrolled {
@@ -917,7 +931,7 @@ body.has-global-bg .hero {
     position: fixed;
     inset: 0;
     background: rgba(13,26,58,.4);
-    z-index: 199;
+    z-index: var(--z-mobile-menu);
 }
 .sitemap-overlay.open { display: block; }
 .sitemap-panel {
@@ -931,7 +945,7 @@ body.has-global-bg .hero {
     max-width: 85vw;
     background: var(--color-bg);
     box-shadow: -8px 0 24px rgba(0,0,0,.15);
-    z-index: 200;
+    z-index: calc(var(--z-mobile-menu) + 1);
     padding: 20px;
     transition: right .25s ease;
     overflow-y: auto;
@@ -1604,7 +1618,7 @@ a.news-card--link {
     inset: 0;
     background: rgba(0,0,0,.55);
     backdrop-filter: blur(4px);
-    z-index: 9999;
+    z-index: var(--z-modal);
     align-items: center;
     justify-content: center;
     padding: 20px;
@@ -2263,7 +2277,7 @@ a.doc-download:hover { color: var(--color-primary-hover); }
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,.88);
-    z-index: 9999;
+    z-index: var(--z-modal);
     align-items: center;
     justify-content: center;
     padding: 16px;
@@ -2367,7 +2381,8 @@ a.doc-download:hover { color: var(--color-primary-hover); }
     cursor: pointer;
     padding: 8px;
     position: relative;
-    z-index: 100;
+    /* Кнопка (она же крестик закрытия) должна оставаться поверх открытого .nav */
+    z-index: calc(var(--z-mobile-menu) + 1);
 }
 .burger-btn span {
     display: block;
@@ -2663,7 +2678,7 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
         right: 0;
         bottom: 0;
         background: var(--color-bg);
-        z-index: 99;
+        z-index: var(--z-mobile-menu);
     }
     .nav.open { display: flex; }
     .nav-links {
@@ -2784,7 +2799,7 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,.55);
-    z-index: 1000;
+    z-index: var(--z-modal);
     align-items: center;
     justify-content: center;
     padding: 16px;
@@ -2905,7 +2920,7 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
     visibility: hidden;
     transform: translateY(12px);
     transition: opacity .3s, transform .3s, visibility .3s, background .2s;
-    z-index: 999;
+    z-index: var(--z-back-to-top);
 }
 #back-to-top.visible {
     opacity: 1;
