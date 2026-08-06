@@ -50,7 +50,6 @@ window.renderCircles = function(data) {
         const card = `
         <div class="circle-card">
             <div class="circle-cover">
-                <div class="circle-cover-flag"><span style="background:#1DAEEF"></span><span style="background:#fff"></span><span style="background:#1EB57E"></span></div>
                 <div class="circle-cover-wm" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none">${iconMarkupWhite}</svg>
                 </div>

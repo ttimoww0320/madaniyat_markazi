@@ -1,14 +1,5 @@
 window._galleryData = [];
 
-// Подписи из Telegram-синка иногда приходят уже HTML-энкоженными (напр. "A&#33;");
-// декодируем сущности перед экранированием, иначе escapeHtml задваивает "&" и на
-// странице виден сырой текст вроде "A&amp;#33;".
-function decodeEntities(str) {
-    const ta = document.createElement('textarea');
-    ta.innerHTML = str ?? '';
-    return ta.value;
-}
-
 window.renderGallery = function(data) {
     window._galleryData = data;
 
@@ -43,7 +34,7 @@ window.renderGallery = function(data) {
              ${count > 0 ? `onclick="window.openGalleryItem(${idx})"` : ''}>
             ${imgEl}
             <div class="news-body">
-                <h3 class="news-title">${esc(decodeEntities(window.tData(item.alt)))}</h3>
+                <h3 class="news-title">${esc(window.tData(item.alt))}</h3>
             </div>
         </div>`;
     };
@@ -85,7 +76,7 @@ window.openGalleryItem = function(idx) {
     const item = window._galleryData[idx];
     if (!item || !item.photos || !item.photos.length) return;
     _lbPhotos  = item.photos;
-    _lbTitle   = decodeEntities(window.tData(item.alt)) || '';
+    _lbTitle   = window.decodeEntities(window.tData(item.alt)) || '';
     _lbCurrent = 0;
     _lbRender();
     document.getElementById('lightbox').style.display = 'flex';

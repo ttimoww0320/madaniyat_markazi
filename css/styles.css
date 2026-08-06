@@ -533,16 +533,6 @@ body.has-global-bg .hero {
 /* =============================================
    HEADER
    ============================================= */
-/* Флаг Узбекистана — тонкая полоса сверху */
-.flag-stripe {
-    display: flex;
-    height: 5px;
-    width: 100%;
-}
-.flag-stripe .fs-blue  { flex: 1; background: #1DAEEF; }
-.flag-stripe .fs-white { flex: 1; background: #fff; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
-.flag-stripe .fs-green { flex: 1; background: #1EB57E; }
-
 .header {
     position: sticky;
     top: 0;
@@ -916,6 +906,11 @@ body.has-global-bg .hero {
 .gov-nav-sitemap-wrap .sitemap-btn { width: 24px; }
 .gov-nav-sitemap-wrap .sitemap-btn span { background: var(--color-text); }
 
+/* На широком десктопе меню уже показано текстом целиком — иконка-гамбургер рядом с ним лишняя */
+@media (min-width: 1025px) {
+    .gov-nav-sitemap-wrap { display: none; }
+}
+
 /* ===== Панель "Карта сайта" ===== */
 .sitemap-overlay {
     display: none;
@@ -1154,33 +1149,17 @@ body.has-global-bg .hero {
 .event-image.yellow { background: linear-gradient(135deg, #F6EFDC, #E3CE8E); color: #8A6A1F; }
 .event-image.green  { background: linear-gradient(135deg, var(--color-bg-alt), #C7CDD4); color: #4A5568; }
 
-/* Цветной индикатор категории поверх изображения */
-.event-image::before {
-    content: '';
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    box-shadow: 0 0 0 2px #fff;
-}
-.event-image.yellow::before { background: #8A6A1F; }
-.event-image.green::before  { background: #4A5568; }
-
 .event-content {
     padding: var(--card-pad);
 }
 
-.event-date {
+.event-date,
+.event-date.yellow,
+.event-date.green {
     font-size: 14px;
     font-weight: 600;
     color: var(--color-primary);
 }
-
-.event-date.yellow { color: #8A6A1F; }
-.event-date.green  { color: #4A5568; }
 
 .event-title {
     font-size: var(--fs-h3);
@@ -1229,14 +1208,6 @@ body.has-global-bg .hero {
     background: linear-gradient(180deg, var(--color-primary-hover) 0%, var(--color-primary) 100%);
     overflow: hidden;
 }
-
-.circle-cover-flag {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    display: flex;
-}
-.circle-cover-flag span { flex: 1; }
 
 .circle-cover-wm {
     position: absolute;

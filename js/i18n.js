@@ -61,8 +61,17 @@
         document.documentElement.lang = _lang === 'oz' ? 'uz-Cyrl' : _lang;
     }
 
+    // Контент из Telegram-синка иногда приходит уже HTML-энкоженным (напр. "A&#33;") —
+    // декодируем перед экранированием, иначе escapeHtml задваивает "&" и на странице
+    // виден сырой текст вроде "A&amp;#33;" вместо декодированного символа.
+    function decodeEntities(s) {
+        const ta = document.createElement('textarea');
+        ta.innerHTML = String(s ?? '');
+        return ta.value;
+    }
+
     function escapeHtml(s) {
-        return String(s ?? '')
+        return decodeEntities(s)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
@@ -70,8 +79,9 @@
             .replace(/'/g, '&#39;');
     }
 
-    window.i18n      = { t, tData, getLang, setLang, init, LANGS, DEFAULT };
-    window.t         = t;
+    window.i18n           = { t, tData, getLang, setLang, init, LANGS, DEFAULT };
+    window.t              = t;
+    window.decodeEntities = decodeEntities;
     window.tData     = tData;
     window.escapeHtml = escapeHtml;
 })();
