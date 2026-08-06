@@ -1,5 +1,14 @@
 window._galleryData = [];
 
+// Подписи из Telegram-синка иногда приходят уже HTML-энкоженными (напр. "A&#33;");
+// декодируем сущности перед экранированием, иначе escapeHtml задваивает "&" и на
+// странице виден сырой текст вроде "A&amp;#33;".
+function decodeEntities(str) {
+    const ta = document.createElement('textarea');
+    ta.innerHTML = str ?? '';
+    return ta.value;
+}
+
 window.renderGallery = function(data) {
     window._galleryData = data;
 
@@ -24,17 +33,17 @@ window.renderGallery = function(data) {
             ? `<div class="news-img news-img-loading">
                 <img src="${esc(cover)}" alt="" loading="lazy"
                     onload="this.parentElement.classList.remove('news-img-loading')"
-                    onerror="this.parentElement.classList.add('news-img-error');this.remove()">
+                    onerror="window.imgFallback(this,'camera')">
                 ${count > 1 ? `<span class="gallery-count">${count > 9 ? '9+' : count + '+'}</span>` : ''}
                </div>`
-            : `<div class="news-img news-img-placeholder"></div>`;
+            : `<div class="news-img news-img-placeholder img-fallback-tile"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
 
         return `
         <div class="news-card gallery-card${count > 0 ? ' clickable' : ''}"
              ${count > 0 ? `onclick="window.openGalleryItem(${idx})"` : ''}>
             ${imgEl}
             <div class="news-body">
-                <h3 class="news-title">${esc(window.tData(item.alt))}</h3>
+                <h3 class="news-title">${esc(decodeEntities(window.tData(item.alt)))}</h3>
             </div>
         </div>`;
     };
@@ -76,7 +85,7 @@ window.openGalleryItem = function(idx) {
     const item = window._galleryData[idx];
     if (!item || !item.photos || !item.photos.length) return;
     _lbPhotos  = item.photos;
-    _lbTitle   = window.tData(item.alt) || '';
+    _lbTitle   = decodeEntities(window.tData(item.alt)) || '';
     _lbCurrent = 0;
     _lbRender();
     document.getElementById('lightbox').style.display = 'flex';
