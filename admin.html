@@ -2038,6 +2038,9 @@ function renderDocMainItem(doc) {
     const titleIn  = mlInput(doc.title, 'Название документа');
     const descIn   = mlInput(doc.description || '', 'Описание');
     const colorSel = select([['red','🔴 Красный'],['green','🟢 Зелёный'],['blue','🔵 Синий'],['yellow','🟡 Жёлтый']], doc.color);
+    // Тип определяет, в каком выпадающем подпункте меню "Документы" на сайте
+    // окажется документ (см. sections/documents.js DOC_GROUPS).
+    const typeSel = select([['postanovlenie','Постановление'],['prikaz','Приказ'],['normativ','Нормативный акт']], doc.type || 'postanovlenie');
 
     const fileField = docUploadField(doc.file, doc.size, () => {});
 
@@ -2050,6 +2053,7 @@ function renderDocMainItem(doc) {
 
     row.appendChild(fieldGroup('Название', titleIn));
     row.appendChild(fieldGroup('Описание', descIn));
+    row.appendChild(fieldGroup('Тип', typeSel));
     row.appendChild(fieldGroup('Цвет', colorSel));
     row.appendChild(fileField);
     row.appendChild(delWrapper);
@@ -2058,6 +2062,7 @@ function renderDocMainItem(doc) {
         id: doc.id || Date.now(),
         title: titleIn.getValue(),
         description: descIn.getValue(),
+        type: typeSel.value,
         size: fileField._getSize() || doc.size,
         color: colorSel.value,
         file: fileField._getFile()
@@ -2067,7 +2072,7 @@ function renderDocMainItem(doc) {
 
 function addDocMain() {
     document.getElementById('docs-main-list').appendChild(
-        renderDocMainItem({ id: Date.now(), title: '', description: '', size: '', color: 'blue', file: '' })
+        renderDocMainItem({ id: Date.now(), title: '', description: '', type: 'postanovlenie', size: '', color: 'blue', file: '' })
     );
 }
 

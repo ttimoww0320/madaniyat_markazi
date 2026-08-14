@@ -1035,12 +1035,17 @@ function cleanOrphanedUploads() {
             const raw = fs.readFileSync(path.join(dataDir, f), 'utf8');
             for (const m of raw.matchAll(/uploads\/([^"'\s\\]+)/g)) used.add(m[1]);
         }
-        for (const f of fs.readdirSync(ROOT)) {
-            if (!f.endsWith('.html') && !f.endsWith('.js')) continue;
-            try {
-                const raw = fs.readFileSync(path.join(ROOT, f), 'utf8');
-                for (const m of raw.matchAll(/uploads\/([^"'\s\\)]+)/g)) used.add(m[1]);
-            } catch {}
+        const scanDirs = [ROOT, path.join(ROOT, 'partials'), path.join(ROOT, 'sections')];
+        for (const dir of scanDirs) {
+            let files;
+            try { files = fs.readdirSync(dir); } catch { continue; }
+            for (const f of files) {
+                if (!f.endsWith('.html') && !f.endsWith('.js')) continue;
+                try {
+                    const raw = fs.readFileSync(path.join(dir, f), 'utf8');
+                    for (const m of raw.matchAll(/uploads\/([^"'\s\\)]+)/g)) used.add(m[1]);
+                } catch {}
+            }
         }
         const now = Date.now();
         let deleted = 0;

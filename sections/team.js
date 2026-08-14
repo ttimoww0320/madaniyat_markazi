@@ -62,11 +62,11 @@ window.renderTeam = function(data) {
     return `
 <section class="section" id="team">
     <div class="section-block">
-        <h2 class="section-title">${window.t('sections.team')}</h2>
+        <h1 class="section-title">${window.t('sections.team')}</h1>
         <p class="section-subtitle">${window.t('sections.teamSub')}</p>
     </div>
 
-    <div class="director-card">
+    <div class="director-card" id="team-director">
         ${photoAvatar(director.photo, 'lg', personSVG(56))}
         <span class="badge purple">${window.t('team.director')}</span>
         <h3 class="name-lg">${director.name}</h3>
@@ -96,9 +96,9 @@ window.renderTeam = function(data) {
         </a>
     </div>
 
-    <div class="deputies-grid">${deputyCards}</div>
+    <div class="deputies-grid" id="team-deputies">${deputyCards}</div>
     ${deputies.length > 4 ? window.renderToggleBtn('deputy-toggle-btn', 'window.toggleDeputies()') : ''}
-    <div class="staff-grid">${staffCards}</div>
+    <div class="staff-grid" id="team-staff">${staffCards}</div>
 </section>`;
 };
 

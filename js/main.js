@@ -1,13 +1,21 @@
-// Список секций: id контейнера → render-функция
+// Список секций: id контейнера → render-функция.
+// section-team/section-documents — полные секции (team.html, documents.html);
+// section-team-teaser/section-documents-teaser — компактные анонсы на главной.
+// На каждой странице реально существует только часть контейнеров — loadSections()
+// фетчит и рендерит только то, что найдёт в DOM.
 const SECTIONS = [
-    { id: 'section-news',         api: 'news',         render: () => window.renderNews         },
-    { id: 'section-events',       api: 'events',       render: () => window.renderEvents       },
-    { id: 'section-circles',      api: 'circles',      render: () => window.renderCircles      },
-    { id: 'section-map',          api: 'map',          render: () => window.renderMap          },
-    { id: 'section-achievements', api: 'achievements', render: () => window.renderAchievements },
-    { id: 'section-team',         api: 'team',         render: () => window.renderTeam         },
-    { id: 'section-gallery',      api: 'gallery',      render: () => window.renderGallery      },
-    { id: 'section-documents',    api: 'documents',    render: () => window.renderDocuments    },
+    { id: 'section-news',              api: 'news',         render: () => window.renderNews             },
+    { id: 'section-events',            api: 'events',       render: () => window.renderEvents           },
+    { id: 'section-circles',           api: 'circles',      render: () => window.renderCircles          },
+    { id: 'section-map',               api: 'map',          render: () => window.renderMap              },
+    { id: 'section-achievements',      api: 'achievements', render: () => window.renderAchievements     },
+    { id: 'section-team',              api: 'team',         render: () => window.renderTeam             },
+    { id: 'section-team-teaser',       api: 'team',         render: () => window.renderTeamTeaser       },
+    { id: 'section-gallery',           api: 'gallery',      render: () => window.renderGallery          },
+    { id: 'section-documents',         api: 'documents',    render: () => window.renderDocuments        },
+    { id: 'section-documents-teaser',  api: 'documents',    render: () => window.renderDocumentsTeaser  },
+    { id: 'section-contacts',          api: 'contact',      render: () => window.renderContactsPage     },
+    { id: 'section-all-numbers',       api: 'team',         render: () => window.renderAllNumbers       },
 ];
 
 // Секции у которых есть .section-gray обёртка
@@ -18,8 +26,16 @@ const _cache = {};
 let   _cachedSiteData = null;
 
 async function loadSections() {
+    // Поисковый индекс собираем заново при каждой полной загрузке секций —
+    // динамический контент (новости/кружки/события/документы/команда)
+    // добавляется в индекс сразу после рендера соответствующей секции.
+    window.searchIndexReset();
+
+    // На отдельных страницах (team.html, documents.html и т.п.) в DOM есть только
+    // часть контейнеров — не тратим запросы на секции, которых на странице нет.
+    const activeSections = SECTIONS.filter(({ id }) => document.getElementById(id));
     await Promise.all(
-        SECTIONS.map(async ({ id, api, render }) => {
+        activeSections.map(async ({ id, api, render }) => {
             try {
                 const res  = await fetch(`/api/${api}`);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -29,8 +45,10 @@ async function loadSections() {
                 if (el) {
                     el.innerHTML = render()(data);
                     applyScrollAnimation(el);
+                    window.searchIndexAddSection(api, data);
                 }
                 if (api === 'map' && window._mapAfterRender) window._mapAfterRender(data);
+                if (id === 'section-contacts' && window._contactsAfterRender) window._contactsAfterRender(data);
             } catch (err) {
                 console.error(`Ошибка загрузки секции "${api}":`, err);
                 const el = document.getElementById(id);
@@ -42,14 +60,17 @@ async function loadSections() {
 
 // Перерендерить все секции с закэшированными данными (при смене языка)
 function rerenderSections() {
+    window.searchIndexReset();
     SECTIONS.forEach(({ id, api, render }) => {
         if (!_cache[api]) return;
         const el = document.getElementById(id);
         if (el) {
             el.innerHTML = render()(_cache[api]);
             applyScrollAnimation(el);
+            window.searchIndexAddSection(api, _cache[api]);
         }
         if (api === 'map' && window._mapAfterRender) window._mapAfterRender(_cache[api]);
+        if (id === 'section-contacts' && window._contactsAfterRender) window._contactsAfterRender(_cache[api]);
     });
 }
 
@@ -138,7 +159,7 @@ function applySiteData(data) {
     const bar = document.getElementById('stats-bar');
     if (bar) {
         const esc = window.escapeHtml;
-        let tiles = (data.stats && data.stats.length)
+        const tiles = (data.stats && data.stats.length)
             ? data.stats.map(s =>
                 `<div class="stat-item">
                     <span class="stat-num" data-target="${esc(s.value)}" data-suffix="${esc(s.suffix || '')}">0</span>
@@ -146,12 +167,6 @@ function applySiteData(data) {
                 </div>`
               ).join('')
             : '';
-        if (typeof data._visitorsToday === 'number') {
-            tiles += `<div class="stat-item">
-                <span class="stat-num" data-target="${data._visitorsToday}" data-suffix="">0</span>
-                <span class="stat-label">${esc(window.t('stats.visitorsToday'))}</span>
-            </div>`;
-        }
         if (tiles) {
             bar.innerHTML = tiles;
             if (window.initStatsAnimation) window.initStatsAnimation();
@@ -163,10 +178,6 @@ async function loadSite() {
     const res = await fetch('/api/site');
     if (!res.ok) return null;
     const data = await res.json();
-    try {
-        const visRes = await fetch('/api/visitors-public');
-        if (visRes.ok) data._visitorsToday = (await visRes.json()).today;
-    } catch {}
     _cachedSiteData = data;
     applySiteData(data);
     return data;
@@ -206,8 +217,27 @@ function applyNavStrings() {
         'nav-team':         'nav.team',
         'nav-gallery':      'nav.gallery',
         'nav-documents':    'nav.documents',
+        'nav-contact':      'nav.contact',
     };
     Object.entries(navMap).forEach(([id, key]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        // У пунктов с dropdown (напр. "Команда") текст лежит в .nav-dropdown-label —
+        // рядом со стрелкой-шевроном, которую textContent стёр бы целиком.
+        const label = el.querySelector('.nav-dropdown-label');
+        if (label) label.textContent = window.t(key); else el.textContent = window.t(key);
+    });
+
+    const navDropdownSubMap = {
+        'nav-team-sub-director':    'team.nav.director',
+        'nav-team-sub-deputies':    'team.nav.deputies',
+        'nav-team-sub-staff':       'team.nav.staff',
+        'nav-contact-sub-contacts': 'nav.contact',
+        'nav-contact-sub-numbers':  'contact.nav.allNumbers',
+        'nav-contact-sub-bank':     'contact.nav.bankDetails',
+        'nav-contact-sub-feedback': 'contact.nav.feedback',
+    };
+    Object.entries(navDropdownSubMap).forEach(([id, key]) => {
         const el = document.getElementById(id);
         if (el) el.textContent = window.t(key);
     });
@@ -221,6 +251,7 @@ function applyNavStrings() {
         'footer-fnav-team':         'nav.team',
         'footer-fnav-gallery':      'nav.gallery',
         'footer-fnav-documents':    'nav.documents',
+        'footer-fnav-contact':      'nav.contact',
     };
     Object.entries(footerNavMap).forEach(([id, key]) => {
         const el = document.getElementById(id);
@@ -236,6 +267,7 @@ function applyNavStrings() {
         team:         '<circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.5 3-5 7-5s7 1.5 7 5"/><circle cx="17.5" cy="9" r="2.3"/><path d="M23 20c0-2.7-2-4.3-4.5-4.7"/>',
         gallery:      '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
         documents:    '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>',
+        contact:      '<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>',
     };
     const sitemapNavMap = {
         'sitemap-news':         ['news', 'nav.news'],
@@ -246,6 +278,7 @@ function applyNavStrings() {
         'sitemap-team':         ['team', 'nav.team'],
         'sitemap-gallery':      ['gallery', 'nav.gallery'],
         'sitemap-documents':    ['documents', 'nav.documents'],
+        'sitemap-contact':      ['contact', 'nav.contact'],
     };
     Object.entries(sitemapNavMap).forEach(([id, [iconKey, key]]) => {
         const el = document.getElementById(id);
@@ -253,6 +286,56 @@ function applyNavStrings() {
         const icon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SITEMAP_ICON_PATHS[iconKey]}</svg>`;
         el.innerHTML = icon + window.escapeHtml(window.t(key));
     });
+
+    // Хлебные крошки на отдельных страницах (team.html, documents.html)
+    const bcHome = document.getElementById('bc-home');
+    if (bcHome) bcHome.textContent = window.t('nav.home');
+    const bcCurrent = document.getElementById('bc-current');
+    if (bcCurrent && bcCurrent.dataset.i18n) bcCurrent.textContent = window.t(bcCurrent.dataset.i18n);
+    const bcMid = document.getElementById('bc-mid');
+    if (bcMid && bcMid.dataset.i18n) bcMid.textContent = window.t(bcMid.dataset.i18n);
+    const bcNav = document.querySelector('.breadcrumbs');
+    if (bcNav) bcNav.setAttribute('aria-label', window.t('a11y.breadcrumbs'));
+
+    const contactsLabel = document.getElementById('gov-contacts-label');
+    if (contactsLabel) contactsLabel.textContent = window.t('nav.contact');
+
+    // Гос.плашка шапки (пилюля с названием хокимията, "ОФИЦИАЛЬНЫЙ САЙТ" + район, герб, баннер)
+    const govTextMap = {
+        'gov-orgs-pill-text': 'gov.orgsPill',
+        'gov-official-label': 'gov.officialSite',
+        'gov-locality-text':  'gov.localityName',
+    };
+    Object.entries(govTextMap).forEach(([id, key]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = window.t(key);
+    });
+    const govLocalityLink = document.getElementById('gov-locality-link');
+    if (govLocalityLink) govLocalityLink.setAttribute('aria-label', window.t('gov.homeAria'));
+    const govEmblemImg = document.getElementById('gov-emblem-img');
+    if (govEmblemImg) govEmblemImg.setAttribute('alt', window.t('gov.emblemAlt'));
+    const govBannerImg = document.getElementById('gov-building-banner-img');
+    if (govBannerImg) govBannerImg.setAttribute('alt', window.t('gov.bannerAlt'));
+
+    const searchInput = document.getElementById('site-search-input');
+    if (searchInput) {
+        searchInput.placeholder = window.t('search.placeholder');
+        searchInput.setAttribute('aria-label', window.t('search.ariaLabel'));
+    }
+    const searchBtn = document.querySelector('.header-search-btn');
+    if (searchBtn) {
+        searchBtn.setAttribute('aria-label', window.t('search.ariaLabel'));
+        searchBtn.setAttribute('title', window.t('search.ariaLabel'));
+    }
+    const searchClose = document.getElementById('site-search-close');
+    if (searchClose) searchClose.setAttribute('aria-label', window.t('search.close'));
+    const searchOverlay = document.getElementById('site-search-overlay');
+    if (searchOverlay) searchOverlay.setAttribute('aria-label', window.t('search.ariaLabel'));
+    // Если панель открыта при смене языка — переотрисуем результаты под новый язык
+    const currentQuery = searchInput ? searchInput.value.trim() : '';
+    if (currentQuery.length >= 2 && searchOverlay && searchOverlay.classList.contains('open')) {
+        window.searchRenderResults && window.searchRenderResults(currentQuery);
+    }
 }
 
 // Обновить форму контакта при смене языка
@@ -301,6 +384,17 @@ function applyContactStrings() {
     if (navTitle) navTitle.textContent = window.t('footer.sections');
     const contactsTitle = document.getElementById('footer-col-contacts-title');
     if (contactsTitle) contactsTitle.textContent = window.t('nav.contact');
+}
+
+// Универсальный перевод статичной разметки: <span data-i18n="ключ">.
+// Используется на страницах-«скелетах» (bank-details.html и т.п.), где нет
+// смысла заводить отдельный render()/API — значения там всё равно плейсхолдеры.
+// bc-current/bc-mid переводятся отдельно в applyNavStrings (крошки нужны раньше).
+function applyGenericI18n() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        if (el.id === 'bc-current' || el.id === 'bc-mid') return;
+        el.textContent = window.t(el.dataset.i18n);
+    });
 }
 
 // aria-label/title у статичных элементов шапки и модалок (не перерисовываются — переводим отдельно)
@@ -353,33 +447,22 @@ async function loadContactFooter() {
             clock:  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
         };
 
-        const el = document.getElementById('footer-contact-list');
-        if (el) {
-            el.innerHTML = [
-                d.address ? `<div class="footer-contact-item"><span class="fci-icon">${FCI_ICONS.pin}</span><span>${esc(window.tData(d.address))}</span></div>` : '',
-                ...(d.phones || []).map(p =>
-                    `<div class="footer-contact-item"><span class="fci-icon">${FCI_ICONS.phone}</span><a href="tel:${p.number}">${esc(p.number)}</a></div>`),
-                d.email ? `<div class="footer-contact-item"><span class="fci-icon">${FCI_ICONS.mail}</span><a href="mailto:${esc(d.email)}">${esc(d.email)}</a></div>` : '',
-                d.hours?.weekdays ? `<div class="footer-contact-item"><span class="fci-icon">${FCI_ICONS.clock}</span><span>${esc(window.tData(d.hours.weekdays))}</span></div>` : '',
-            ].join('');
-        }
+        const contactItemsHtml = [
+            d.address ? `<div class="footer-contact-item"><span class="fci-icon">${FCI_ICONS.pin}</span><span>${esc(window.tData(d.address))}</span></div>` : '',
+            ...(d.phones || []).map(p =>
+                `<div class="footer-contact-item"><span class="fci-icon">${FCI_ICONS.phone}</span><a href="tel:${p.number}">${esc(p.number)}</a></div>`),
+            d.email ? `<div class="footer-contact-item"><span class="fci-icon">${FCI_ICONS.mail}</span><a href="mailto:${esc(d.email)}">${esc(d.email)}</a></div>` : '',
+            d.hours?.weekdays ? `<div class="footer-contact-item"><span class="fci-icon">${FCI_ICONS.clock}</span><span>${esc(window.tData(d.hours.weekdays))}</span></div>` : '',
+        ].join('');
 
-        const headerPhone = document.getElementById('gov-header-phone');
-        if (headerPhone) {
-            const phones = d.phones || [];
-            const first  = phones[0];
-            headerPhone.innerHTML = first ? `
-                <span class="gov-phone-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span>
-                <span class="gov-phone-text">
-                    <span class="gov-phone-label">${esc(window.t('contact.phone').replace(' *', ''))}</span>
-                    <a class="gov-phone-number" href="tel:${first.number}">${esc(first.number)}</a>
-                    ${phones.length > 1 ? `<a class="gov-phone-all" href="#contact">${esc(window.t('nav.contact'))} →</a>` : ''}
-                </span>
-            ` : '';
-        }
+        // footer-contact-list — колонка «Контакты» в подвале (на всех страницах);
+        // feedback-contact-list — тот же блок над формой на feedback.html.
+        ['footer-contact-list', 'feedback-contact-list'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = contactItemsHtml;
+        });
 
-        const socEl = document.getElementById('footer-socials-row');
-        if (socEl && d.socials?.length) {
+        if (d.socials?.length) {
             const icons = {
                 Telegram:  `<svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`,
                 Instagram: `<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>`,
@@ -388,10 +471,16 @@ async function loadContactFooter() {
             };
             const safeUrl = u => { try { const p = new URL(u); return (p.protocol === 'https:' || p.protocol === 'http:') ? p.href : '#'; } catch { return '#'; } };
             const linkIcon = `<svg viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M14 11a5 5 0 00-7.07 0l-2.83 2.83a5 5 0 007.07 7.07L12.5 19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
-            socEl.innerHTML = d.socials.map(s => `
-                <a href="${safeUrl(s.url)}" target="_blank" rel="noopener" class="footer-soc-btn" title="${esc(s.name)}">
+            const socialLinks = (btnClass) => d.socials.map(s => `
+                <a href="${safeUrl(s.url)}" target="_blank" rel="noopener" class="${btnClass}" title="${esc(s.name)}">
                     ${icons[s.name] || linkIcon}
                 </a>`).join('');
+
+            const socEl = document.getElementById('footer-socials-row');
+            if (socEl) socEl.innerHTML = socialLinks('footer-soc-btn');
+
+            const newsSocEl = document.getElementById('news-socials-row');
+            if (newsSocEl) newsSocEl.innerHTML = socialLinks('news-soc-btn');
         }
     } catch (e) {
         console.warn('[loadContactFooter] Не удалось загрузить контакты:', e.message);
@@ -481,6 +570,7 @@ document.addEventListener('langchange', () => {
     applyNavStrings();
     applyContactStrings();
     applyA11yStrings();
+    applyGenericI18n();
     rerenderSections();
     if (_cachedSiteData) {
         applySiteData(_cachedSiteData);
@@ -549,7 +639,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     applyNavStrings();
     applyContactStrings();
     applyA11yStrings();
+    applyGenericI18n();
 
     // Инициализируем форму
     initContactForm();
+
+    // Секции до этого момента были скелетонами меньшей высоты — браузер уже
+    // прыгнул к якорю из URL (#gallery и т.п.), но целился в старую разметку.
+    // После рендера реального контента высота страницы изменилась — довернём скролл.
+    if (location.hash) {
+        const target = document.querySelector(location.hash);
+        // behavior:'instant' — с глобальным CSS scroll-behavior:smooth анимация
+        // прокрутки то и дело обрывается на середине (мешают догружающиеся картинки/
+        // карта), и страница застревает у самого верха вместо нужной секции.
+        if (target) target.scrollIntoView({ block: 'start', behavior: 'instant' });
+        // Убираем якорь из адресной строки — иначе он "прилипает" и обычный
+        // Ctrl+Shift+R на этой же вкладке снова прыгает к разделу вместо верха страницы.
+        history.replaceState(null, '', location.pathname + location.search);
+    }
 });

@@ -1,5 +1,6 @@
 {
   "nav": {
+    "home":         "Bosh sahifa",
     "news":         "Yangiliklar",
     "events":       "Afisha",
     "circles":      "To'garaklar",
@@ -12,6 +13,7 @@
   },
   "sections": {
     "news":            "Yangiliklar",
+    "newsAll":         "Barcha yangiliklar",
     "events":          "Yaqinlashayotgan tadbirlar",
     "circles":         "To'garaklar va seksiyalar",
     "map":             "Interaktiv xarita",
@@ -25,6 +27,39 @@
     "documents":       "Hujjatlar",
     "documentsSub":    "Rasmiy hujjatlar va litsenziyalar"
   },
+  "news": {
+    "readInTelegram": "Telegramda o'qish →"
+  },
+  "gov": {
+    "orgsPill":     "Yunusobod tumani hokimiyati",
+    "officialSite": "RASMIY SAYT",
+    "localityName": "YUNUSOBOD TUMANI",
+    "homeAria":     "Bosh sahifaga",
+    "emblemAlt":    "O'zbekiston Respublikasi gerbi",
+    "bannerAlt":    "O'zbekiston Mustaqilligining 35 yilligi"
+  },
+  "search": {
+    "placeholder": "Sayt bo'yicha qidiruv…",
+    "ariaLabel":   "Sayt bo'yicha qidiruv",
+    "close":       "Yopish",
+    "emptyTitle":  "«{q}» so'rovi bo'yicha hech narsa topilmadi",
+    "type": {
+      "section":  "Bo'lim",
+      "news":     "Yangilik",
+      "circle":   "To'garak",
+      "event":    "Tadbir",
+      "document": "Hujjat",
+      "staff":    "Xodim"
+    },
+    "group": {
+      "section":  "Bo'limlar",
+      "news":     "Yangiliklar",
+      "circle":   "To'garaklar",
+      "event":    "Tadbirlar",
+      "document": "Hujjatlar",
+      "staff":    "Xodimlar"
+    }
+  },
   "circles": {
     "schedule":    "Dars jadvali",
     "teacher":     "O'qituvchi",
@@ -37,21 +72,70 @@
     "showAll":  "Barchasini ko'rish →",
     "hideAll":  "Yashirish ↑",
     "enroll":   "Yozilish",
-    "download": "↓ Yuklab olish"
+    "download": "↓ Yuklab olish",
+    "openSource": "Manbani ochish"
   },
   "team": {
     "director": "Rahbar",
     "hours":    "Qabul soatlari",
     "bioBtn":   "Batafsil",
+    "viewAll":  "Butun jamoa",
     "bio": {
       "born":           "Tug'ilgan yili",
       "education":      "Ma'lumoti",
       "specialization": "Mutaxassisligi",
       "career":         "Mehnat faoliyati"
+    },
+    "nav": {
+      "director": "Rahbariyat",
+      "deputies": "Markaz rahbarlari",
+      "staff":    "Mutaxassislar"
+    }
+  },
+  "documents": {
+    "viewAll": "Barcha hujjatlar",
+    "group": {
+      "postanovlenie": "Qarorlar",
+      "prikaz":        "Buyruqlar",
+      "normativ":      "Normativ hujjatlar"
     }
   },
   "map": {
     "selectSector": "Xaritadan sektor tanlang"
+  },
+  "contactsPage": {
+    "subtitle":   "Yunusobod tumani Madaniyat bo'limining kontakt ma'lumotlari",
+    "phone":      "Telefon",
+    "hotline":    "Ishonch telefoni",
+    "website":    "Veb-sayt",
+    "email":      "Elektron manzil",
+    "socials":    "Ijtimoiy tarmoqlar",
+    "address":    "Manzil",
+    "transport":  "Transport",
+    "hours":      "Ish vaqti",
+    "hoursExtra": "tushlik 13:00–14:00; Shanba, Yakshanba — dam olish kuni",
+    "mapTitle":   "Yo'nalish xaritasi",
+    "openYandex": "Yandex Xaritada ochish"
+  },
+  "allNumbersPage": {
+    "subtitle":     "Madaniyat bo'limi xodimlarining to'liq telefon reyestri",
+    "colContact":   "Telefon / Email",
+    "colPerson":    "F.I.Sh. va lavozimi",
+    "groupGeneral": "Umumiy raqamlar",
+    "reception":    "Qabulxona",
+    "office":       "Devonxona"
+  },
+  "bankDetailsPage": {
+    "subtitle":     "Yunusobod tumani Madaniyat bo'limining naqd bo'lmagan hisob-kitoblar uchun rekvizitlari",
+    "orgName":      "Tashkilotning to'liq nomi (mablag' oluvchi)",
+    "account":      "Hisob-kitob raqami (x/r)",
+    "bank":         "Bank / HKM",
+    "mfo":          "MFO (bank kodi)",
+    "inn":          "STIR (INN)",
+    "treasury":     "G'aznachilik hisobi (ShXR)",
+    "legalAddress": "Yuridik manzil",
+    "accPhone":     "Telefon (buxgalteriya)",
+    "oked":         "OKED kodi"
   },
   "contact": {
     "title":           "Ariza qoldirish",
@@ -76,7 +160,13 @@
     "sending":         "Yuborilmoqda...",
     "sent":            "✓ Ariza yuborildi!",
     "error":           "✗ Xatolik, qayta urinib ko'ring",
-    "noConn":          "✗ Ulanish yo'q"
+    "noConn":          "✗ Ulanish yo'q",
+    "tbd":             "aniqlanmoqda",
+    "nav": {
+      "allNumbers":  "Barcha raqamlar",
+      "bankDetails": "Bank rekvizitlari",
+      "feedback":    "Aloqa uchun"
+    }
   },
   "enroll": {
     "title":         "To'garakka yozilish",
@@ -99,9 +189,6 @@
     "official": "Rasmiy sayt",
     "sections": "Sayt bo'limlari"
   },
-  "stats": {
-    "visitorsToday": "Bugun tashrif buyurganlar"
-  },
   "freshness": {
     "updated":    "Yangilandi",
     "justNow":    "hozirgina",
@@ -111,6 +198,7 @@
   },
   "a11y": {
     "mainNav":       "Asosiy navigatsiya",
+    "breadcrumbs":   "Sahifa yo'li",
     "accessibility": "Qulaylik",
     "increaseFont":  "Shriftni kattalashtirish",
     "decreaseFont":  "Shriftni kichiklashtirish",

@@ -1,7 +1,3 @@
-window.toggleAchievements = function() {
-    window._toggleSection('.ach-extra-item', 'ach-toggle-btn');
-};
-
 window.openAchModal = function(idx) {
     const modal = document.getElementById('ach-modal');
     const data  = window._achData;
@@ -88,10 +84,12 @@ window.renderAchievements = function(data) {
     if (!data || !data.length) return '';
     window._achData = data;
 
-    const hasMore = data.length > 4;
+    // На главной показываем сжатый ряд — не более 4 карточек, без "показать ещё"
+    // (полный список достижений отдельной страницы не имеет).
+    const shown = data.slice(0, 4);
 
     const esc = window.escapeHtml;
-    const cards = data.map((a, i) => {
+    const cards = shown.map((a, i) => {
         const images = (a.images && a.images.length) ? a.images : (a.image ? [a.image] : []);
         const thumb  = images[0];
         const count  = images.length;
@@ -109,9 +107,8 @@ window.renderAchievements = function(data) {
                    </svg>
                </div>`;
 
-        const extra = i >= 4;
         return `
-        <div class="ach-card${extra ? ' ach-extra-item' : ''}"${extra ? ' style="display:none"' : ''}
+        <div class="ach-card"
              onclick="window.openAchModal(${i})" role="button" tabindex="0"
              onkeydown="if(event.key==='Enter')window.openAchModal(${i})">
             ${imgBlock}
@@ -142,7 +139,6 @@ window.renderAchievements = function(data) {
         <p class="section-subtitle">${window.t('sections.achievementsSub')}</p>
     </div>
     <div class="ach-grid">${cards}</div>
-    ${hasMore ? window.renderToggleBtn('ach-toggle-btn', 'window.toggleAchievements()') : ''}
 </section>
 ${modal}`;
 };
