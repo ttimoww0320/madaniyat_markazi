@@ -963,6 +963,26 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
+    // Allowlist: раздаём только публичные каталоги сайта и страницы верхнего
+    // уровня — не весь корень проекта (иначе утекают .env, index.js, data/,
+    // logs/, node_modules/ и т.п., которые формально тоже "внутри ROOT").
+    const PUBLIC_DIRS      = ['css', 'js', 'uploads', 'sections', 'partials', 'locales'];
+    const PUBLIC_ROOT_EXTS = new Set(['.html', '.txt', '.xml', '.ico']);
+    const segments = normalizedFile.slice(normalizedRoot.length).split(path.sep).filter(Boolean);
+    const isPublicDirFile  = segments.length > 1 && PUBLIC_DIRS.includes(segments[0]);
+    const isPublicRootFile = segments.length === 1
+        && !segments[0].startsWith('.')
+        && PUBLIC_ROOT_EXTS.has(path.extname(segments[0]).toLowerCase());
+    if (!isPublicDirFile && !isPublicRootFile) {
+        const page404 = path.join(ROOT, '404.html');
+        fs.readFile(page404, (err2, html) => {
+            if (err2) { res.writeHead(404); res.end('404 Not Found'); return; }
+            res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+            res.end(html);
+        });
+        return;
+    }
+
     const ext  = path.extname(filePath);
     const mime = MIME_TYPES[ext] || 'application/octet-stream';
 
