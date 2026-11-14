@@ -33,7 +33,7 @@
                 </div>
                 <div class="gov-topbar-right">
                     <div class="gov-building-banner">
-                        <img id="gov-building-banner-img" src="/uploads/building.webp" alt="35 лет Независимости Узбекистана" width="420" height="82" onerror="this.parentElement.style.display='none'">
+                        <img id="gov-building-banner-img" src="/img/building.webp" alt="35 лет Независимости Узбекистана" width="420" height="82" onerror="this.parentElement.style.display='none'">
                     </div>
                     <div class="gov-widgets">
                         <span class="gov-clock" id="gov-clock" aria-hidden="true"></span>
