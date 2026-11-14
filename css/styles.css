@@ -3679,3 +3679,6 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
 
 /* Резерв высоты под контент, который дорисовывается JS — подвал не прыгает вверх-вниз (CLS) */
 main { display: block; min-height: 100vh; }
+
+/* Пока применяются переводы — не показываем русский текст из HTML (см. js/i18n.js) */
+html.i18n-pending body > *:not(#splash-screen) { visibility: hidden; }

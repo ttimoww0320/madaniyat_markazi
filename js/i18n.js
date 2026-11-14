@@ -10,17 +10,32 @@
     let _lang = DEFAULT;
     try { const saved = localStorage.getItem('lang'); if (LANGS.includes(saved)) _lang = saved; } catch {}
     let _tr   = {};   // кэш переводов { lang: {…} }
+    const _loading = {}; // текущие загрузки { lang: Promise } — чтобы не качать файл дважды
 
-    async function _load(lang) {
-        if (_tr[lang]) return;
-        try {
-            const res = await fetch(`/locales/${lang}.json?v=${Date.now()}`);
-            _tr[lang] = await res.json();
-        } catch (e) {
-            console.warn(`[i18n] Не удалось загрузить ${lang}.json`);
-            _tr[lang] = {};
+    function _load(lang) {
+        if (_tr[lang]) return Promise.resolve();
+        if (!_loading[lang]) {
+            _loading[lang] = fetch(`/locales/${lang}.json?v=${Date.now()}`)
+                .then(res => res.json())
+                .then(json => { _tr[lang] = json; })
+                .catch(() => {
+                    console.warn(`[i18n] Не удалось загрузить ${lang}.json`);
+                    _tr[lang] = {};
+                });
         }
+        return _loading[lang];
     }
+
+    // HTML страниц свёрстан на русском. Если язык не русский (в т.ч. первый визит → uz),
+    // прячем страницу, пока не применятся переводы, — иначе посетитель видит русский
+    // текст, который через секунду меняется на узбекский. Снимает main.js (reveal),
+    // страховка — через 3 сек в любом случае.
+    if (_lang !== 'ru') {
+        document.documentElement.classList.add('i18n-pending');
+        setTimeout(reveal, 3000);
+    }
+    function reveal() { document.documentElement.classList.remove('i18n-pending'); }
+    _load(_lang); // начинаем качать перевод сразу, ещё до разбора страницы
 
     /** Получить статический перевод по ключу "a.b.c" */
     function t(key) {
@@ -159,7 +174,7 @@
     document.documentElement.lang = _lang === 'oz' ? 'uz-Cyrl' : _lang;
     _uzSync(); // запускаем сразу — текст конвертируется по мере разбора HTML
 
-    window.i18n           = { t, tData, getLang, setLang, init, LANGS, DEFAULT, uzLatin };
+    window.i18n           = { t, tData, getLang, setLang, init, reveal, LANGS, DEFAULT, uzLatin };
     window.t              = t;
     window.decodeEntities = decodeEntities;
     window.tData     = tData;

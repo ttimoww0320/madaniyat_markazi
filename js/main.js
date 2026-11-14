@@ -653,10 +653,22 @@ window._toggleSection = function(itemSelector, btnId) {
     btn.textContent = open ? window.t('btn.hideAll') : window.t('btn.showAll');
 };
 
+// Переводим статичный текст (шапка, меню, подвал) как только скачан файл перевода —
+// main.js подключён в конце <body>, так что разметка уже на месте. Не ждём
+// DOMContentLoaded: на главной он ждёт ещё и тяжёлые defer-скрипты карты.
+// После перевода показываем страницу (см. i18n-pending в i18n.js).
+const _i18nReady = window.i18n.init().then(() => {
+    applyNavStrings();
+    applyContactStrings();
+    applyA11yStrings();
+    applyGenericI18n();
+    window.i18n.reveal();
+});
+
 // Запускаем после загрузки DOM
 document.addEventListener('DOMContentLoaded', async () => {
     // Сначала инициализируем i18n
-    await window.i18n.init();
+    await _i18nReady;
 
     // Даты обновления новостей/галереи нужны ДО рендера секций (используются в бейджах)
     await loadFreshness();
