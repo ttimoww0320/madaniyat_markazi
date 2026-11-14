@@ -1,3 +1,14 @@
+// Дни недели в расписании хранятся по-русски ("Вт, Чт · 10:00") — переводим под язык
+const CIRCLE_DAYS = {
+    uz: { 'Пн': 'Du', 'Вт': 'Se', 'Ср': 'Çor', 'Чт': 'Pa', 'Пт': 'Ju', 'Сб': 'Şa', 'Вс': 'Ya' },
+    oz: { 'Пн': 'Ду', 'Вт': 'Се', 'Ср': 'Чор', 'Чт': 'Па', 'Пт': 'Жу', 'Сб': 'Ша', 'Вс': 'Як' },
+};
+function circleScheduleI18n(str) {
+    const map = CIRCLE_DAYS[window.i18n?.getLang()];
+    if (!map) return str;
+    return String(str).replace(/(^|[^А-Яа-яЁё])(Пн|Вт|Ср|Чт|Пт|Сб|Вс)(?![А-Яа-яЁё])/g, (m, pre, d) => pre + map[d]);
+}
+
 // Иконки по цвету кружка
 const CIRCLE_ICONS = {
     purple: `<path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
@@ -25,7 +36,7 @@ window.renderCircles = function(data) {
         if (c.schedule) {
             statCells.push(`<div class="circle-stat-cell">
                 <span class="circle-stat-cap">${window.t('circles.schedule')}</span>
-                <span class="circle-stat-val">${esc(c.schedule)}</span>
+                <span class="circle-stat-val">${esc(circleScheduleI18n(c.schedule))}</span>
             </div>`);
         }
         if (c.teacher) {

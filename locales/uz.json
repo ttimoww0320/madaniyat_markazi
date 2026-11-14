@@ -1,9 +1,9 @@
 {
   "nav": {
-    "home":         "Bosh sahifa",
+    "home":         "Boş sahifa",
     "news":         "Yangiliklar",
-    "events":       "Afisha",
-    "circles":      "To'garaklar",
+    "events":       "Afişa",
+    "circles":      "Tögaraklar",
     "map":          "Xarita",
     "achievements": "Yutuqlar",
     "team":         "Jamoa",
@@ -13,48 +13,48 @@
   },
   "sections": {
     "news":            "Yangiliklar",
-    "newsAll":         "Barcha yangiliklar",
-    "events":          "Yaqinlashayotgan tadbirlar",
-    "circles":         "To'garaklar va seksiyalar",
+    "newsAll":         "Barça yangiliklar",
+    "events":          "Yaqinlaşayotgan tadbirlar",
+    "circles":         "Tögaraklar va seksiyalar",
     "map":             "Interaktiv xarita",
-    "mapSubtitle":     "Yunusobod tumani, Toshkent shahri",
+    "mapSubtitle":     "Yunusobod tumani, Toşkent şahri",
     "mapPlaceholder":  "Xaritadan sektor tanlang",
     "achievements":    "Bizning yutuqlarimiz",
-    "achievementsSub": "Yillar davomida erishilgan mukofotlar",
+    "achievementsSub": "Yillar davomida erişilgan mukofotlar",
     "team":            "Bizning jamoamiz",
-    "teamSub":         "Madaniyatni yaqinlashtiruvchi mutaxassislar",
+    "teamSub":         "Madaniyatni yaqinlaştiruvçi mutaxassislar",
     "gallery":         "Galereya",
     "documents":       "Hujjatlar",
     "documentsSub":    "Rasmiy hujjatlar va litsenziyalar"
   },
   "news": {
-    "readInTelegram": "Telegramda o'qish →"
+    "readInTelegram": "Telegramda öqiş →"
   },
   "gov": {
     "orgsPill":     "Yunusobod tumani hokimiyati",
     "officialSite": "RASMIY SAYT",
     "localityName": "YUNUSOBOD TUMANI",
-    "homeAria":     "Bosh sahifaga",
-    "emblemAlt":    "O'zbekiston Respublikasi gerbi",
-    "bannerAlt":    "O'zbekiston Mustaqilligining 35 yilligi"
+    "homeAria":     "Boş sahifaga",
+    "emblemAlt":    "Özbekiston Respublikasi gerbi",
+    "bannerAlt":    "Özbekiston Mustaqilligining 35 yilligi"
   },
   "search": {
-    "placeholder": "Sayt bo'yicha qidiruv…",
-    "ariaLabel":   "Sayt bo'yicha qidiruv",
-    "close":       "Yopish",
-    "emptyTitle":  "«{q}» so'rovi bo'yicha hech narsa topilmadi",
+    "placeholder": "Sayt böyiça qidiruv…",
+    "ariaLabel":   "Sayt böyiça qidiruv",
+    "close":       "Yopiş",
+    "emptyTitle":  "«{q}» sörovi böyiça heç narsa topilmadi",
     "type": {
-      "section":  "Bo'lim",
+      "section":  "Bölim",
       "news":     "Yangilik",
-      "circle":   "To'garak",
+      "circle":   "Tögarak",
       "event":    "Tadbir",
       "document": "Hujjat",
       "staff":    "Xodim"
     },
     "group": {
-      "section":  "Bo'limlar",
+      "section":  "Bölimlar",
       "news":     "Yangiliklar",
-      "circle":   "To'garaklar",
+      "circle":   "Tögaraklar",
       "event":    "Tadbirlar",
       "document": "Hujjatlar",
       "staff":    "Xodimlar"
@@ -62,18 +62,18 @@
   },
   "circles": {
     "schedule":    "Dars jadvali",
-    "teacher":     "O'qituvchi",
-    "spots":       "O'rinlar",
+    "teacher":     "Öqituvçi",
+    "spots":       "Örinlar",
     "spotsLeft":   "qoldi",
-    "spotsClosed": "to'ldirilgan",
-    "waitlist":    "Kutish ro'yxati"
+    "spotsClosed": "töldirilgan",
+    "waitlist":    "Kutiş röyxati"
   },
   "btn": {
-    "showAll":  "Barchasini ko'rish →",
-    "hideAll":  "Yashirish ↑",
-    "enroll":   "Yozilish",
-    "download": "↓ Yuklab olish",
-    "openSource": "Manbani ochish"
+    "showAll":  "Barçasini köriş →",
+    "hideAll":  "Yaşiriş ↑",
+    "enroll":   "Yoziliş",
+    "download": "↓ Yuklab oliş",
+    "openSource": "Manbani oçiş"
   },
   "team": {
     "director": "Rahbar",
@@ -81,7 +81,7 @@
     "bioBtn":   "Batafsil",
     "viewAll":  "Butun jamoa",
     "bio": {
-      "born":           "Tug'ilgan yili",
+      "born":           "Tuğilgan yili",
       "education":      "Ma'lumoti",
       "specialization": "Mutaxassisligi",
       "career":         "Mehnat faoliyati"
@@ -93,7 +93,7 @@
     }
   },
   "documents": {
-    "viewAll": "Barcha hujjatlar",
+    "viewAll": "Barça hujjatlar",
     "group": {
       "postanovlenie": "Qarorlar",
       "prikaz":        "Buyruqlar",
@@ -101,45 +101,49 @@
     }
   },
   "map": {
-    "selectSector": "Xaritadan sektor tanlang"
+    "selectSector": "Xaritadan sektor tanlang",
+    "unavailable":  "Xarita vaqtinça mavjud emas"
   },
   "contactsPage": {
-    "subtitle":   "Yunusobod tumani Madaniyat bo'limining kontakt ma'lumotlari",
+    "subtitle":   "Yunusobod tumani Madaniyat bölimining kontakt ma'lumotlari",
     "phone":      "Telefon",
-    "hotline":    "Ishonch telefoni",
+    "hotline":    "Işonç telefoni",
     "website":    "Veb-sayt",
     "email":      "Elektron manzil",
     "socials":    "Ijtimoiy tarmoqlar",
     "address":    "Manzil",
     "transport":  "Transport",
-    "hours":      "Ish vaqti",
-    "hoursExtra": "tushlik 13:00–14:00; Shanba, Yakshanba — dam olish kuni",
-    "mapTitle":   "Yo'nalish xaritasi",
-    "openYandex": "Yandex Xaritada ochish"
+    "hours":      "Iş vaqti",
+    "hoursExtra": "tuşlik 13:00–14:00; Şanba, Yakşanba — dam oliş kuni",
+    "mapTitle":   "Yönaliş xaritasi",
+    "openYandex": "Yandex Xaritada oçiş"
   },
   "allNumbersPage": {
-    "subtitle":     "Madaniyat bo'limi xodimlarining to'liq telefon reyestri",
+    "subtitle":     "Madaniyat bölimi xodimlarining töliq telefon reyestri",
     "colContact":   "Telefon / Email",
-    "colPerson":    "F.I.Sh. va lavozimi",
+    "colPerson":    "F.I.Ş. va lavozimi",
     "groupGeneral": "Umumiy raqamlar",
     "reception":    "Qabulxona",
     "office":       "Devonxona"
   },
   "bankDetailsPage": {
-    "subtitle":     "Yunusobod tumani Madaniyat bo'limining naqd bo'lmagan hisob-kitoblar uchun rekvizitlari",
-    "orgName":      "Tashkilotning to'liq nomi (mablag' oluvchi)",
+    "subtitle":     "Yunusobod tumani Madaniyat bölimining naqd bölmagan hisob-kitoblar uçun rekvizitlari",
+    "orgName":      "Taşkilotning töliq nomi (mablağ oluvçi)",
     "account":      "Hisob-kitob raqami (x/r)",
     "bank":         "Bank / HKM",
     "mfo":          "MFO (bank kodi)",
     "inn":          "STIR (INN)",
-    "treasury":     "G'aznachilik hisobi (ShXR)",
+    "treasury":     "Ğaznaçilik hisobi (ŞXR)",
     "legalAddress": "Yuridik manzil",
     "accPhone":     "Telefon (buxgalteriya)",
-    "oked":         "OKED kodi"
+    "oked":         "OKED kodi",
+    "orgNameVal":   "22-sonli \"Hamid Olimjon\" nomidagi (avvalgi nomi «Aholi madaniyati va dam oliş markazi»)",
+    "bankVal":      "Markaziy bank, Ipoteka bank, Yunusobod filiali",
+    "legalAddressVal": "Toşkent ş., Yunusobod tumani, Osiyo köçasi, 40-uy"
   },
   "contact": {
-    "title":           "Ariza qoldirish",
-    "subtitle":        "Barcha savollaringizga ish kuni davomida javob beramiz",
+    "title":           "Ariza qoldiriş",
+    "subtitle":        "Barça savollaringizga iş kuni davomida javob beramiz",
     "name":            "Ismingiz *",
     "namePh":          "Ismingizni kiriting",
     "phone":           "Telefon *",
@@ -148,46 +152,46 @@
     "emailPh":         "Ixtiyoriy",
     "topic":           "Murojaat mavzusi",
     "topicPh":         "Mavzuni tanlang",
-    "topicCircle":     "To'garakka yozilish",
+    "topicCircle":     "Tögarakka yoziliş",
     "topicRent":       "Zal ijarasi",
     "topicPartner":    "Hamkorlik",
-    "topicFeedback":   "Shikoyat yoki taklif",
-    "topicOther":      "Boshqa",
+    "topicFeedback":   "Şikoyat yoki taklif",
+    "topicOther":      "Boşqa",
     "message":         "Xabar *",
     "messagePh":       "Xabaringizni yozing...",
-    "consent":         "Maxfiylik siyosatiga muvofiq shaxsiy ma'lumotlarni qayta ishlashga roziman",
-    "submit":          "Ariza yuborish",
+    "consent":         "Maxfiylik siyosatiga muvofiq şaxsiy ma'lumotlarni qayta işlaşga roziman",
+    "submit":          "Ariza yuboriş",
     "sending":         "Yuborilmoqda...",
     "sent":            "✓ Ariza yuborildi!",
-    "error":           "✗ Xatolik, qayta urinib ko'ring",
-    "noConn":          "✗ Ulanish yo'q",
+    "error":           "✗ Xatolik, qayta urinib köring",
+    "noConn":          "✗ Ulaniş yöq",
     "tbd":             "aniqlanmoqda",
     "nav": {
-      "allNumbers":  "Barcha raqamlar",
+      "allNumbers":  "Barça raqamlar",
       "bankDetails": "Bank rekvizitlari",
-      "feedback":    "Aloqa uchun"
+      "feedback":    "Aloqa uçun"
     }
   },
   "enroll": {
-    "title":         "To'garakka yozilish",
+    "title":         "Tögarakka yoziliş",
     "name":          "Ismingiz *",
     "namePh":        "Ism familiya",
     "phone":         "Telefon *",
-    "child":         "Bola ismi va yoshi",
-    "childPh":       "Masalan: Alisher, 10 yosh",
-    "submit":        "Ariza yuborish",
+    "child":         "Bola ismi va yoşi",
+    "childPh":       "Masalan: Alişer, 10 yoş",
+    "submit":        "Ariza yuboriş",
     "sending":       "Yuborilmoqda...",
     "errorRequired": "Iltimos, ism va telefonni kiriting.",
-    "errorSend":     "Xatolik yuz berdi. Qayta urinib ko'ring.",
+    "errorSend":     "Xatolik yuz berdi. Qayta urinib köring.",
     "successTitle":  "Ariza qabul qilindi!",
-    "successText":   "Tez orada siz bilan bog'lanamiz.",
-    "circleLabel":   "To'garak",
+    "successText":   "Tez orada siz bilan boğlanamiz.",
+    "circleLabel":   "Tögarak",
     "childLabel":    "Bola",
-    "noConn":        "Ulanish yo'q. Internetni tekshiring."
+    "noConn":        "Ulaniş yöq. Internetni tekşiring."
   },
   "footer": {
     "official": "Rasmiy sayt",
-    "sections": "Sayt bo'limlari"
+    "sections": "Sayt bölimlari"
   },
   "freshness": {
     "updated":    "Yangilandi",
@@ -198,22 +202,33 @@
   },
   "a11y": {
     "mainNav":       "Asosiy navigatsiya",
-    "breadcrumbs":   "Sahifa yo'li",
+    "breadcrumbs":   "Sahifa yöli",
     "accessibility": "Qulaylik",
-    "increaseFont":  "Shriftni kattalashtirish",
-    "decreaseFont":  "Shriftni kichiklashtirish",
-    "contrastTitle": "Ko'zi ojizlar uchun rejim",
+    "increaseFont":  "Şriftni kattalaştiriş",
+    "decreaseFont":  "Şriftni kiçiklaştiriş",
+    "contrastTitle": "Közi ojizlar uçun rejim",
     "contrastLabel": "Yuqori kontrast",
     "specialFeatures": "Maxsus imkoniyatlar",
-    "fontSize":        "Shrift o'lchami",
+    "fontSize":        "Şrift ölçami",
     "sitemap":          "Sayt xaritasi",
     "menu":          "Menyu",
-    "close":         "Yopish",
+    "close":         "Yopiş",
     "back":          "Orqaga",
     "next":          "Oldinga",
-    "backToTop":     "Yuqoriga"
+    "backToTop":     "Yuqoriga",
+    "logo":          "Logotip"
   },
   "errors": {
-    "sectionLoad": "Bo'limni yuklab bo'lmadi. Sahifani yangilab ko'ring."
+    "sectionLoad": "Bölimni yuklab bölmadi. Sahifani yangilab köring."
+  },
+  "pageTitle": {
+    "org": "Yunusobod tumani madaniyat bölimi",
+    "home": "Rasmiy sayt",
+    "team": "Jamoa",
+    "documents": "Hujjatlar",
+    "contacts": "Kontaktlar",
+    "allNumbers": "Barça raqamlar",
+    "bankDetails": "Bank rekvizitlari",
+    "feedback": "Murojaat"
   }
 }

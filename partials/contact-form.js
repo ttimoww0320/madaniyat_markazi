@@ -13,7 +13,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label" id="lbl-phone" for="field-phone">Телефон *</label>
-                    <input type="tel" id="field-phone" class="form-input" placeholder="+998 (__) ___-__-__" required>
+                    <input type="tel" id="field-phone" class="form-input" placeholder="+998 (__) ___-__-__" inputmode="tel" autocomplete="tel" maxlength="20" required>
                 </div>
             </div>
             <div class="form-row">
@@ -32,6 +32,11 @@
                         <option value="other">Другое</option>
                     </select>
                 </div>
+            </div>
+            <!-- honeypot: скрыто от людей, боты заполняют -->
+            <div class="form-hp" aria-hidden="true">
+                <label for="field-website">Website</label>
+                <input type="text" id="field-website" name="website" tabindex="-1" autocomplete="off">
             </div>
             <div class="form-group">
                 <label class="form-label" id="lbl-message" for="field-message">Сообщение *</label>

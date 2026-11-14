@@ -45,7 +45,7 @@
                                 </button>
                                 <div class="lang-panel" id="lang-panel">
                                     <button class="lang-btn active" data-lang="ru" onclick="window.i18n.setLang('ru')">Русский</button>
-                                    <button class="lang-btn"        data-lang="uz" onclick="window.i18n.setLang('uz')">O'zbek</button>
+                                    <button class="lang-btn"        data-lang="uz" onclick="window.i18n.setLang('uz')">Özbek</button>
                                     <button class="lang-btn"        data-lang="oz" onclick="window.i18n.setLang('oz')">Ўзбек</button>
                                 </div>
                             </div>
@@ -80,7 +80,7 @@
             <div class="gov-mainbar-inner">
                 <div class="logo">
                     <div class="logo-emblem" aria-hidden="true">
-                        <img src="/uploads/logo.png" alt="Логотип" width="44" height="44" style="object-fit:contain;" onerror="window.imgFallback(this,'landmark')">
+                        <img src="/img/logo-128.webp" alt="Логотип" width="44" height="44" style="object-fit:contain;" onerror="window.imgFallback(this,'landmark')">
                     </div>
                     <span class="logo-text" id="logo-text">Дом культуры</span>
                 </div>

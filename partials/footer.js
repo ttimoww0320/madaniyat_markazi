@@ -13,7 +13,7 @@
             <div class="footer-col footer-col--brand">
                 <div class="footer-logo">
                     <div class="footer-logo-icon">
-                        <img src="/uploads/logo.png" alt="Логотип" width="40" height="40" style="object-fit:contain;" onerror="window.imgFallback(this,'landmark')">
+                        <img src="/img/logo-128.webp" alt="Логотип" width="40" height="40" style="object-fit:contain;" onerror="window.imgFallback(this,'landmark')">
                     </div>
                     <span class="footer-logo-text" id="footer-logo-text">Дом культуры</span>
                 </div>

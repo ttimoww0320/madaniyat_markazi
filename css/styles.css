@@ -547,6 +547,8 @@ body.has-global-bg .hero {
 }
 .breadcrumbs a {
     color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
 .breadcrumbs a:hover {
     text-decoration: underline;
@@ -3241,8 +3243,8 @@ a.doc-download:hover { color: var(--color-primary-hover); }
     flex-shrink: 0;
 }
 .footer-flag-mini span { flex: 1; }
-.footer-copy { font-size: 12px; color: rgba(255,255,255,.45); }
-.footer-official { font-size: 12px; color: rgba(255,255,255,.35); }
+.footer-copy { font-size: 12px; color: rgba(255,255,255,.75); }
+.footer-official { font-size: 12px; color: rgba(255,255,255,.7); }
 
 /* Мобильная адаптация */
 @media (max-width: 900px) {
@@ -3671,3 +3673,9 @@ body.high-contrast .footer { background: #000; border-top: 2px solid #fff; }
     border-radius: 6px;
     background: rgba(83,74,183,.06);
 }
+
+/* Honeypot-поле формы: убрано с экрана, но не display:none (часть ботов это проверяет) */
+.form-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+/* Резерв высоты под контент, который дорисовывается JS — подвал не прыгает вверх-вниз (CLS) */
+main { display: block; min-height: 100vh; }

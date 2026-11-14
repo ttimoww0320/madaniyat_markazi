@@ -1,8 +1,7 @@
 // Страница «Все номера» — реестр телефонов по образцу gov.uz. Данные сотрудников
 // НЕ хардкодятся: строится из того же /api/team, что и window.renderTeam
 // (см. sections/team.js) — правишь номер один раз в «Команде», здесь он
-// подхватывается автоматически. Общие номера (Приёмная/Канцелярия/Телефон
-// доверия) в схеме team.json отсутствуют — статичный плейсхолдер «уточняется».
+// подхватывается автоматически.
 
 // Общий номер учреждения (data/contact.json → phones[0], «Для справок»).
 // Если он по ошибке проставлен как личный номер сотрудника в team.json,
@@ -36,15 +35,7 @@ function numbersGroupRow(label) {
 }
 
 window.renderAllNumbers = function (data) {
-    const td  = window.tData;
-    const tbd = window.t('contact.tbd');
-
-    // TODO: вписать реальные номера/почту приёмной, канцелярии и телефона доверия
-    const generalRows = [
-        window.t('allNumbersPage.reception'),
-        window.t('allNumbersPage.office'),
-        window.t('contactsPage.hotline'),
-    ].map(label => numbersRow(tbd, numbersPersonCell(label, ''))).join('');
+    const td = window.tData;
 
     const director = data.director;
     const directorRows = director
@@ -75,8 +66,6 @@ window.renderAllNumbers = function (data) {
                 </tr>
             </thead>
             <tbody>
-                ${numbersGroupRow(window.t('allNumbersPage.groupGeneral'))}
-                ${generalRows}
                 ${director ? numbersGroupRow(window.t('team.nav.director')) + directorRows : ''}
                 ${deputyRows ? numbersGroupRow(window.t('team.nav.deputies')) + deputyRows : ''}
                 ${staffRows ? numbersGroupRow(window.t('team.nav.staff')) + staffRows : ''}

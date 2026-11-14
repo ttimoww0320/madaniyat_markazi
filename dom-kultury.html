@@ -15,24 +15,25 @@
     <meta property="og:description" content="Кружки, мероприятия, афиша и новости культурной жизни Юнусабадского района Ташкента.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://yunusobod-madaniyat.uz/">
-    <meta property="og:image" content="https://yunusobod-madaniyat.uz/uploads/logo.png">
+    <meta property="og:image" content="https://yunusobod-madaniyat.uz/img/logo-512.png">
     <meta property="og:locale" content="ru_RU">
     <meta property="og:locale:alternate" content="uz_UZ">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Официальный сайт Дома культуры Юнусабадского района">
     <meta name="twitter:description" content="Кружки, мероприятия, афиша и новости культурной жизни Юнусабадского района Ташкента.">
-    <meta name="twitter:image" content="https://yunusobod-madaniyat.uz/uploads/logo.png">
+    <meta name="twitter:image" content="https://yunusobod-madaniyat.uz/img/logo-512.png">
     <!-- Favicon — герб в SVG -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%231A3C6E'/><path d='M16 4a10.5 10.5 0 100 22 8 8 0 110-16 10.5 10.5 0 010-6z' fill='%23C8A84B'/><polygon points='20,6 21.5,10.5 26,10.5 22.5,13.5 24,18 20,15.5 16,18 17.5,13.5 14,10.5 18.5,10.5' fill='%23C8A84B'/></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="css/styles.css">
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
     <!-- Turf.js — нарезка полигонов по границе района -->
-    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js" defer></script>
 
     <!-- i18n движок — загружать ДО секций -->
     <script src="js/i18n.js"></script>
@@ -53,7 +54,7 @@
         "alternateName": ["Дом культуры Юнусабадского района", "Yunusobod madaniyat markazi"],
         "description": "Официальный сайт Дома культуры Юнусабадского района Ташкента. Кружки, мероприятия, афиша, новости культурной жизни.",
         "url": "https://yunusobod-madaniyat.uz",
-        "logo": "https://yunusobod-madaniyat.uz/uploads/logo.png",
+        "logo": "https://yunusobod-madaniyat.uz/img/logo-512.png",
         "address": {
             "@type": "PostalAddress",
             "addressLocality": "Ташкент",
@@ -103,14 +104,14 @@
         </div>
         <div class="splash-content">
             <div class="splash-logo-row">
-                <img src="uploads/logo.png" alt="Логотип" class="splash-logo-img" onerror="this.style.display='none'">
+                <img src="/img/logo-384.webp" alt="Логотип" class="splash-logo-img" onerror="this.style.display='none'">
                 <div class="splash-divider"></div>
                 <div class="splash-text-wrapper">
                     <div class="splash-flag-cover"></div>
                     <div class="splash-text-block">
-                        <span class="splash-text-top">TOSHKENT SHAHAR</span>
+                        <span class="splash-text-top">TOŞKENT ŞAHAR</span>
                         <span class="splash-text-main">YUNUSOBOD</span>
-                        <span class="splash-text-bottom">TUMANI MADANIYAT BO'LIMI</span>
+                        <span class="splash-text-bottom">TUMANI MADANIYAT BÖLIMI</span>
                     </div>
                 </div>
             </div>

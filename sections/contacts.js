@@ -65,9 +65,24 @@ window.renderContactsPage = function (data) {
 </section>`;
 };
 
+/* ── Заглушка на случай, если тайлы карты не загрузились (сеть/блокировка) ── */
+function _contactsShowMapFallback(address) {
+    const wrap = document.getElementById('contacts-leaflet-map');
+    if (!wrap || wrap.dataset.fallbackShown) return;
+    wrap.dataset.fallbackShown = '1';
+    wrap.innerHTML = `
+      <div class="map-fallback" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;height:100%;min-height:320px;text-align:center;padding:24px;color:var(--color-text-secondary);background:var(--color-bg-alt);border-radius:var(--radius-card);">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 4v13M15 7v13"/></svg>
+        <p style="font-weight:600;">${window.t('map.unavailable')}</p>
+        ${address ? `<p style="font-size:14px;">${window.escapeHtml(address)}</p>` : ''}
+      </div>`;
+}
+
 /* ── Простая Leaflet-карта с одним маркером (вызывается после вставки HTML) ── */
 window._contactsAfterRender = function (data) {
-    if (!window.L || !document.getElementById('contacts-leaflet-map')) return;
+    if (!document.getElementById('contacts-leaflet-map')) return;
+    const address = window.tData(data.address) || '';
+    if (!window.L) { _contactsShowMapFallback(address); return; }
     if (window._contactsLeafletMap) { window._contactsLeafletMap.remove(); window._contactsLeafletMap = null; }
 
     const center = CONTACTS_MAP_CENTER;
@@ -75,12 +90,15 @@ window._contactsAfterRender = function (data) {
     const map = L.map('contacts-leaflet-map', {
         center, zoom: 16, zoomControl: true, scrollWheelZoom: false,
     });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
         maxZoom: 18,
     }).addTo(map);
 
-    const address = window.tData(data.address) || '';
+    let tileLoadedOk = false;
+    tileLayer.on('load', () => { tileLoadedOk = true; });
+    setTimeout(() => { if (!tileLoadedOk) _contactsShowMapFallback(address); }, 8000);
+
     L.marker(center).addTo(map).bindPopup(window.escapeHtml(address)).openPopup();
 
     // Клик по карте (не по элементам управления) открывает эту точку в Яндекс Картах.

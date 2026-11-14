@@ -30,6 +30,7 @@ test.describe('Секции: граница между Кружки/Карта �
 test.describe('Интерактивная карта', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('/dom-kultury.html');
+        await page.locator('#leaflet-map').scrollIntoViewIfNeeded(); // карта грузится лениво, при подлёте к экрану
         await page.locator('#leaflet-map .leaflet-tile, #leaflet-map svg').first().waitFor({ timeout: 15000 });
     });
 
@@ -39,6 +40,7 @@ test.describe('Интерактивная карта', () => {
         page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
 
         await page.reload();
+        await page.locator('#leaflet-map').scrollIntoViewIfNeeded(); // карта грузится лениво, при подлёте к экрану
         await page.locator('#leaflet-map .leaflet-tile, #leaflet-map svg').first().waitFor({ timeout: 15000 });
 
         expect(errors, `Ошибки в консоли: ${errors.join('; ')}`).toEqual([]);

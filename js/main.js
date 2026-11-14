@@ -421,6 +421,30 @@ function applyA11yStrings() {
         Object.entries(attrs).forEach(([attr, key]) => el.setAttribute(attr, window.t(key)));
     });
 
+    const extraAria = {
+        'nav-team-panel':    'nav.team',
+        'nav-contact-panel': 'nav.contact',
+        'sitemap-panel':     'a11y.sitemap',
+    };
+    Object.entries(extraAria).forEach(([id, key]) => {
+        const el = document.getElementById(id);
+        if (el) el.setAttribute('aria-label', window.t(key));
+    });
+    document.querySelectorAll('.sitemap-close').forEach(b => b.setAttribute('aria-label', window.t('a11y.close')));
+    document.querySelectorAll('img[src*="/img/logo-"]').forEach(img => img.setAttribute('alt', window.t('a11y.logo')));
+
+    // Заголовок вкладки браузера — на текущем языке
+    const page = {
+        'team.html': 'team', 'documents.html': 'documents', 'contacts.html': 'contacts',
+        'all-numbers.html': 'allNumbers', 'bank-details.html': 'bankDetails', 'feedback.html': 'feedback',
+    }[location.pathname.split('/').pop()] || 'home';
+    const org = window.t('pageTitle.org');
+    if (org !== 'pageTitle.org') {
+        document.title = page === 'home'
+            ? `${org} — ${window.t('pageTitle.home')}`
+            : `${window.t('pageTitle.' + page)} — ${org}`;
+    }
+
     const textMap = {
         'a11y-panel-title':    'a11y.specialFeatures',
         'sitemap-panel-title': 'a11y.sitemap',
@@ -497,6 +521,13 @@ function initContactForm() {
     const topic   = document.getElementById('field-topic');
     const message = document.getElementById('field-message');
     const consent = document.getElementById('consent');
+    const website = document.getElementById('field-website');
+
+    // Маска телефона: оставляем только цифры, +, пробел, скобки и дефис
+    phone.addEventListener('input', () => {
+        const clean = phone.value.replace(/[^\d+\s()\-]/g, '');
+        if (clean !== phone.value) phone.value = clean;
+    });
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -530,7 +561,8 @@ function initContactForm() {
                     phone:   phone.value.trim(),
                     email:   email ? email.value.trim() : '',
                     topic:   topic ? topic.value : '',
-                    message: message.value.trim()
+                    message: message.value.trim(),
+                    website: website ? website.value : ''
                 })
             });
 

@@ -66,7 +66,16 @@ window.handleNavDropdownClick = function(e, wrapId) {
     e.preventDefault();
     const els = _navDropdownEls(wrapId);
     if (!els) return;
-    window.toggleNavDropdown(wrapId, !els.wrap.classList.contains('open'));
+    // На десктопе (>1024px) панель уже открывается по mouseenter — клик по самому
+    // триггеру в этом случае не должен её закрывать (иначе наведение открывает,
+    // а следующий же клик по тому же пункту тут же всё схлопывает). Клик там
+    // только гарантирует, что панель открыта; закрывается она по mouseleave/Escape.
+    // На тач/клавиатуре (<=1024px, hover недоступен) клик остаётся переключателем —
+    // это единственный способ открыть и закрыть панель.
+    const open = window.innerWidth > NAV_DROPDOWN_HOVER_MAX_WIDTH
+        ? true
+        : !els.wrap.classList.contains('open');
+    window.toggleNavDropdown(wrapId, open);
 };
 
 document.querySelectorAll('.nav-item-dropdown').forEach(wrap => {
@@ -250,10 +259,13 @@ window.searchIndexAddSection = function(api, data) {
     }
 };
 
-// Без учёта регистра, апострофов и диакритики (o'g'li = oʻgʻli)
+// Без учёта регистра, апострофов и диакритики (o'g'li = oʻgʻli = öğli),
+// новая латиница приравнена к старой: ş = sh, ç = ch (Alişer = Alisher)
 function _searchNormalize(s) {
     return String(s || '')
         .toLowerCase()
+        .replace(/ş/g, 'sh')
+        .replace(/ç/g, 'ch')
         .replace(/[ʻʼ'’‘`´]/g, '')
         .normalize('NFKD')
         .replace(/[̀-ͯ]/g, '');

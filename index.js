@@ -741,7 +741,9 @@ const server = http.createServer(async (req, res) => {
                 sendJSON(res, 400, { error: 'Некорректный JSON' }); return;
             }
 
-            const { name, phone, message, email, topic } = body;
+            const { name, phone, message, email, topic, website } = body;
+            // Honeypot: поле скрыто от людей — если заполнено, это бот. Делаем вид, что всё ок.
+            if (website) { sendJSON(res, 200, { ok: true }); return; }
             if (!name || !phone || !message) {
                 sendJSON(res, 400, { error: 'Заполните все поля' }); return;
             }
@@ -966,7 +968,7 @@ const server = http.createServer(async (req, res) => {
     // Allowlist: раздаём только публичные каталоги сайта и страницы верхнего
     // уровня — не весь корень проекта (иначе утекают .env, index.js, data/,
     // logs/, node_modules/ и т.п., которые формально тоже "внутри ROOT").
-    const PUBLIC_DIRS      = ['css', 'js', 'uploads', 'sections', 'partials', 'locales'];
+    const PUBLIC_DIRS      = ['css', 'js', 'img', 'uploads', 'sections', 'partials', 'locales'];
     const PUBLIC_ROOT_EXTS = new Set(['.html', '.txt', '.xml', '.ico']);
     const segments = normalizedFile.slice(normalizedRoot.length).split(path.sep).filter(Boolean);
     const isPublicDirFile  = segments.length > 1 && PUBLIC_DIRS.includes(segments[0]);
@@ -1007,6 +1009,7 @@ const server = http.createServer(async (req, res) => {
             'Cache-Control': cacheControl,
             'X-Content-Type-Options': 'nosniff',
             'X-Frame-Options': 'SAMEORIGIN',
+            'Referrer-Policy': 'strict-origin-when-cross-origin',
         };
         if (mime.startsWith('text/html')) {
             headers['Content-Security-Policy'] = 'upgrade-insecure-requests';

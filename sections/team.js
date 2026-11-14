@@ -37,8 +37,8 @@ window.renderTeam = function(data) {
             <span class="badge sm ${esc(d.color)}">${esc(window.tData(d.role))}</span>
             <h3 class="name-md">${esc(d.name)}</h3>
             <p class="title-sm">${esc(window.tData(d.department))}</p>
-            <p class="contact-text"><a href="tel:${esc(d.phone)}" onclick="event.stopPropagation()">${esc(d.phone)}</a></p>
-            <p class="contact-text"><a href="mailto:${esc(d.email)}" class="contact-email" onclick="event.stopPropagation()">${esc(d.email)}</a></p>
+            ${d.phone ? `<p class="contact-text"><a href="tel:${esc(d.phone)}" onclick="event.stopPropagation()">${esc(d.phone)}</a></p>` : ''}
+            ${d.email ? `<p class="contact-text"><a href="mailto:${esc(d.email)}" class="contact-email" onclick="event.stopPropagation()">${esc(d.email)}</a></p>` : ''}
             ${hasBio ? `<div style="margin-top:auto;padding:7px 0;font-size:13px;font-weight:600;color:var(--color-primary);display:flex;align-items:center;justify-content:center;gap:6px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
                 ${window.t('team.bioBtn')} →
@@ -69,7 +69,7 @@ window.renderTeam = function(data) {
     <div class="director-card" id="team-director">
         ${photoAvatar(director.photo, 'lg', personSVG(56))}
         <span class="badge purple">${window.t('team.director')}</span>
-        <h3 class="name-lg">${director.name}</h3>
+        <h2 class="name-lg">${esc(director.name)}</h2>
         <p class="title-text">${window.tData(director.title)}</p>
         <div class="hours-box">
             <div class="hours-title">
@@ -81,19 +81,19 @@ window.renderTeam = function(data) {
             </div>
             ${hourLines}
         </div>
-        <a href="tel:${director.phone}" class="contact-btn">
+        ${director.phone ? `<a href="tel:${esc(director.phone)}" class="contact-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="currentColor" stroke-width="1.5"/>
             </svg>
-            ${director.phone}
-        </a>
-        <a href="mailto:${director.email}" class="contact-btn">
+            ${esc(director.phone)}
+        </a>` : ''}
+        ${director.email ? `<a href="mailto:${esc(director.email)}" class="contact-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5"/>
                 <path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.5"/>
             </svg>
-            ${director.email}
-        </a>
+            ${esc(director.email)}
+        </a>` : ''}
     </div>
 
     <div class="deputies-grid" id="team-deputies">${deputyCards}</div>
